@@ -42,6 +42,25 @@ npm test
 # Expected: all green. Fix any failures before starting new work.
 ```
 
+### Note: Rebasing Over Merge Commits
+
+If `pr-4-macos` has absorbed an upstream merge commit (e.g., after syncing 0.9.9),
+`git rebase pr-4-macos` on the feature branch may fail with:
+
+```text
+error: Your local changes to the following files would be overwritten by merge
+```
+
+This happens because the rebase machinery leaves transient state that overlaps with
+commits being applied when a merge commit is in the history. Use `--autostash`:
+
+```bash
+git rebase --autostash pr-4-macos
+```
+
+The flag stashes any working-tree changes before rebase starts and restores them after.
+Discovered during 2026-04-18 when rebasing `feature/MacOS-post-install` onto the 0.9.9 merge.
+
 ---
 
 ## End-of-Session Checklist
