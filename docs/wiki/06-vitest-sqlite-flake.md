@@ -1,5 +1,12 @@
 # 06. Vitest + SQLite WAL Lock Flake
 
+
+> ⚠️ **UPDATE 2026-04-18:** The `singleFork` fix described in this article was
+> rejected upstream (PR #69) and is preserved here as session history only.
+> Vitest 4 removed this option — it was already a no-op when submitted.
+> **The correct fix** is `DatabaseSync.close()` in `afterEach`.
+> → [wiki/10 § Resource Contention](10-root-cause-debugging.md)
+
 **TL;DR:** Multiple vitest workers opening `DatabaseSync` connections to WAL-mode SQLite files simultaneously race for write locks, causing 60s+ timeouts. Fix: `singleFork: true` in `vitest.config.js`.
 
 ---
