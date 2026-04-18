@@ -360,3 +360,10 @@ All agent skills and lessons are organized as a linked wiki. **Read before codin
 - [ ] Final sanitized changes from feature branch(es) are cherry-picked ->pr-4-macos.
 
 ## To Do List = ./TODO.md
+
+## Helper Scripts (run on demand, never automatic)
+
+| Script | Purpose |
+| --- | --- |
+| `bash scripts/step1-sync-main.sh` | Sync local main from upstream chrysb/alphaclaw |
+| `bash scripts/step2-main-to-pr-branch.sh` | Merge upstream main into pr-4-macos (creates backup tag first) |
