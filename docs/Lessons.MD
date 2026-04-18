@@ -1,33 +1,92 @@
 # Lessons
 
-## Windows Development
+> **This is the chronological log.** For organized, cross-linked lessons see the **[wiki →](wiki/README.md)**
+> For agent behavioral rules see **[SKILL.md →](../SKILL.md)**
 
-- Use user-owned shims in `C:\Users\lab\.lmstudio\bin` instead of versioned symlinks into app install folders.
-- Anchor `node` to LM Studio's bundled runtime at `C:\Users\lab\.lmstudio\.internal\utils\node.exe` and let `npm.cmd` resolve the latest compatible npm package from `C:\Users\lab\.lmstudio\tools\npm`.
-- Resolve `git.exe` dynamically from GitHub Desktop so app updates do not break the shell setup.
-- Verify the wiring directly with `git --version`, `node --version`, and `npm --version`.
+---
 
-## AlphaClaw PR Decisions
+## Session 2026-04-13 — macOS PR Implementation
 
+### Platform / Bin-Path
+
+- Use user-owned shims in `~/.local/bin` on darwin; SIP blocks `/usr/local/bin` for non-root users.
+- Wire `getBinPath()` from `lib/platform.js` everywhere — never inline the path logic.
+- Verify with `ls ~/.local/bin/gog` after install.
+- → [wiki/02-macos-bin-path.md](wiki/02-macos-bin-path.md)
+
+### Gateway Config
+
+- Every provider in `openclaw.json` must have `models: []`. Missing it = silent 30-second gateway timeout.
+- `sanitizeOpenclawConfig()` must be called before every gateway spawn.
+- → [wiki/03-gateway-config.md](wiki/03-gateway-config.md)
+
+### macOS Cron / Scheduler
+
+- `/etc/cron.d` is root-only on macOS. Use the in-process managed scheduler on darwin.
+- Named cron tokens (`MON`, `SUN`) crash the `parseInt`-based parser — numeric-only fields only.
 - Start the managed scheduler immediately after macOS onboarding installs the hourly sync config.
-- Reject named cron tokens in the managed scheduler path because the parser only handles numeric cron fields reliably.
-- Add targeted regression tests beside the affected onboarding and system routes.
-- Keep process notes in a separate docs branch so the code-fix branch stays easy to review and merge.
+- → [wiki/04-cron-scheduler.md](wiki/04-cron-scheduler.md)
 
-## macOS Duplicate File Hazard
+### Merge Conflicts
+
+- After any conflict resolution touching `lib/server/onboarding/index.js`, run onboarding tests before pushing.
+- `ensureManagedExecDefaults` must stay inside `!validatedReadOnlyMode` — it is a security boundary.
+- Duplicate calls from merge residue break tests silently.
+- → [wiki/05-merge-conflicts.md](wiki/05-merge-conflicts.md)
+
+### AlphaClaw PR Decisions
+
+- Keep process notes in a separate docs branch so the code-fix branch stays easy to review and merge.
+- Add targeted regression tests beside the affected onboarding and system routes.
+- → [macos-post-install-lessons.md](macos-post-install-lessons.md)
+
+---
+
+## Session 2026-04-16 — Duplicate Cleanup, Vitest Fix, Upstream 0.9.8
+
+### macOS Duplicate File Hazard
 
 - macOS Finder creates numbered copies (`file 2.js`, `file 3.js`) when files are duplicated or "keep both" is selected.
-- These can silently enter git as new files — check with `find . -name "* 2.*" -o -name "* 3.*" | grep -v node_modules | grep -v .git` periodically.
-- Always use `git mv` or terminal `cp` + `git rm` — never Finder for tracked files.
+- These can silently enter git as new files. The canonical file may not exist at all — only the numbered copy.
+- **Check command:** `find . -name "* 2.*" -o -name "* 3.*" | grep -v node_modules | grep -v .git`
+- Always use `git mv` or terminal commands — never Finder for tracked files.
+- → [wiki/07-duplicate-files.md](wiki/07-duplicate-files.md)
 
-## Vitest + node:sqlite WAL Lock Flake
+### Vitest + node:sqlite WAL Lock Flake
 
-- When multiple vitest workers open `DatabaseSync` connections to the same WAL-mode SQLite file concurrently, `PRAGMA busy_timeout` retries compound into multi-minute hangs.
-- Fix: `pool: "forks"` + `poolOptions.forks.singleFork: true` in `vitest.config.js` serializes test files into one process. Suite time dropped from 64s to 7s.
+- Parallel vitest workers race on WAL write locks → `busy_timeout` retries compound → 60s+ hang.
+- Fix: `pool: "forks"` + `poolOptions.forks.singleFork: true` in `vitest.config.js`. Suite: 64s → 7s.
 - Submitted upstream as chrysb/alphaclaw#69.
+- → [wiki/06-vitest-sqlite-flake.md](wiki/06-vitest-sqlite-flake.md)
 
-## Subagent Bash Permissions
+### Subagent Bash Permissions
 
 - Background agents dispatched via the Agent tool do NOT inherit the parent session's Bash permission grants.
 - Agents that need `git`, `npm`, or shell commands will fail silently unless Bash is globally permitted in settings.
 - For this project: keep all shell/debug work in the parent session. Use subagents only for read-only file analysis.
+- → [wiki/08-subagent-bash-permissions.md](wiki/08-subagent-bash-permissions.md)
+
+### Windows Development
+
+- Use user-owned shims in `C:\Users\lab\.lmstudio\bin` instead of versioned symlinks into app install folders.
+- Anchor `node` to LM Studio's bundled runtime at `C:\Users\lab\.lmstudio\.internal\utils\node.exe`.
+- Resolve `git.exe` dynamically from GitHub Desktop so app updates do not break the shell setup.
+- Verify: `git --version`, `node --version`, `npm --version`.
+
+---
+
+## Wiki
+
+All lessons above are expanded with root causes, exact fixes, and verification commands:
+
+| # | Page | Topic |
+| --- | --- | --- |
+| 01 | [Branch Roles](wiki/01-branch-roles.md) | Which branch, which purpose, data flow |
+| 02 | [macOS Bin-Path](wiki/02-macos-bin-path.md) | SIP, `~/.local/bin`, `getBinPath()` |
+| 03 | [Gateway Config](wiki/03-gateway-config.md) | `models: []`, `sanitizeOpenclawConfig()` |
+| 04 | [Cron / Scheduler](wiki/04-cron-scheduler.md) | LaunchAgent, named token rejection |
+| 05 | [Merge Conflicts](wiki/05-merge-conflicts.md) | Read-only guard, onboarding patterns |
+| 06 | [Vitest SQLite Flake](wiki/06-vitest-sqlite-flake.md) | WAL locks, singleFork fix |
+| 07 | [Duplicate Files](wiki/07-duplicate-files.md) | macOS "keep both", dupe check command |
+| 08 | [Subagent Bash](wiki/08-subagent-bash-permissions.md) | Permission inheritance gotcha |
+| 09 | [Session Checklist](wiki/09-session-checklist.md) | Full startup/shutdown sequence |
