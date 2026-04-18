@@ -596,6 +596,26 @@ npm run build:ui          # required before local runs
 
 ---
 
+## Learning Hub
+
+All agent skills and lessons are organized as a linked wiki. **Read before coding.**
+
+| Resource | Purpose |
+| --- | --- |
+| [`SKILL.md`](SKILL.md) | **Start here.** Agent behavioral rules — every "never" with commands |
+| [`docs/wiki/README.md`](docs/wiki/README.md) | Wiki index — links to all 9 lesson pages |
+| [`docs/wiki/09-session-checklist.md`](docs/wiki/09-session-checklist.md) | Full session startup/shutdown command sequence |
+| [`docs/Lessons.MD`](docs/Lessons.MD) | Chronological lesson log |
+| [`docs/macos-post-install-lessons.md`](docs/macos-post-install-lessons.md) | PR #63 deep-dive: root causes, fixes, test coverage |
+
+**Critical skills (read these first):**
+
+- [01 — Branch Roles](docs/wiki/01-branch-roles.md) — which branch, which purpose
+- [07 — Duplicate Files](docs/wiki/07-duplicate-files.md) — run the dupe check before any file work
+- [05 — Merge Conflicts](docs/wiki/05-merge-conflicts.md) — onboarding guard invariant
+
+---
+
 ## Session Checklist (run at start of each session)
 
 - [ ] Sync main from upstream (`git fetch upstream && git merge --ff-only`)
