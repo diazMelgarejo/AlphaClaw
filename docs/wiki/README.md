@@ -14,12 +14,12 @@
 | [03](03-gateway-config.md) | Gateway Config Sanitization | Every provider in `openclaw.json` must have `models: []`. Missing it = 30s silent timeout. |
 | [04](04-cron-scheduler.md) | macOS Cron / LaunchAgent | `/etc/cron.d` is root-only on macOS. Use the in-process managed scheduler. Named cron tokens crash the parser. |
 | [05](05-merge-conflicts.md) | Merge Conflict Patterns | Read-only onboarding guard must stay inside `!validatedReadOnlyMode`. Re-run onboarding tests after any conflict. |
-| [06](06-vitest-sqlite-flake.md) | Vitest + SQLite WAL Flake | Parallel vitest workers race on WAL locks → 60s timeout. Fix: `singleFork: true`. |
+| [06](06-vitest-sqlite-flake.md) | Vitest + SQLite WAL Flake | WAL lock race history; `singleFork` rejected upstream. Correct fix: `DatabaseSync.close()` in `afterEach`. |
 | [07](07-duplicate-files.md) | Prevent Duplicate Files | macOS "keep both" creates `file 2.js`. Never use Finder on tracked files. Run the dupe check command. |
 | [08](08-subagent-bash-permissions.md) | Subagent Bash Permissions | Dispatched agents don't inherit Bash grants. Shell work stays in parent session. |
-
 | [09](09-session-checklist.md) | Session Startup Checklist | Commands to run at the start of every session before touching any code. |
-| [10](10-root-cause-debugging.md) | Root Cause Debugging | Mask vs fix, flakiness taxonomy, resource management. |
+| [10](10-root-cause-debugging.md) | Root Cause Debugging | Mask vs. fix principle, test flakiness taxonomy (4 types), resource management checklist. |
+| [11](11-windows-dev.md) | Windows Dev Environment | Shims in LM Studio bin; resolve git dynamically from GitHub Desktop. Never symlink versioned install folders. |
 
 ---
 

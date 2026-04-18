@@ -31,7 +31,6 @@ cherry-pick sanitized fixes
 
 ---
 
-
 ## Session Start Sequence
 
 See [09 — Session Startup Checklist](09-session-checklist.md) for the full

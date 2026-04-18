@@ -18,6 +18,14 @@
 
 ---
 
+## Session 2026-04-15 — Windows Dev Environment Setup
+
+| Topic | What happened | Details |
+|---|---|---|
+| Windows launcher | Anchored Node/npm to LM Studio bin; resolved git from GitHub Desktop; never symlink versioned install dirs | → [wiki/11](wiki/11-windows-dev.md) |
+
+---
+
 ## Session 2026-04-16 — Duplicate Cleanup, Vitest, Upstream 0.9.8
 
 | Topic | What happened | Details |

@@ -7,7 +7,7 @@
 > **The correct fix** is `DatabaseSync.close()` in `afterEach`.
 > → [wiki/10 § Resource Contention](10-root-cause-debugging.md)
 
-**TL;DR:** Multiple vitest workers opening `DatabaseSync` connections to WAL-mode SQLite files simultaneously race for write locks, causing 60s+ timeouts. Fix: `singleFork: true` in `vitest.config.js`.
+**TL;DR:** Multiple vitest workers race on WAL-mode SQLite write locks → 60s+ timeouts. We proposed `singleFork: true` (see above — rejected upstream). The correct fix is `DatabaseSync.close()` in `afterEach`. This article is preserved as session history.
 
 ---
 
@@ -57,9 +57,9 @@ export default defineConfig({
 
 ## Rule
 
-**`singleFork: true` must remain in `vitest.config.js`.** Do not remove it to "improve parallelism" — the SQLite WAL races will return immediately.
-
-If a future contributor asks why, point them here.
+> ⚠️ **This rule is superseded.** `singleFork` was rejected upstream and removed in Vitest 4.
+> The correct rule: **close `DatabaseSync` handles in `afterEach`** and export `close()` from
+> singleton DB modules. See [wiki/10 § Section 5](10-root-cause-debugging.md) for code examples.
 
 ---
 
