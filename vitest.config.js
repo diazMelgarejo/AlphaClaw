@@ -7,5 +7,11 @@ export default defineConfig({
     include: ["tests/**/*.test.js"],
     restoreMocks: true,
     clearMocks: true,
+    pool: "forks",
+    poolOptions: {
+      forks: {
+        singleFork: true,
+      },
+    },
   },
 });
