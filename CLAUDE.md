@@ -359,7 +359,7 @@ All agent skills and lessons are organized as a linked wiki. **Read before codin
 - [ ] Log any macOS build errors to docs/build-errors-macos.md on feature branch
 - [ ] Final sanitized changes from feature branch(es) are cherry-picked ->pr-4-macos.
 
-## To Do List = ./TODO.md
+## To Do List = ./docs/TODO.md
 
 ## Helper Scripts (run on demand, never automatic)
 
