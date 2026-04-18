@@ -112,3 +112,59 @@ Upstream rejected: (a) Vitest 4 removed singleFork — our fix was already a no-
 4. For DatabaseSync (node:sqlite): always close handles in afterEach; never leave module-level singletons open across tests
 
 **Do not re-propose:** vitest singleFork, poolOptions.forks serialization, or any "force single worker" approach for this codebase.
+
+---
+
+## Session 2026-04-18: Upstream Merge — ENV Refactor Conflict & Test Fixes
+
+**Branches:** merged upstream 0.9.9 into `pr-4-macos`; rebased `feature/MacOS-post-install` docs on top.
+
+### gogcli HOME Compatibility Pattern
+
+Upstream commit `e0f9fa8` changed the env block passed to every subprocess:
+
+- **Before:** `OPENCLAW_HOME: OPENCLAW_DIR` (the `.openclaw/` subdir)
+- **After:** `HOME: kRootDir, OPENCLAW_HOME: kRootDir, OPENCLAW_STATE_DIR: OPENCLAW_DIR`
+
+**Why it changes:** gogcli tools now respect `HOME` for XDG paths; `OPENCLAW_HOME` shifted to the user root and a new `OPENCLAW_STATE_DIR` carries the old managed-dir value.
+
+**Lesson:** When upstream adds a `HOME` override to subprocess env blocks, **two things break at once:** (1) any test asserting `OPENCLAW_HOME: OPENCLAW_DIR`, and (2) any test asserting `OPENCLAW_HOME: "/tmp/openclaw"` (the test-scoped override). Both must migrate to `OPENCLAW_STATE_DIR`.
+
+**Fix pattern:**
+
+```js
+// Old assertion (breaks after HOME refactor)
+expect(spawnCall[2]).toMatchObject({ env: { OPENCLAW_HOME: OPENCLAW_DIR } });
+
+// New assertion (correct after refactor)
+expect(spawnCall[2]).toMatchObject({
+  env: expect.objectContaining({
+    HOME: expect.any(String),
+    OPENCLAW_HOME: expect.any(String),
+    OPENCLAW_STATE_DIR: OPENCLAW_DIR,
+  }),
+});
+```
+
+→ [wiki/05-merge-conflicts.md](wiki/05-merge-conflicts.md) Pattern 4
+
+### Import Updates After Conflict Resolution
+
+When a conflict resolution adds a new constant (`kRootDir`) to an env block, **check the require/import at the top of the same file.** Git auto-merge preserves the old import list; the new constant silently resolves as `undefined` at runtime.
+
+**Check after any conflict resolution:**
+
+```bash
+grep "kRootDir" lib/server/gateway.js lib/server/onboarding/index.js
+# Verify kRootDir appears in both the require() line AND the env block
+```
+
+### Rebase Over Upstream Merge Commits
+
+When rebasing a docs branch over a branch that gained a merge commit (e.g., upstream 0.9.9 absorbed into pr-4-macos), use `--autostash`:
+
+```bash
+git rebase --autostash pr-4-macos
+```
+
+Plain `git rebase` may fail with "your local changes would be overwritten" if the rebase machinery leaves transient state that overlaps with commits being applied.
