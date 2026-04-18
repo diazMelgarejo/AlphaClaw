@@ -1,12 +1,12 @@
-# AlphaClaw macOS Port — Canonical Implementation Plan
+# AlphaClaw macOS Port Implementation Plan
 
 ## Save a copy of this file to branch: feature/MacOS-post-install
 
 ## Context
 
 `diazMelgarejo/AlphaClaw` is a fork of `chrysb/alphaclaw`. The goal is to port
-AlphaClaw to macOS Sonoma (ARM64), make `npm run build:ui` and all 440 tests
-pass on a clean Mac, and publish the result as `@diazmelgarejo/alphaclaw@0.9.6`.
+AlphaClaw to macOS Sonoma (ARM64), make `npm run build:ui` and all tests pass
+on a clean Mac, and publish the result as `@diazmelgarejo/alphaclaw@0.9.9.6`
 
 ---
 
@@ -14,9 +14,9 @@ pass on a clean Mac, and publish the result as `@diazmelgarejo/alphaclaw@0.9.6`.
 
 | Branch | Role | Rules |
 |---|---|---|
-| `main` | Upstream mirror of `chrysb/alphaclaw` | NO local changes. Currently 0.9.4, heading to 0.9.5. |
+| `main` | Upstream mirror of `chrysb/alphaclaw` | NO local changes. Currently 0.9.9.0 |
 | `pr-4-macos` | Official PR awaiting maintainer review | NO version bumps. Respect upstream versioning. One-way merge FROM main only, once per session start. Final sanitized changes from feature branch are cherry-picked here. |
-| `feature/MacOS-post-install` | **Persistent memory + build hub** | Rebased on top of latest `pr-4-macos`. Version 0.9.6 for local dev. ALL plans, lessons, and TODO lists are saved and committed here. |
+| `feature/MacOS-post-install` | **Persistent memory + build hub** | Rebased on top of latest `pr-4-macos`. Version 0.9.9.6 for local dev only. ALL plans, lessons, and TODO lists are saved and committed here. |
 | `claude/publish-alphaclaw-macos-WmewH` | AI agent coworking space | Agents and subagents do all active work here. ALL lessons and plans are copied back to `feature/MacOS-post-install` before session ends. |
 
 **Data flow:**
@@ -35,7 +35,7 @@ upstream/chrysb/main → our main (mirror)
 
 ## A — Sync main with upstream (first step every session)
 
-Upstream is at 0.9.4 (our local env still shows 0.9.3 — we are behind):
+Upstream is at 0.9.9 (our local env still shows 0.9.6 — we are behind):
 
 ```bash
 git remote add upstream https://github.com/chrysb/alphaclaw.git 2>/dev/null || true
@@ -57,7 +57,7 @@ git merge --ff-only main
 
 ## B — Refresh pr-4-macos from main (once per session)
 
-`pr-4-macos` already contains the 7 macOS commits. Only sync upstream changes 
+`pr-4-macos` already contains the macOS commits. Only sync upstream changes 
 into it — never add version bumps or experimental code here.
 
 ```bash
@@ -74,15 +74,14 @@ conserving the pr-4-macos macOS additions.
 
 ## C — Rebase feature/MacOS-post-install onto pr-4-macos
 
-`feature/MacOS-post-install` is stale (based on 0.8.0-era merge + 1 docs
-commit `bbe1766`). Rebase it:
+`feature/MacOS-post-install` is stale. Rebase it:
 
 ```bash
 git fetch origin feature/MacOS-post-install
 git checkout -b feature/MacOS-post-install origin/feature/MacOS-post-install
 
 # Replay only our commits (docs plan) on top of updated pr-4-macos
-git rebase --onto pr-4-macos cef44656 feature/MacOS-post-install
+git rebase --onto pr-4-macos 4cba0d8 feature/MacOS-post-install
 
 # cef44656 = old "Merge main into pr-4-macos" March 2026 base commit
 git push -u origin feature/MacOS-post-install --force-with-lease
@@ -107,274 +106,7 @@ git push -u origin feature/MacOS-post-install --force-with-lease
 
 ---
 
-## E — Remaining macOS work (lands on feature/MacOS-post-install first)
-
-### E.1 — Apple Silicon esbuild fix (HIGH PRIORITY)
-
-`esbuild` ships platform-specific optional binaries. If npm was run under
-
-Rosetta 2 (x64 shell), it installs `@esbuild/darwin-x64` and `npm run build:ui`
-
-silently fails on a native ARM64 shell.
-
-Fix: add to `package.json` `optionalDependencies`:
-
-```json
-"@esbuild/darwin-arm64": "0.25.x",
-"@esbuild/darwin-x64":  "0.25.x"
-```
-
-(pin to the same major.minor as `esbuild` devDependency)
-
-Alternatively, verify that `npm install` on a native ARM64 shell auto-selects
-the right binary — if it does, no package.json change needed, just document the
-"use native ARM64 shell" requirement.
-
-### E.2 — npm global install without sudo on macOS
-
-When a user runs `npm install -g @diazmelgarejo/alphaclaw` on a stock macOS,
-npm defaults to `/usr/local` (root-owned). Fix: on darwin, if the npm global
-prefix is not user-writable, log a one-time advisory at startup:
-
-```js
-// bin/alphaclaw.js, early darwin check (~line 130)
-
-if (os.platform() === 'darwin') {
-
-  try {
-
-    const npmPrefix = execSync('npm config get prefix', { encoding: 'utf8' }).trim();
-
-    if (npmPrefix === '/usr/local' || npmPrefix.startsWith('/usr')) {
-      console.log('[alphaclaw] Tip: run `npm config set prefix ~/.local` for sudo-free installs');
-      console.log('[alphaclaw] Then add: export PATH="$HOME/.local/bin:$PATH" to ~/.zshrc');
-    }
-  } catch {}
-}
-```
-
-PATH priority on macOS:
-
-```
-~/.local/bin : ~/.node/bin : /opt/homebrew/bin : $PATH
-
-```
-
-### E.3 — macOS cron → user LaunchAgent
-
-The current code writes `/etc/cron.d/openclaw-hourly-sync` which requires
-root on macOS and silently fails (EACCES, caught and skipped). The pr-4-macos
-cron validation fix improves the schedule parser but does not fix the write
-path. Finish it:
-
-In `bin/alphaclaw.js` cron setup block (~line 595), add darwin branching:
-
-```js
-
-if (os.platform() === 'darwin') {
-
-  // Write ~/Library/LaunchAgents/com.alphaclaw.hourly-sync.plist
-  const plistDir = path.join(os.homedir(), 'Library', 'LaunchAgents');
-  fs.mkdirSync(plistDir, { recursive: true });
-
-  const plistPath = path.join(plistDir, 'com.alphaclaw.hourly-sync.plist');
-
-  const plistContent = buildHourlySyncPlist(hourlyGitSyncPath); // new helper
-
-  fs.writeFileSync(plistPath, plistContent);
-  execSync(`launchctl load -w "${plistPath}"`, { stdio: 'ignore' });
-  console.log('[alphaclaw] LaunchAgent installed for hourly sync');
-
-} else {
-  // existing /etc/cron.d path (unchanged)
-}
-
-```
-
-Create `lib/scripts/macos-hourly-sync.plist.template`:
-
-```xml
-
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
-  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0"><dict>
-
-  <key>Label</key><string>com.alphaclaw.hourly-sync</string>
-  <key>ProgramArguments</key>
-  <array><string>@@SYNC_SCRIPT_PATH@@</string></array>
-  <key>StartInterval</key><integer>3600</integer>
-  <key>RunAtLoad</key><false/>
-  <key>StandardOutPath</key>
-  <string>@@LOG_PATH@@</string>
-  <key>StandardErrorPath</key>
-  <string>@@LOG_PATH@@</string>
-
-</dict></plist>
-
-```
-
-### E.4 — ENOTEMPTY mitigation protocol
-
-On macOS Sonoma, ENOTEMPTY during `npm install` is a concurrent-write race
-(another process holds a handle on `node_modules`). Protocol:
-
-```bash
-# 1. Find blockers
-lsof +D ./node_modules 2>/dev/null | head -20
-
-# 2. Clean install
-rm -rf node_modules package-lock.json
-npm install
-
-
-
-# 3. If still failing on rename loops, use --no-bin-links and link manually
-npm install --no-bin-links
-ln -sf $(pwd)/node_modules/.bin/esbuild ~/.local/bin/esbuild
-```
-
-Note: Spotlight indexing can occasionally hold handles, but is not the primary
-cause. Closing IDEs and terminals that watch node_modules is more effective.
-
-### E.5 — CI matrix for macOS
-
-Update `.github/workflows/ci.yml`:
-
-```yaml
-strategy:
-
-  matrix:
-    os: [ubuntu-latest, macos-latest]
-    node-version: [22]
-
-runs-on: ${{ matrix.os }}
-
-steps:
-  - uses: actions/setup-node@v4
-
-    with:
-      node-version: ${{ matrix.node-version }}
-```
-
----
-
-## F — npm Package Preparation for Publishing
-
-### F.1 — package.json changes (on feature/MacOS-post-install, version 0.9.6)
-
-| Field | Before | After |
-|---|---|---|
-| `name` | `@chrysb/alphaclaw` | `@diazmelgarejo/alphaclaw` (npm scopes must be **lowercase**) |
-| `version` | `0.9.x` | `0.9.6` (local dev version — NOT cherry-picked to pr-4-macos) |
-| `repository` | `https://github.com/chrysb/alphaclaw.git` | `https://github.com/diazmelgarejo/alphaclaw` |
-| `publishConfig.access` | `public` | `public` (keep) |
-| `engines.node` | `>=22.14.0` | `>=22.14.0` (keep) |
-
-**Do NOT cherry-pick the version bump to pr-4-macos.** Version on that branch
-must follow upstream chrysb/alphaclaw versioning.
-
-### F.2 — .npmrc changes
-
-```
-# Replace:
-@chrysb:registry=https://registry.npmjs.org/
-
-# With:
-@diazmelgarejo:registry=https://registry.npmjs.org/
-```
-
-### F.3 — Internal string updates
-
-- `scripts/apply-openclaw-patches.js` line 76: `[@chrysb/alphaclaw]` → `[@diazmelgarejo/alphaclaw]`
-- Search: `grep -r '@chrysb/alphaclaw' lib/ bin/ scripts/`
-
-### F.4 — npm Publishing workflow (manual steps)
-
-```bash
-# Authenticate
-npm adduser          # create npmjs.com account if needed
-npm login            # authenticate terminal session
-npm whoami           # must print "diazmelgarejo"
-
-# Dry run
-npm pack --dry-run   # verify: bin/, lib/, patches/, scripts/apply-openclaw-patches.js
-
-# Publish (prepack runs build:ui automatically)
-npm publish --access public
-```
-
-**`~/.npmrc` auth token must NEVER be committed.**
-
----
-
-## G — Verification Checklist (clean macOS Sonoma)
-
-```bash
-
-# Pre-requisites
-node --version        # must be ≥ 22.14.0, ARM64 native (not Rosetta)
-npm config get prefix # should be ~/.local, not /usr/local
-
-# Build + test
-npm install
-npm run build:ui      # no ENOTEMPTY, no permission errors, no esbuild arch errors
-npm test              # 440 tests green
-npm run test:watchdog # 14 tests green
-npm run test:coverage # coverage report generated
-
-
-# Runtime smoke (requires SETUP_PASSWORD in .env)
-node bin/alphaclaw.js start
-
-# ✓ Server starts on port 3000
-# ✓ No writes to /usr/local/bin, /etc/cron.d attempted
-# ✓ ~/.local/bin/gog installed
-# ✓ ~/Library/LaunchAgents/com.alphaclaw.hourly-sync.plist created (if onboarded)
-# ✓ PATH advisory logged if npm prefix is root-owned
-```
-
----
-
-## H — Critique of the Naive Plan (for reference / avoid regressions)
-
-**What the improved proposal got right (absorb these):**
-
-- Apple Silicon / Rosetta 2 esbuild arch mismatch is real and important
-- `@esbuild/darwin-arm64` optional dependency is the correct fix
-- PATH priority for user-space binaries (`~/.local/bin` first)
-- `lsof +D ./node_modules` as ENOTEMPTY diagnostic is practical
-
-**What it still got wrong (do not repeat):**
-
-1. `apply-openclaw-patches.js` is NOT "hardware-aware." It applies npm
-   patch-package patches for WebSocket scope and gateway auth. It reads no
-   hardware info and is not affected by `.env`.
-
-2. SETUP_PASSWORD is NOT an "Onboarding Barrier" to "bypass." It is a
-   mandatory security credential. The process hard-exits (line 503) if missing.
-   The right fix is to put it in `.env`, not to frame it as a bug.
-
-3. GITHUB_TOKEN and GITHUB_WORKSPACE_REPO are NOT required to run
-   `npm run build:ui` or `npm test`. They are only needed for already-onboarded
-   deployments with git sync enabled.
-
-4. ENOTEMPTY is a concurrent-write race condition. Spotlight is a secondary
-   contributor at most. Closing file-watching processes and IDEs is the fix.
-
-5. "Masoretic correction visualizations" does not exist in this codebase.
-   This was a hallucination in the original naive plan.
-
-6. The plan still never mentions the actual npm publishing steps (`npm login`,
-   `npm publish`), the `name`/`version` changes needed in package.json, or
-   that `~/.local/bin` must be in PATH for the installed binary to be found.
-
-7. "Amplifier Principle" and "AI-driven data orchestration" are marketing
-   language not present anywhere in the codebase or CONTRIBUTING.md.
-
----
-
-## I — M2 MacBook Sandbox Testing
+## E — M2 MacBook Sandbox Testing
 
 AlphaClaw is a **Node.js project** — VS Code is the primary IDE. Xcode is NOT
 used to build or run AlphaClaw itself. However, on your M2 MacBook Pro, Xcode
@@ -395,10 +127,10 @@ Claude Code extension           xcrun mcpbridge
                (shared session)
 ```
 
-**Xcode 26.3 MCP setup (one-time, M2 MacBook only):**
+**Xcode 26.5 MCP setup (one-time, M2 MacBook only):**
 
 ```bash
-# 1. Requires Xcode 26.3+ (26.4 is current stable as of March 2026)
+# 1. Requires Xcode 26.5+ 
 #    Enable in: Xcode → Settings → Intelligence → Model Context Protocol → Xcode Tools: ON
 
 # 2. Connect Claude Code CLI to Xcode's MCP bridge
@@ -501,7 +233,7 @@ This becomes the regression test record for future contributors.
 
 ---
 
-## J — CLAUDE.md for the AlphaClaw Repository
+## F — CLAUDE.md for the AlphaClaw Repository
 
 A `CLAUDE.md` in the repo root gives Claude Code agents context so they don't
 
@@ -589,7 +321,7 @@ npm run build:ui          # required before local runs
 - Claude Code reads this on every session start — no additional configuration needed.
 - For global preferences that apply across all repos, use `~/.claude/CLAUDE.md`.
 
-- **Xcode 26.3**: The built-in Claude agent also reads `CLAUDE.md` from the
+- **Xcode 26.5 Beta**: The built-in Claude agent also reads `CLAUDE.md` from the
   project root. Xcode agent config lives at:
   `~/Library/Developer/Xcode/CodingAssistant/ClaudeAgentConfig/.claude.json`
   but you do not need to edit it — `CLAUDE.md` in the repo root is sufficient.
@@ -625,3 +357,6 @@ All agent skills and lessons are organized as a linked wiki. **Read before codin
 - [ ] Do all active work on claude/publish-alphaclaw-macos-WmewH
 - [ ] Before session ends: copy lessons/plan updates back to feature/MacOS-post-install
 - [ ] Log any macOS build errors to docs/build-errors-macos.md on feature branch
+- [ ] Final sanitized changes from feature branch(es) are cherry-picked ->pr-4-macos.
+
+## To Do List = ./TODO.md
