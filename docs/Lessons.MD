@@ -90,3 +90,25 @@ All lessons above are expanded with root causes, exact fixes, and verification c
 | 07 | [Duplicate Files](wiki/07-duplicate-files.md) | macOS "keep both", dupe check command |
 | 08 | [Subagent Bash](wiki/08-subagent-bash-permissions.md) | Permission inheritance gotcha |
 | 09 | [Session Checklist](wiki/09-session-checklist.md) | Full startup/shutdown sequence |
+| 10 | [Root Cause Debugging](wiki/10-root-cause-debugging.md) | Mask vs. fix, test flakiness taxonomy, resource management |
+
+---
+
+## Session 2026-04-18: PR #69 — Root Cause vs. Mask
+
+**PR:** <https://github.com/chrysb/alphaclaw/pull/69>
+**Rejected commit:** `2f5b3b3` (vitest singleFork)
+
+**What happened:** We correctly diagnosed SQLite WAL-lock contention causing flaky tests.
+We proposed `singleFork: true` in vitest.config.js to serialize the suite through one worker.
+Upstream rejected: (a) Vitest 4 removed singleFork — our fix was already a no-op, and
+(b) the correct fix is explicit `DatabaseSync.close()` in afterEach, not config-level serialization.
+
+**Generalizable patterns (see wiki/10-root-cause-debugging.md):**
+
+1. Diagnose the root cause layer before proposing a fix — we fixed at the config layer when the issue was at the resource layer
+2. Verify framework API exists before proposing config changes (`singleFork` was removed in Vitest 4)
+3. Check upstream issues/PRs before implementing — they may already have a fix in-flight
+4. For DatabaseSync (node:sqlite): always close handles in afterEach; never leave module-level singletons open across tests
+
+**Do not re-propose:** vitest singleFork, poolOptions.forks serialization, or any "force single worker" approach for this codebase.

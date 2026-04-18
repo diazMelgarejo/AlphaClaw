@@ -119,6 +119,22 @@ Validation: `return parts.every((part) => /^[\d,*/\-]+$/.test(part));`
 
 ---
 
+## Skill 9 — Test Flakiness: Diagnose Before Fixing
+
+When a test suite has flaky tests:
+
+1. Identify the failure category (timing race, state leak, resource contention, environment difference)
+2. Verify your proposed fix targets the actual cause — not a symptom
+3. Check if the framework version supports your proposed config change
+4. Search upstream issues/PRs before implementing
+
+**Never:** Add vitest `singleFork` or single-worker config to mask resource leaks.
+**Instead:** Close DatabaseSync handles in afterEach; export `close()` from singleton DB modules.
+
+→ [docs/wiki/10-root-cause-debugging.md](docs/wiki/10-root-cause-debugging.md)
+
+---
+
 ## Quick Reference: Session Commands
 
 ```bash
