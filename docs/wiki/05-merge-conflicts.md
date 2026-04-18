@@ -56,6 +56,35 @@ grep -c "ensureGatewayProxyConfig" lib/server/onboarding/index.js
 
 ---
 
+### Pattern 4: ENV Block Refactor — HOME / OPENCLAW_HOME Split
+
+Upstream commit `e0f9fa8` changed subprocess env from `OPENCLAW_HOME: OPENCLAW_DIR` to:
+
+```js
+HOME: kRootDir,
+OPENCLAW_HOME: kRootDir,
+OPENCLAW_STATE_DIR: OPENCLAW_DIR,
+```
+
+Any test asserting `OPENCLAW_HOME: OPENCLAW_DIR` or `OPENCLAW_HOME: "/tmp/openclaw"` will fail. Both must migrate to assert `OPENCLAW_STATE_DIR` for the managed dir:
+
+```js
+// gateway.test.js / routes-onboarding.test.js
+env: expect.objectContaining({
+  HOME: expect.any(String),
+  OPENCLAW_HOME: expect.any(String),
+  OPENCLAW_STATE_DIR: OPENCLAW_DIR,   // ← old OPENCLAW_HOME value lives here
+})
+```
+
+**Also check imports:** if a conflict adds `kRootDir` to an env block, ensure `kRootDir` is destructured in the same file's `require("../constants")`.
+
+```bash
+grep "kRootDir" lib/server/gateway.js lib/server/onboarding/index.js
+```
+
+---
+
 ## Rule
 
 **After any conflict resolution touching `lib/server/onboarding/index.js` or `lib/server/routes/system.js`, run these tests before pushing:**
