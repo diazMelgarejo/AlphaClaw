@@ -31,26 +31,11 @@ cherry-pick sanitized fixes
 
 ---
 
+
 ## Session Start Sequence
 
-```bash
-# 1. Sync main with upstream
-git remote add upstream https://github.com/chrysb/alphaclaw.git 2>/dev/null || true
-git fetch upstream main
-git checkout main && git merge --ff-only upstream/main
-git push -u origin main
-
-# 2. Bring upstream changes into pr-4-macos
-git checkout pr-4-macos
-git merge --ff-only main   # abort if this fails; investigate divergence
-
-# 3. Rebase feature branch onto updated pr-4-macos
-git checkout feature/MacOS-post-install
-git rebase origin/feature/MacOS-post-install   # get remote-only commits first
-git rebase pr-4-macos                           # then rebase onto pr-4-macos tip
-```
-
-See [09 — Session Startup Checklist](09-session-checklist.md) for the full sequence.
+See [09 — Session Startup Checklist](09-session-checklist.md) for the full
+command sequence. Short form: sync main → merge into pr-4-macos → rebase feature branch.
 
 ---
 

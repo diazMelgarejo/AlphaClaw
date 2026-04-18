@@ -17,7 +17,9 @@
 | [06](06-vitest-sqlite-flake.md) | Vitest + SQLite WAL Flake | Parallel vitest workers race on WAL locks → 60s timeout. Fix: `singleFork: true`. |
 | [07](07-duplicate-files.md) | Prevent Duplicate Files | macOS "keep both" creates `file 2.js`. Never use Finder on tracked files. Run the dupe check command. |
 | [08](08-subagent-bash-permissions.md) | Subagent Bash Permissions | Dispatched agents don't inherit Bash grants. Shell work stays in parent session. |
+
 | [09](09-session-checklist.md) | Session Startup Checklist | Commands to run at the start of every session before touching any code. |
+| [10](10-root-cause-debugging.md) | Root Cause Debugging | Mask vs fix, flakiness taxonomy, resource management. |
 
 ---
 
@@ -26,7 +28,7 @@
 - Each page is a standalone lesson: **TL;DR → Root Cause → Fix → Rule → Links**
 - `SKILL.md` at the repo root is the agent-facing entry point — it indexes skills and links here
 - `CLAUDE.md` has a **Learning Hub** section that points agents at this wiki
-- `docs/Lessons.MD` is the chronological log — this wiki is the organized, cross-linked reference
+- `docs/Lessons.MD` is the compressed index-card — one row per session/topic, each row links to the wiki article that owns the details
 
 ---
 
@@ -54,4 +56,4 @@
 
 ---
 
-*Last updated: 2026-04-16*
+*Last updated: 2026-04-19*
