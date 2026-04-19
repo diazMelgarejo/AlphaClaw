@@ -18,6 +18,8 @@ const flushPromises = async () => {
   await Promise.resolve();
 };
 
+const createdTempRoots = [];
+
 const createModelDeps = () => {
   const deps = {
     shellCmd: vi.fn(),
@@ -58,6 +60,7 @@ const createApp = (deps) => {
   const tempRoot = fs.mkdtempSync(
     path.join(os.tmpdir(), "alphaclaw-routes-models-"),
   );
+  createdTempRoots.push(tempRoot);
   const modelCatalogCache = createModelCatalogCache({
     cachePath: path.join(tempRoot, "cache", "model-catalog.json"),
     shellCmd: deps.shellCmd,
@@ -76,6 +79,12 @@ const createApp = (deps) => {
 };
 
 describe("server/routes/models", () => {
+  afterEach(() => {
+    for (const dir of createdTempRoots.splice(0)) {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
   it("bootstraps with the bundled catalog, then returns normalized models from openclaw output", async () => {
     const deps = createModelDeps();
     deps.shellCmd.mockResolvedValue("noise");
