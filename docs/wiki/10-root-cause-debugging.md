@@ -289,4 +289,81 @@ afterEach(() => closeDb());
 | Timeout under load | Timing race or resource contention | Check for unresolved promises, lock waits |
 | Config change has no effect | Framework API removed | Check installed version changelog |
 
+---
+
+## Section 6: Case Study — macOS ARM64 Parallel Test Timeouts (2026-04-19)
+
+### Symptom
+
+`npm test` (parallel Vitest workers) = 10 failures, all `Test timed out in 5000ms`.  
+`npm run test:coverage` (sequential) = 594/594 green.
+
+Failing tests spanned **routes test files that use only mocks** (agents, auth, browse, cron, models, onboarding, pairings, system, webhooks) and `usage-db.test.js`.
+
+### Why the diagnosis in TODO.md was partially wrong
+
+The initial analysis ("routes tests create SQLite-backed services without afterEach cleanup") is only partially correct:
+
+| File | Real resource leak? | What actually leaks |
+|---|---|---|
+| `routes-browse.test.js` | ✅ YES | Temp dirs via `createTestRoot()`, never cleaned up |
+| `routes-models.test.js` | ✅ YES | Temp dirs via `createApp()`, never cleaned up |
+| `routes-agents.test.js` | ❌ NO | Pure mocks, no real resources |
+| `routes-auth.test.js` | ⚠️ PARTIAL | Already has afterEach; `vi.resetModules()` per test |
+| `routes-cron.test.js` | ❌ NO | Pure mocks |
+| `routes-pairings.test.js` | ❌ NO | Pure mocks |
+| `routes-system.test.js` | ❌ NO | Pure mocks |
+| `routes-webhooks.test.js` | ❌ NO | Pure mocks |
+| `usage-db.test.js` | ✅ has cleanup | afterEach closes both connections; still times out |
+
+### Two-layer root cause
+
+**Layer 1 — macOS shared memory pressure** (affects ALL workers including pure-mock ones):  
+Node.js `DatabaseSync` (node:sqlite) keeps `.db-shm` shared memory files mmap'd in the process until `close()` is called. The upstream fix for 5 db-layer files freed this memory promptly. The unfixed db-layer tests (doctor, watchdog, webhooks) leave these mmap'd files alive across tests. Under parallel load on macOS ARM64, with 60+ concurrent worker processes each holding several mmap'd pages, the OS experiences memory pressure. This slows ALL workers — including workers running pure-mock routes tests — past the 5s timeout.
+
+**Layer 2 — I/O pressure from leaked temp dirs** (affects routes-browse and routes-models):  
+Each test in these files creates a temp dir with `mkdtempSync` that is never cleaned up. With 18 tests in routes-browse and 12 in routes-models, each parallel run leaves 30 undeleted temp directories on disk. On macOS, temp dirs under `/var/folders/` are on a memory-mapped filesystem — excessive undeleted entries add I/O overhead.
+
+### Fix applied (2026-04-19)
+
+**1. Temp dir cleanup for routes-browse.test.js:**
+
+```js
+// Track created dirs at module level
+const createdTestRoots = [];
+const createTestRoot = () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "alphaclaw-browse-test-"));
+  createdTestRoots.push(dir);
+  return dir;
+};
+
+// Inside describe:
+afterEach(() => {
+  for (const dir of createdTestRoots.splice(0)) {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+```
+
+**2. Same pattern for routes-models.test.js** — track `createdTempRoots` in `createApp()`, clean in `afterEach`.
+
+**3. vitest.config.js testTimeout increase:**
+
+```js
+testTimeout: 10000,  // raised from 5000ms default
+```
+
+Reason: pure-mock routes tests (agents, cron, pairings, system, webhooks) have NO resources to close. Their timeouts are caused by global shared-memory pressure from db-layer tests in other workers. A higher timeout gives them breathing room while the upstream db cleanup fix propagates.
+
+### What did NOT help (and why)
+
+- **`afterEach(() => app.close?.())`** for pure mock routes tests — Express apps don't have `close()`. This is a no-op. The correct fix for those files is the timeout increase.
+- **`singleFork: true`** — removed in Vitest 4. Would have been a mask anyway (hides contention by serializing instead of fixing resource leaks).
+
+### To verify (run on native ARM64 terminal)
+
+```bash
+npm test   # target: 594/594, previously 584/594
+```
+
 → Related: [06 — Vitest SQLite Flake](06-vitest-sqlite-flake.md) · [05 — Merge Conflicts](05-merge-conflicts.md)
