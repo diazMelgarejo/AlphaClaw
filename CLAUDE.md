@@ -383,3 +383,67 @@ All agent skills and lessons are organized as a linked wiki. **Read before codin
 | --- | --- |
 | `bash scripts/step1-sync-main.sh` | Sync local main from upstream chrysb/alphaclaw |
 | `bash scripts/step2-main-to-pr-branch.sh` | Merge upstream main into pr-4-macos (creates backup tag first) |
+| `bash scripts/install-gstack.sh` | Install gstack for this project (requires bun) |
+
+---
+
+## gstack
+
+gstack v1.3 is the agent skill framework used for all web browsing, planning, and review workflows.
+
+**Rules — enforced for all agents working in this repo:**
+- ALWAYS use the `/browse` skill from gstack for web browsing. NEVER use `mcp__Claude_in_Chrome__*` tools directly.
+- Use gstack skills for structured planning and review instead of ad-hoc tool chains.
+
+**Install (one-time, per machine — requires `bun`):**
+```bash
+bash scripts/install-gstack.sh
+# OR manually:
+git clone --single-branch --depth 1 https://github.com/garrytan/gstack.git ~/.claude/skills/gstack
+cd ~/.claude/skills/gstack && ./setup
+```
+
+**Available gstack skills:**
+
+| Skill | Purpose |
+|---|---|
+| `/browse` | **Primary web browser** — use this, never mcp__Claude_in_Chrome__* |
+| `/connect-chrome` | Connect to running Chrome instance |
+| `/setup-browser-cookies` | Configure session cookies for browsing |
+| `/plan-ceo-review` | Strategic plan review (CEO lens) |
+| `/plan-eng-review` | Engineering plan review |
+| `/plan-design-review` | Design plan review |
+| `/plan-devex-review` | Developer experience review |
+| `/office-hours` | Open-ended collaborative session |
+| `/review` | Code review workflow |
+| `/design-consultation` | Design consultation session |
+| `/design-shotgun` | Rapid parallel design exploration |
+| `/design-html` | Generate/review HTML designs |
+| `/design-review` | Design artifact review |
+| `/qa` | Full QA workflow (plan + execute) |
+| `/qa-only` | Execute QA without re-planning |
+| `/ship` | Pre-ship checklist and sign-off |
+| `/land-and-deploy` | Land PR + trigger deploy |
+| `/setup-deploy` | Configure deployment pipeline |
+| `/canary` | Canary deploy workflow |
+| `/benchmark` | Performance benchmarking |
+| `/investigate` | Structured investigation / RCA |
+| `/document-release` | Release notes and changelog |
+| `/retro` | Sprint retrospective |
+| `/autoplan` | Auto-generate a plan from context |
+| `/codex` | Codex-specific agent workflow |
+| `/cso` | Chief of Staff operations |
+| `/devex-review` | Developer experience audit |
+| `/careful` | Enable careful/conservative mode |
+| `/freeze` | Freeze branch (block merges) |
+| `/guard` | Enable guardrails |
+| `/unfreeze` | Unfreeze branch |
+| `/gstack-upgrade` | Upgrade gstack to latest |
+| `/learn` | Learning and onboarding mode |
+
+**Team setup** (adds gstack to project so all teammates get it):
+```bash
+cd ~/Documents/Terminal\ xCode/claude/OpenClaw/AlphaClaw
+~/.claude/skills/gstack/setup --team
+~/.claude/skills/gstack/bin/gstack-team-init required
+```
