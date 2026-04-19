@@ -46,6 +46,17 @@
 
 ---
 
+## Session 2026-04-19 — Build & Test Run (macOS arm64)
+
+| Topic | What happened | Details |
+|---|---|---|
+| npm parallel race | Simultaneous `npm install` background jobs → ENOTEMPTY on staging dir; fix: `rm -rf node_modules/@chrysb/.alphaclaw-HgyXfxzk` | → [build-errors-macos.md](build-errors-macos.md) |
+| SQLite WAL timeouts | 10/594 tests timeout @ 5000ms in `npm test` (parallel); 0 failures in `npm run test:coverage` (sequential) — confirms WAL contention, not logic bugs | → [wiki/06](wiki/06-vitest-sqlite-flake.md), [wiki/10](wiki/10-root-cause-debugging.md) |
+| xcrun mcpbridge missing | CLT only, not Xcode.app; xcode MCP server fails to connect; non-blocking | → [build-errors-macos.md](build-errors-macos.md) |
+| npm audit 20 vulns | 4 critical (WhatsApp/protobuf), 12 high (Discord); all in channel deps, none in macOS port path | → [build-errors-macos.md](build-errors-macos.md) |
+
+---
+
 ## Wiki Index
 
 | # | Page | Topic |
