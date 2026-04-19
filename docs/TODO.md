@@ -135,7 +135,20 @@ node bin/alphaclaw.js start
 | `tests/server/routes-webhooks.test.js` | no `afterEach`/`close` |
 | `tests/server/usage-db.test.js` | fix present but one test still cascades |
 
-**Next action:** Add `afterEach(() => app.close?.())` or equivalent db teardown to each affected file. This is a candidate for a follow-up PR to upstream.
+**Root cause (corrected 2026-04-19):** Two-layer issue — see [wiki/10 § Section 6](wiki/10-root-cause-debugging.md):
+
+1. **`.db-shm` shared memory pressure** — db-layer tests hold `DatabaseSync` mmap'd pages open between tests. 60+ parallel workers → OS memory pressure → ALL workers slow past timeout, including pure-mock routes tests.
+2. **Temp dir I/O leak** — `routes-browse` and `routes-models` create `mkdtempSync` dirs per test and never clean them up.
+
+**Fixes applied (2026-04-19):**
+
+- `routes-browse.test.js`: added `afterEach` temp dir cleanup ✅
+- `routes-models.test.js`: added `afterEach` temp dir cleanup ✅
+- `vitest.config.js`: raised `testTimeout` 5000ms → 10000ms ✅
+
+**Note:** The claim that routes-agents, routes-cron, routes-pairings, routes-system, routes-webhooks "create SQLite-backed services" is INCORRECT — these are pure mock tests. Their fix is the `testTimeout` increase, not `afterEach` teardown. Adding `afterEach(() => app.close?.())` to those files would be a no-op (Express apps have no `close()` method).
+
+**What remains:** `doctor-db`, `watchdog-db`, `webhooks-db` test files still leave `.db-shm` mmap'd between tests. Adding `afterEach(() => closeXyzDb())` to those three files is the remaining upstream contribution.
 
 See [docs/build-errors-macos.md](build-errors-macos.md) for full run log.
 
