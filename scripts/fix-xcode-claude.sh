@@ -229,7 +229,6 @@ done
 
 if [[ -n "$MCPBRIDGE" ]]; then
     ok "mcpbridge found: $MCPBRIDGE"
-    # Register as MCP server if not already done
     if "$CLAUDE_BIN" mcp list 2>/dev/null | grep -q "^xcode"; then
         ok "'xcode' MCP server already registered"
     else
@@ -238,8 +237,27 @@ if [[ -n "$MCPBRIDGE" ]]; then
     fi
 else
     warn "xcrun mcpbridge not found — requires Xcode 26.3+ with Intelligence enabled"
-    warn "Enable via: Xcode → Settings → Intelligence → Model Context Protocol → Xcode Tools: ON"
-    warn "After enabling, rerun this script to register the MCP server"
+    warn "Enable via: Xcode → Settings → Intelligence → Model Context Protocol"
+    warn "→ 'Allow external agents to use Xcode tools': ON"
+    warn "After enabling, rerun this script"
+fi
+
+# Register alphaclaw MCP server
+sep
+log "Step 6b: Registering alphaclaw MCP server"
+SCRIPT_DIR_TMP="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT_TMP="$(dirname "$SCRIPT_DIR_TMP")"
+ALPHACLAW_MCP="$PROJECT_ROOT_TMP/lib/mcp/alphaclaw-mcp.js"
+
+if [[ -f "$ALPHACLAW_MCP" ]]; then
+    if "$CLAUDE_BIN" mcp list 2>/dev/null | grep -q "^alphaclaw"; then
+        ok "'alphaclaw' MCP server already registered"
+    else
+        "$CLAUDE_BIN" mcp add --transport stdio alphaclaw -- node "$ALPHACLAW_MCP"
+        ok "Registered 'alphaclaw' MCP server ($ALPHACLAW_MCP)"
+    fi
+else
+    warn "lib/mcp/alphaclaw-mcp.js not found — skipping alphaclaw MCP registration"
 fi
 
 # ─── STEP 7: Xcode CodingAssistant config ────────────────────────────────
