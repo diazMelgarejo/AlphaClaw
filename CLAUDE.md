@@ -16,19 +16,35 @@ on a clean Mac, and publish the result as `@diazmelgarejo/alphaclaw@0.9.9.6`
 |---|---|---|
 | `main` | Upstream mirror of `chrysb/alphaclaw` | NO local changes. Currently 0.9.9.0 |
 | `pr-4-macos` | Official PR awaiting maintainer review | NO version bumps. Respect upstream versioning. One-way merge FROM main only, once per session start. Final sanitized changes from feature branch are cherry-picked here. |
-| `feature/MacOS-post-install` | **Persistent memory + build hub** | Rebased on top of latest `pr-4-macos`. Version 0.9.9.6 for local dev only. ALL plans, lessons, and TODO lists are saved and committed here. |
+| `feature/MacOS-post-install` | **Persistent memory + build hub** | Superset of `pr-4-macos`. Version 0.9.9.6 for local dev only. ALL plans, lessons, TODO lists, fork-specific code committed here. |
+| `fix/<name>` | Standalone upstream PR branches | Cherry-picked from `pr-4-macos`. Narrowest scope — platform-agnostic fixes only. |
 | `claude/publish-alphaclaw-macos-WmewH` | AI agent coworking space | Agents and subagents do all active work here. ALL lessons and plans are copied back to `feature/MacOS-post-install` before session ends. |
+
+**Subset-superset strategy (upstream PR ⊂ pr-4-macos ⊂ feature):**
+
+```
+upstream PR branch (fix/<name>)          — platform-agnostic fixes only
+         ⊂
+    pr-4-macos                           — macOS port fixes + above
+         ⊂
+feature/MacOS-post-install               — fork-specific + MCP + docs + above
+```
+
+**Rule:** Every commit in a narrower branch must also be present in every wider branch. Cherry-pick down (narrow → wide), merge up (pr-4-macos → feature). See [wiki/01](docs/wiki/01-branch-roles.md) § Subset-Superset for the decision tree.
+
+**Fork-specific (feature ONLY — never pr-4-macos or upstream PR):**
+`.npmrc` scope rename · `scripts/apply-openclaw-patches.js` label · `lib/mcp/` · `lib/agents/` · `scripts/fix-xcode-claude.sh` · `.mcp.json` · `docs/wiki/**`
 
 **Data flow:**
 
 ```
 upstream/chrysb/main → our main (mirror)
                    ↓ (once per session, one-way)
-              pr-4-macos
-                   ↓ (rebase)
-     feature/MacOS-post-install  ←→  claude/publish-alphaclaw-macos-WmewH
-                   ↑                        (work here, sync plans back)
-        cherry-pick sanitized fixes
+              pr-4-macos  ←──────────────────── cherry-pick upstream-worthy fixes
+                   ↓ (merge into feature)
+     feature/MacOS-post-install  ←  commit fork-specific changes here
+                   ↑
+        fix/<name> branches ← cherry-pick platform-agnostic fixes for separate upstream PRs
 ```
 
 ---
