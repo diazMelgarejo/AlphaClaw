@@ -1,263 +1,229 @@
-# To Do:
+# AlphaClaw macOS Port — Master TODO
 
-## Remaining macOS work (lands on feature/MacOS-post-install first)
+> Last updated: 2026-04-19 | Branches: `pr-4-macos` / `feature/MacOS-post-install`
 
-### E.1 — Apple Silicon esbuild fix (HIGH PRIORITY)
+---
 
-`esbuild` ships platform-specific optional binaries. If npm was run under
+## ✅ COMPLETED
 
-Rosetta 2 (x64 shell), it installs `@esbuild/darwin-x64` and `npm run build:ui`
+- [x] **E.1** `optionalDependencies` `@esbuild/darwin-arm64` + `@esbuild/darwin-x64` 0.25.x → `package.json`
+- [x] **E.2** darwin npm prefix advisory on `alphaclaw start` → `bin/alphaclaw.js` (line ~594)
+- [x] **E.3** LaunchAgent plist writer replaces `/etc/cron.d` on darwin → `bin/alphaclaw.js` + `lib/scripts/macos-hourly-sync.plist.template`
+- [x] **E.4** ENOTEMPTY protocol documented → `scripts/setup-macos-sandbox.sh` (clean-install + lsof diagnostic)
+- [x] **E.5** CI matrix `ubuntu-latest` + `macos-latest`, watchdog + coverage → `.github/workflows/ci.yml`
+- [x] **F.2** npm registry scope `@chrysb` → `@diazmelgarejo` → `.npmrc`
+- [x] **F.3** patch-package label `[@chrysb/alphaclaw]` → `[@diazmelgarejo/alphaclaw]` → `scripts/apply-openclaw-patches.js`
+- [x] `.mcp.json` — project-level MCP config (`xcrun mcpbridge` + `alphaclaw-mcp`)
+- [x] `scripts/fix-xcode-claude.sh` — clears stale sessions, registers mcpbridge, creates CodingAssistant config
+- [x] `scripts/setup-macos-sandbox.sh` — full ARM64 sandbox setup + smoke test runner
+- [x] `docs/xcode-claude-integration.md` — Xcode 26.3 BETA integration guide
+- [x] `lib/mcp/alphaclaw-mcp.js` — AlphaClaw MCP server (11 tools: status, config, providers, logs, env, build, test + 4 local-agent tools) — syntax ✓
+- [x] `lib/agents/local-agent-client.js` — Ollama (127.0.0.1:11435, GLM-5.1:cloud → qwen3.5-local:latest fallback) + LM Studio (192.168.254.101:1234) client — no external deps, syntax ✓
+- [x] `lib/agents/orchestrator.js` — Claude-as-planner / local-agent-as-worker pattern (code Q&A, patch proposals, dir review) — syntax ✓
+- [x] `bin/alphaclaw.js` syntax check ✓
+- [x] `lib/mcp/alphaclaw-mcp.js` syntax check ✓
 
-silently fails on a native ARM64 shell.
+---
 
-Fix: add to `package.json` `optionalDependencies`:
+## 🤖 LOCAL AGENT ORCHESTRATION (new)
 
-```json
-"@esbuild/darwin-arm64": "0.25.x",
-"@esbuild/darwin-x64":  "0.25.x"
-```
+Ollama + LM Studio are wired as coding subagents. Claude = orchestrator/planner.
 
-(pin to the same major.minor as `esbuild` devDependency)
-
-Alternatively, verify that `npm install` on a native ARM64 shell auto-selects
-the right binary — if it does, no package.json change needed, just document the
-"use native ARM64 shell" requirement.
-
-### E.2 — npm global install without sudo on macOS
-
-When a user runs `npm install -g @diazmelgarejo/alphaclaw` on a stock macOS,
-npm defaults to `/usr/local` (root-owned). Fix: on darwin, if the npm global
-prefix is not user-writable, log a one-time advisory at startup:
-
-```js
-// bin/alphaclaw.js, early darwin check (~line 130)
-
-if (os.platform() === 'darwin') {
-
-  try {
-
-    const npmPrefix = execSync('npm config get prefix', { encoding: 'utf8' }).trim();
-
-    if (npmPrefix === '/usr/local' || npmPrefix.startsWith('/usr')) {
-      console.log('[alphaclaw] Tip: run `npm config set prefix ~/.local` for sudo-free installs');
-      console.log('[alphaclaw] Then add: export PATH="$HOME/.local/bin:$PATH" to ~/.zshrc');
-    }
-  } catch {}
-}
-```
-
-PATH priority on macOS:
+### Architecture
 
 ```
-~/.local/bin : ~/.node/bin : /opt/homebrew/bin : $PATH
-
+Claude (main)                    Local Agents
+──────────────────               ────────────────────────────────
+Plans, reviews, applies    ←→    Reads files, proposes patches
+MCP: local_agent_*               Ollama  127.0.0.1:11435
+                                   models: GLM-5.1:cloud (primary)
+                                           qwen3.5-local:latest (fallback)
+                                 LM Studio  192.168.254.101:1234
+                                   model: whatever is loaded
 ```
 
-### E.3 — macOS cron → user LaunchAgent
-
-The current code writes `/etc/cron.d/openclaw-hourly-sync` which requires
-root on macOS and silently fails (EACCES, caught and skipped). The pr-4-macos
-cron validation fix improves the schedule parser but does not fix the write
-path. Finish it:
-
-In `bin/alphaclaw.js` cron setup block (~line 595), add darwin branching:
-
-```js
-
-if (os.platform() === 'darwin') {
-
-  // Write ~/Library/LaunchAgents/com.alphaclaw.hourly-sync.plist
-  const plistDir = path.join(os.homedir(), 'Library', 'LaunchAgents');
-  fs.mkdirSync(plistDir, { recursive: true });
-
-  const plistPath = path.join(plistDir, 'com.alphaclaw.hourly-sync.plist');
-
-  const plistContent = buildHourlySyncPlist(hourlyGitSyncPath); // new helper
-
-  fs.writeFileSync(plistPath, plistContent);
-  execSync(`launchctl load -w "${plistPath}"`, { stdio: 'ignore' });
-  console.log('[alphaclaw] LaunchAgent installed for hourly sync');
-
-} else {
-  // existing /etc/cron.d path (unchanged)
-}
+### New MCP tools (available to Claude Code in Xcode/VS Code)
 
 ```
-
-Create `lib/scripts/macos-hourly-sync.plist.template`:
-
-```xml
-
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
-  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0"><dict>
-
-  <key>Label</key><string>com.alphaclaw.hourly-sync</string>
-  <key>ProgramArguments</key>
-  <array><string>@@SYNC_SCRIPT_PATH@@</string></array>
-  <key>StartInterval</key><integer>3600</integer>
-  <key>RunAtLoad</key><false/>
-  <key>StandardOutPath</key>
-  <string>@@LOG_PATH@@</string>
-  <key>StandardErrorPath</key>
-  <string>@@LOG_PATH@@</string>
-
-</dict></plist>
-
+local_agent_health           — check Ollama + LM Studio reachability
+local_agent_list_models      — list all loaded models on both backends
+local_agent_ask_about_code   — delegate file reading + Q&A to local agent
+local_agent_propose_edit     — get a unified diff from local agent (Claude reviews before applying)
 ```
 
-### E.4 — ENOTEMPTY mitigation protocol
-
-On macOS Sonoma, ENOTEMPTY during `npm install` is a concurrent-write race
-(another process holds a handle on `node_modules`). Protocol:
+### Quick test (run on your Mac after `bash scripts/fix-xcode-claude.sh`)
 
 ```bash
-# 1. Find blockers
-lsof +D ./node_modules 2>/dev/null | head -20
-
-# 2. Clean install
-rm -rf node_modules package-lock.json
-npm install
-
-
-
-# 3. If still failing on rename loops, use --no-bin-links and link manually
-npm install --no-bin-links
-ln -sf $(pwd)/node_modules/.bin/esbuild ~/.local/bin/esbuild
+# In Claude Code:
+# > Use local_agent_health to check which agents are running
+# > Use local_agent_ask_about_code on lib/platform.js: "Where does getBinPath return for darwin?"
+# > Use local_agent_propose_edit on bin/alphaclaw.js: "Add better error message when SETUP_PASSWORD is missing"
 ```
 
-Note: Spotlight indexing can occasionally hold handles, but is not the primary
-cause. Closing IDEs and terminals that watch node_modules is more effective.
+### Environment overrides (.env or shell)
 
-### E.5 — CI matrix for macOS
-
-Update `.github/workflows/ci.yml`:
-
-```yaml
-strategy:
-
-  matrix:
-    os: [ubuntu-latest, macos-latest]
-    node-version: [22]
-
-runs-on: ${{ matrix.os }}
-
-steps:
-  - uses: actions/setup-node@v4
-
-    with:
-      node-version: ${{ matrix.node-version }}
+```bash
+OLLAMA_BASE_URL=http://127.0.0.1:11435         # default
+OLLAMA_MODELS=GLM-5.1:cloud,qwen3.5-local:latest  # comma-sep preference list
+OLLAMA_TIMEOUT_MS=30000
+LMSTUDIO_BASE_URL=http://192.168.254.101:1234  # default
+LMSTUDIO_TIMEOUT_MS=30000
 ```
 
 ---
 
-## F — npm Package Preparation for Publishing
+## 🖥️ RUN THESE ON YOUR MAC (not in sandbox)
 
-### F.1 — package.json changes (on feature/MacOS-post-install, version 0.9.6)
+The sandbox uses a FUSE mount that blocks ESM reads (errno -35). Run in a **native ARM64 Terminal**:
+
+```bash
+cd ~/Documents/Terminal\ xCode/claude/OpenClaw/AlphaClaw
+
+# ── Step 1: Fix Xcode Claude integration ──────────────────────────────────
+bash scripts/fix-xcode-claude.sh
+
+# ── Step 2: Install deps ───────────────────────────────────────────────────
+npm install          # picks up @esbuild/darwin-arm64 optional dep
+# NOTE: run only once — parallel invocations → ENOTEMPTY on staging dir
+
+# ── Step 3: Build UI ──────────────────────────────────────────────────────
+npm run build:ui     # ✓ must exit 0 — app.bundle.js ~986KB
+
+# ── Step 4: Full test suite ────────────────────────────────────────────────
+npm test             # 584/594 pass (10 SQLite WAL timeouts in parallel — see Known Issues)
+# OR use coverage for a clean 594/594 green run:
+npm run test:coverage   # ✓ 594/594 — sequential runner avoids WAL contention
+
+# ── Step 5: Watchdog tests ────────────────────────────────────────────────
+npm run test:watchdog   # ✓ 29/29 green
+
+# ── Step 6: Register AlphaClaw MCP server ─────────────────────────────────
+claude mcp add --transport stdio alphaclaw -- node lib/mcp/alphaclaw-mcp.js
+claude mcp list   # should show: xcode, alphaclaw
+
+# ── Step 7: Smoke test ────────────────────────────────────────────────────
+echo "SETUP_PASSWORD=localdev123" > .env
+node bin/alphaclaw.js start
+# ✓ [alphaclaw] LaunchAgent installed (not /etc/cron.d)
+# ✓ ~/.local/bin/gog installed (not /usr/local/bin)
+# ✓ http://localhost:3000 responds
+```
+
+---
+
+## ⚠️ KNOWN ISSUES
+
+### SQLite WAL timeouts in routes tests (parallel mode)
+
+**Status:** Open — upstream fix is partial.
+
+`npm test` (parallel workers) fails 10/594 tests with `Test timed out in 5000ms`. All 594 pass in `npm run test:coverage` (sequential runner).
+
+**What upstream fixed:** `092df06 fix(test): close leaked sqlite handles in db tests` (2026-04-17) added `afterEach(() => db.close())` to 5 db-layer test files. This commit **is already in `pr-4-macos`** (pulled via the 0.9.9 merge `ff7f9d2`).
+
+**What remains:** The 9 routes test files were **not** covered by `092df06`. They create full Express apps with SQLite-backed services but have no `afterEach` cleanup:
+
+| Test file | Missing cleanup |
+|---|---|
+| `tests/server/routes-agents.test.js` | no `afterEach`/`close` |
+| `tests/server/routes-auth.test.js` | partial only |
+| `tests/server/routes-browse.test.js` | partial only |
+| `tests/server/routes-cron.test.js` | no `afterEach`/`close` |
+| `tests/server/routes-models.test.js` | no `afterEach`/`close` |
+| `tests/server/routes-pairings.test.js` | no `afterEach`/`close` |
+| `tests/server/routes-system.test.js` | no `afterEach`/`close` |
+| `tests/server/routes-webhooks.test.js` | no `afterEach`/`close` |
+| `tests/server/usage-db.test.js` | fix present but one test still cascades |
+
+**Next action:** Add `afterEach(() => app.close?.())` or equivalent db teardown to each affected file. This is a candidate for a follow-up PR to upstream.
+
+See [docs/build-errors-macos.md](build-errors-macos.md) for full run log.
+
+---
+
+## 📋 REMAINING (feature/MacOS-post-install branch only)
+
+### F.1 — package.json rename + version bump
+
+**⚠️ NEVER apply to `pr-4-macos`. Feature branch only.**
+
+```bash
+git checkout feature/MacOS-post-install
+```
+
+Edit `package.json`:
 
 | Field | Before | After |
 |---|---|---|
-| `name` | `@chrysb/alphaclaw` | `@diazmelgarejo/alphaclaw` (npm scopes must be **lowercase**) |
-| `version` | `0.9.x` | `0.9.6` (local dev version — NOT cherry-picked to pr-4-macos) |
-| `repository` | `https://github.com/chrysb/alphaclaw.git` | `https://github.com/diazmelgarejo/alphaclaw` |
-| `publishConfig.access` | `public` | `public` (keep) |
-| `engines.node` | `>=22.14.0` | `>=22.14.0` (keep) |
+| `name` | `@chrysb/alphaclaw` | `@diazmelgarejo/alphaclaw` |
+| `version` | `0.9.9` | `0.9.9.6` |
+| `repository.url` | `https://github.com/chrysb/alphaclaw.git` | `https://github.com/diazmelgarejo/alphaclaw` |
 
-**Do NOT cherry-pick the version bump to pr-4-macos.** Version on that branch
-must follow upstream chrysb/alphaclaw versioning.
-
-### F.2 — .npmrc changes
-
-```
-# Replace:
-@chrysb:registry=https://registry.npmjs.org/
-
-# With:
-@diazmelgarejo:registry=https://registry.npmjs.org/
-```
-
-### F.3 — Internal string updates
-
-- `scripts/apply-openclaw-patches.js` line 76: `[@chrysb/alphaclaw]` → `[@diazmelgarejo/alphaclaw]`
-- Search: `grep -r '@chrysb/alphaclaw' lib/ bin/ scripts/`
-
-### F.4 — npm Publishing workflow (manual steps)
+### F.4 — npm publish (after F.1)
 
 ```bash
-# Authenticate
-npm adduser          # create npmjs.com account if needed
-npm login            # authenticate terminal session
-npm whoami           # must print "diazmelgarejo"
-
-# Dry run
-npm pack --dry-run   # verify: bin/, lib/, patches/, scripts/apply-openclaw-patches.js
-
-# Publish (prepack runs build:ui automatically)
+npm whoami          # must print "diazmelgarejo"
+npm pack --dry-run  # verify: bin/, lib/, patches/, scripts/apply-openclaw-patches.js
 npm publish --access public
 ```
 
-**`~/.npmrc` auth token must NEVER be committed.**
+### Xcode 26.3 BETA — final wiring
 
----
+After running `fix-xcode-claude.sh`:
 
-## G — Verification Checklist (clean macOS Sonoma)
+- Install full **Xcode 26.5+** from App Store (only CLT is currently installed — `xcrun mcpbridge` requires the Xcode app)
+- Settings → Intelligence → Model Context Protocol → **"Allow external agents to use Xcode tools"**: ON
+- Re-run `bash scripts/fix-xcode-claude.sh` — xcode MCP server should then connect
+
+### Branch management (end of session)
 
 ```bash
+# Commit all changes on current branch
+git add -A
+git commit -m "feat(macos): E.1-E.5 esbuild/LaunchAgent/CI + MCP server + xcode integration"
+git push origin pr-4-macos
 
-# Pre-requisites
-node --version        # must be ≥ 22.14.0, ARM64 native (not Rosetta)
-npm config get prefix # should be ~/.local, not /usr/local
-
-# Build + test
-npm install
-npm run build:ui      # no ENOTEMPTY, no permission errors, no esbuild arch errors
-npm test              # 440 tests green
-npm run test:watchdog # 14 tests green
-npm run test:coverage # coverage report generated
-
-
-# Runtime smoke (requires SETUP_PASSWORD in .env)
-node bin/alphaclaw.js start
-
-# ✓ Server starts on port 3000
-# ✓ No writes to /usr/local/bin, /etc/cron.d attempted
-# ✓ ~/.local/bin/gog installed
-# ✓ ~/Library/LaunchAgents/com.alphaclaw.hourly-sync.plist created (if onboarded)
-# ✓ PATH advisory logged if npm prefix is root-owned
+# Sync to feature/MacOS-post-install
+git checkout feature/MacOS-post-install
+git cherry-pick <commit-hash-from-above>
+# Then apply F.1 name/version bump + commit
+git push origin feature/MacOS-post-install --force-with-lease
 ```
 
 ---
 
-## H — Critique of the Previous Plans (for reference / avoid regressions)
+## 🔒 INVARIANTS — Never break these
 
-**What the improved proposal got right (absorb these):**
-
-- Apple Silicon / Rosetta 2 esbuild arch mismatch is real and important
-- `@esbuild/darwin-arm64` optional dependency is the correct fix
-- PATH priority for user-space binaries (`~/.local/bin` first)
-- `lsof +D ./node_modules` as ENOTEMPTY diagnostic is practical
-
-**What it still got wrong (do not repeat):**
-
-1. `apply-openclaw-patches.js` is NOT "hardware-aware." It applies npm
-   patch-package patches for WebSocket scope and gateway auth. It reads no
-   hardware info and is not affected by `.env`.
-
-2. SETUP_PASSWORD is NOT an "Onboarding Barrier" to "bypass." It is a
-   mandatory security credential. The process hard-exits (line 503) if missing.
-   The right fix is to put it in `.env`, not to frame it as a bug.
-
-3. GITHUB_TOKEN and GITHUB_WORKSPACE_REPO are NOT required to run
-   `npm run build:ui` or `npm test`. They are only needed for already-onboarded
-   deployments with git sync enabled.
-
-4. ENOTEMPTY is a concurrent-write race condition. Spotlight is a secondary
-   contributor at most. Closing file-watching processes and IDEs is the fix.
-
-5. "Amplifier Principle" and "AI-driven data orchestration" are marketing
-   language not present anywhere in the codebase or CONTRIBUTING.md.
+| Rule | File |
+|---|---|
+| No writes to `/usr/local/bin` on darwin | `lib/platform.js` → `~/.local/bin` |
+| No writes to `/etc/cron.d` on darwin | `bin/alphaclaw.js` E.3 → `~/Library/LaunchAgents/` |
+| No version bump on `pr-4-macos` | version follows upstream chrysb/alphaclaw |
+| `SETUP_PASSWORD` is a security gate | Put in `.env`, never bypass |
+| `sanitizeOpenclawConfig()` before gateway spawn | models:[] guard |
+| Read-only onboarding guard | `lib/server/onboarding/index.js` |
+| `~/.npmrc` auth token never committed | covered by `.gitignore` |
 
 ---
 
-## I — M2 MacBook Sandbox Testing
+## 📡 UPSTREAM / MAINLINE NOTES
+
+> **Out of scope for our macOS PR.** Items here are observations to share with `chrysb/alphaclaw` upstream, not work tracked for this fork.
+
+### npm audit — 20 vulnerabilities (as of 2026-04-19, v0.9.9)
+
+Running `npm audit` on a clean install reports:
+
+| Severity | Count | Key packages |
+| -------- | ----- | ------------ |
+| Critical | 4 | `@whiskeysockets/baileys`, `@whiskeysockets/libsignal-node`, `openclaw`, `protobufjs` |
+| High | 12 | `@chrysb/alphaclaw`, `@discordjs/node-pre-gyp`, `@discordjs/opus`, `@discordjs/voice`, `@buape/carbon` |
+| Moderate | 4 | `axios`, `hono`, `follow-redirects`, `@larksuiteoapi/node-sdk` |
+
+**Assessment:** All critical/high vulnerabilities are in messaging channel dependencies (WhatsApp Baileys, Discord.js) or their transitive deps. None are in the macOS port code path. No immediate user-facing risk unless the WhatsApp or Discord channels are actively used with untrusted input.
+
+**Suggested upstream action:** Run `npm audit fix` where possible; for Baileys/libsignal, check if a newer version of `@whiskeysockets/baileys` has been released with patched deps, or pin to a safe sub-dependency version.
+
+### SQLite WAL fix is incomplete upstream
+
+`092df06 fix(test): close leaked sqlite handles in db tests` (upstream, 2026-04-17) fixed 5 db test files but left 9 routes test files without `afterEach` cleanup. The routes tests time out in parallel mode (`npm test`) but pass sequentially (`npm run test:coverage`). A follow-up fix covering the routes test files would make `npm test` fully green.
