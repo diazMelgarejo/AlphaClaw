@@ -1,12 +1,40 @@
 {
   "hooks": {
-    "PreToolUse": [
+    "SessionStart": [
       {
-        "matcher": "Skill",
         "hooks": [
           {
             "type": "command",
-            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/check-gstack.sh\""
+            "command": "bash scripts/discover-lm-studio.sh 2>&1 | grep -v '^$' || true",
+            "statusMessage": "Syncing LM Studio endpoints...",
+            "async": true
+          },
+          {
+            "type": "command",
+            "command": "git fetch origin pr-4-macos --quiet 2>/dev/null || true",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -c \"import sys,json,os; p=json.loads(os.environ.get('CLAUDE_TOOL_INPUT','{}')).get('file_path',''); sys.exit(1 if 'package-lock.json' in p else 0)\" && true || (echo '⛔ Direct edits to package-lock.json are blocked — run npm install instead' && exit 1)"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npm test --reporter=dot 2>&1 | tail -8 || true"
           }
         ]
       }
