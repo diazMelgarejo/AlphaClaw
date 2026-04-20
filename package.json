@@ -1,18 +1,18 @@
 {
-  "name": "@chrysb/alphaclaw",
-  "version": "0.9.9",
+  "name": "@diazmelgarejo/alphaclaw",
+  "version": "0.9.9.6",
   "publishConfig": {
     "access": "public"
   },
   "description": "Setup UI, gateway manager, and onboarding wrapper for OpenClaw",
   "repository": {
     "type": "git",
-    "url": "https://github.com/chrysb/alphaclaw.git"
+    "url": "https://github.com/diazmelgarejo/alphaclaw.git"
   },
   "bugs": {
     "url": "https://github.com/chrysb/alphaclaw/issues"
   },
-  "homepage": "https://github.com/chrysb/alphaclaw#readme",
+  "homepage": "https://github.com/diazmelgarejo/alphaclaw#readme",
   "license": "MIT",
   "bin": {
     "alphaclaw": "bin/alphaclaw.js"
@@ -34,7 +34,7 @@
     "prepack": "npm run build:ui"
   },
   "dependencies": {
-    "@chrysb/alphaclaw": "^0.7.0",
+    "@chrysb/alphaclaw": "^0.9.9",
     "express": "^4.21.0",
     "http-proxy": "^1.18.1",
     "openclaw": "2026.4.15",
@@ -51,7 +51,7 @@
     "marked": "^16.4.1",
     "preact": "^10.27.2",
     "supertest": "^7.2.2",
-    "tailwindcss": "^3.4.17",
+    "tailwindcss": "3.4.17",
     "vitest": "^4.0.18",
     "wouter-preact": "^3.7.1"
   },
