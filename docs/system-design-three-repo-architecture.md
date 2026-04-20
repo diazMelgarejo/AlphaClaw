@@ -62,7 +62,7 @@ AlphaClaw (`diazMelgarejo/AlphaClaw`) is a macOS ARM64 port of `chrysb/alphaclaw
 | `docs/xcode-claude-integration.md` | `docs/xcode-claude-integration.md` | PT owns Xcode docs |
 | `tests/server/local-agent-client.test.js` | `packages/local-agents/tests/` | Travels with code |
 
-**These files must NOT be cherry-picked into pr-4-macos.** They are PT-destined scaffolding committed only to `feature/MacOS-post-install` until the move is complete.
+**These files must NOT be cherry-picked into pr-4-macos.** They are PT-destined scaffolding committed only to `feature/MacOS-post-install` until the move is complete and proven operational by tests.
 
 ---
 
@@ -79,15 +79,51 @@ node bin/alphaclaw.js --version                # version string
 
 ### 3.2 AlphaClaw HTTP API surface (PT polls/drives these)
 
-| Method | Path | Purpose |
-|---|---|---|
-| GET | `/health` | Liveness check — returns 200 + `{status:"ok"}` |
-| GET | `/api/status` | Server state, uptime, connected providers |
-| GET | `/api/config` | Current openclaw.json (secrets must be redacted by PT) |
-| POST | `/api/config` | Update config (if writable endpoint exists) |
-| GET | `/api/providers` | List AI providers and model arrays |
+Verified via `grep` across `lib/server/routes/` on 2026-04-20. Auth column: **none** = unauthenticated, **setup** = accessible during setup via `SETUP_API_PREFIXES` (constants.js:380), **session** = requires active login session.
 
-> **Note:** Verify these endpoints exist in the current AlphaClaw server before writing PT adapter code. Use `grep -r "router\.\(get\|post\)" lib/server/` to enumerate. Update this table as the living contract.
+#### Control plane — PT adapter uses these
+
+| Method | Path | Auth | Source | Purpose |
+|---|---|---|---|---|
+| GET | `/health` | none | pages.js:4 | Liveness probe — 200 + `{status:"ok"}` |
+| GET | `/api/status` | setup | system.js:530 | Server state, uptime, connected providers |
+| GET | `/api/gateway-status` | setup | system.js:657 | Gateway process health |
+| GET | `/api/gateway/dashboard` | setup | system.js:718 | Full gateway dashboard data |
+| POST | `/api/gateway/restart` | setup | system.js:760 | Restart the gateway process |
+| GET | `/api/restart-status` | setup | system.js:730 | Restart state (for polling after restart) |
+| POST | `/api/restart-status/dismiss` | setup | system.js:744 | Dismiss restart required banner |
+| GET | `/api/onboard/status` | none | onboarding.js:161 | Onboarding completion state |
+| GET | `/api/alphaclaw/version` | setup | system.js:604 | Installed version string |
+| GET | `/api/models` | session | models.js:164 | List available AI models |
+| GET | `/api/models/config` | session | models.js:211 | Model routing config |
+| PUT | `/api/models/config` | session | models.js:234 | Update model routing config |
+| GET | `/api/env` | session | system.js:369 | Read env vars (PT must redact secrets) |
+| PUT | `/api/env` | session | system.js:416 | Write env vars |
+
+#### Auth endpoints — PT needs these to obtain session
+
+| Method | Path | Auth | Purpose |
+|---|---|---|---|
+| POST | `/api/auth/login` | none | Login with SETUP_PASSWORD → session cookie |
+| GET | `/api/auth/status` | none | Check if session is active |
+| POST | `/api/auth/logout` | none | Invalidate session |
+
+#### Watchdog — PT observability hooks
+
+| Method | Path | Auth | Purpose |
+|---|---|---|---|
+| GET | `/api/watchdog/status` | session | Watchdog health state |
+| GET | `/api/watchdog/events` | session | Recent watchdog events |
+| GET | `/api/watchdog/logs` | session | Watchdog log tail |
+| POST | `/api/watchdog/repair` | session | Trigger gateway self-repair |
+
+#### Full route inventory (reference — 50+ routes across 18 route files)
+
+`agents.js` · `auth.js` · `browse/index.js` · `codex.js` · `cron.js` · `doctor.js` · `gmail.js` · `google.js` · `models.js` · `nodes.js` · `onboarding.js` · `pages.js` · `pairings.js` · `proxy.js` · `system.js` · `telegram.js` · `usage.js` · `watchdog.js` · `webhooks.js`
+
+PT adapter only needs the **Control plane** and **Auth** groups above. The rest are application-level routes (Telegram, Gmail, Google OAuth, Codex, etc.) that PT does not manage.
+
+> **Living contract:** Run `grep -rn "app\.\(get\|post\|put\|delete\)" lib/server/routes/` to re-enumerate after any AlphaClaw upstream merge. Update this table when the surface changes.
 
 ### 3.3 AlphaClaw config files (PT manages these)
 
@@ -338,7 +374,7 @@ gstack v1.3 provides the `/browse`, `/review`, `/ship`, `/qa`, `/investigate` an
 - Use `/ship` pre-release checklist before any `npm publish`
 - Use `/investigate` for root-cause analysis of adapter failures
 
-Install: `bash scripts/install-gstack.sh` (requires bun). See `CLAUDE.md §gstack` for full skill table.
+Install: `bash scripts/install-gstack.sh` (requires bun). See `CLAUDE.md §gstack` for full skill table. Harmonize and merge with all existing markdowns, lessons, and skills?
 
 ---
 
@@ -362,7 +398,7 @@ Install: `bash scripts/install-gstack.sh` (requires bun). See `CLAUDE.md §gstac
 | AlphaClaw read-only onboarding guard intact | `lib/server/onboarding/index.js` — do not touch |
 | `sanitizeOpenclawConfig()` runs before every gateway spawn | `bin/alphaclaw.js` — upstream invariant |
 | No writes to `/usr/local/bin` or `/etc/cron.d` on darwin | `lib/platform.js` → `~/.local/bin`, `~/Library/LaunchAgents` |
-| `lib/mcp/` and `lib/agents/` never land in `pr-4-macos` | Enforced by branch rules — feature branch only until moved to PT |
+| `lib/mcp/` and `lib/agents/` never land in `pr-4-macos` | Enforced by branch rules — feature branch only until moved to PT and confirmed operational by new tests |
 | No patch applied by local agent without Claude review | `proposeCodeEdit()` returns diff only — apply is explicit |
 | PT drives AlphaClaw via CLI/HTTP only — never `require()` | Adapter interface contract §3 |
 | All AlphaClaw tests green before any Gate transition | CI must pass |
@@ -396,6 +432,6 @@ B. The Repo Links we are working on (where it will land):
 
 i. <https://github.com/diazMelgarejo/AlphaClaw> the branch "feature/MacOS-post-install" will be our home to prepare the thin custom add-ons and configuration on top of it for PT & UTS use (dependency)
 
-ii. PT=<https://github.com/diazMelgarejo/Perplexity-Tools> main
+ii. old PT = `diazMelgarejo/Perplexity-Tools` renamed → <https://github.com/diazMelgarejo/Perpetua-Tools> main
 
-iii. UTS=<https://github.com/diazMelgarejo/ultrathink-system> main
+iii. old UTS = `diazMelgarejo/ultrathink-system` renamed → <https://github.com/diazMelgarejo/orama-system> main
