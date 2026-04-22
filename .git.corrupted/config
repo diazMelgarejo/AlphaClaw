@@ -1,0 +1,20 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+	ignorecase = true
+	precomposeunicode = true
+[remote "origin"]
+	url = https://github.com/diazMelgarejo/AlphaClaw.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "main"]
+	remote = origin
+	merge = refs/heads/main
+[branch "feature/MacOS-post-install"]
+	remote = origin
+	merge = refs/heads/feature/MacOS-post-install
+	vscode-merge-base = origin/feature/MacOS-post-install
+[remote "upstream"]
+	url = https://github.com/chrysb/alphaclaw.git
+	fetch = +refs/heads/*:refs/remotes/upstream/*

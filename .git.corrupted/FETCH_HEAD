@@ -1,0 +1,5 @@
+20825006a3dac983ed021df158399bab5c9a129d		branch 'feature/MacOS-post-install' of https://github.com/diazMelgarejo/AlphaClaw
+9f6143b15d040b4eac68fd5e492789c513df1c65	not-for-merge	branch 'fix/parallel-test-timeouts' of https://github.com/diazMelgarejo/AlphaClaw
+184998b2ebb340c6864bea026d1baa3e09a59b05	not-for-merge	branch 'fix/vitest-singlefork-sqlite-flake' of https://github.com/diazMelgarejo/AlphaClaw
+092df064013f482ad768c17f8880d88b499613bb	not-for-merge	branch 'main' of https://github.com/diazMelgarejo/AlphaClaw
+9baf8b2e9ee1630a5579ad683ede9a4e3a08c5b2	not-for-merge	branch 'pr-4-macos' of https://github.com/diazMelgarejo/AlphaClaw
