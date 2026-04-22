@@ -23,7 +23,7 @@
   <a href="https://updates.alphaclaw.md/desktop/prod/alphaclaw-mac-latest.dmg"><img height="40" src="https://img.shields.io/badge/Download%20for%20macOS-000000?style=for-the-badge&logo=apple&logoColor=white" alt="Download for macOS" /></a>
 </p>
 
-> **Platform:** AlphaClaw currently targets Docker/Linux deployments. macOS local development is not yet supported.
+> **Platform:** AlphaClaw supports Docker/Linux deployments and local macOS development. Linux installs the hourly git sync via `/etc/cron.d`; macOS runs the sync schedule from AlphaClaw's managed in-process scheduler.
 
 ## Features
 
