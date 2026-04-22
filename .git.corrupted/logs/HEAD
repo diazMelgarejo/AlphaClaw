@@ -1,0 +1,13 @@
+0000000000000000000000000000000000000000 092df064013f482ad768c17f8880d88b499613bb Lawrence Melgarejo <Lawrence@bettermind.ph> 1776644437 +0800	clone: from https://github.com/diazMelgarejo/AlphaClaw.git
+092df064013f482ad768c17f8880d88b499613bb 3407ea74bfad54c185ad46ebb37c82c61e2c2618 Lawrence Melgarejo <Lawrence@bettermind.ph> 1776644450 +0800	checkout: moving from main to feature/MacOS-post-install
+3407ea74bfad54c185ad46ebb37c82c61e2c2618 71c6c3b94feff5d0eefc8af8833f6ed21967b378 Lawrence Melgarejo <Lawrence@bettermind.ph> 1776644463 +0800	commit: feat(publish): F.1 rename @chrysb/alphaclaw → @diazmelgarejo/alphaclaw, bump 0.9.9.6
+71c6c3b94feff5d0eefc8af8833f6ed21967b378 057d2e1fb8a3de1de9f06c5e8a4dd5baac8f4358 Lawrence Melgarejo <Lawrence@bettermind.ph> 1776644872 +0800	commit: docs(perpetua): migration plan review + observability artifact
+057d2e1fb8a3de1de9f06c5e8a4dd5baac8f4358 285d73f2be64145bcc251941e42fc825f7f7dab9 Lawrence Melgarejo <Lawrence@bettermind.ph> 1776647310 +0800	commit: docs planning migration
+285d73f2be64145bcc251941e42fc825f7f7dab9 f4218a92810445390fd0473ffc41962223ad6573 Lawrence Melgarejo <Lawrence@bettermind.ph> 1776654530 +0800	commit: docs plan updates before moving to PT
+f4218a92810445390fd0473ffc41962223ad6573 66133f137412e7744311384b3d71020548e5c559 Lawrence Melgarejo <Lawrence@bettermind.ph> 1776678109 +0800	pull --tags origin feature/MacOS-post-install: Fast-forward
+66133f137412e7744311384b3d71020548e5c559 66133f137412e7744311384b3d71020548e5c559 Lawrence Melgarejo <Lawrence@bettermind.ph> 1776739047 +0800	checkout: moving from feature/MacOS-post-install to feature/MacOS-post-install
+66133f137412e7744311384b3d71020548e5c559 989992748390540c3f125cb565fa1bf5decae0a1 Lawrence Melgarejo <Lawrence@bettermind.ph> 1776739048 +0800	pull origin feature/MacOS-post-install: Fast-forward
+989992748390540c3f125cb565fa1bf5decae0a1 0f53355b7b2fc151d0924b7361314c91a07b2640 Lawrence Melgarejo <Lawrence@bettermind.ph> 1776740682 +0800	commit: chore: update package-lock.json after resolving dependencies
+0f53355b7b2fc151d0924b7361314c91a07b2640 914b10af8ab1d7fe2615f7a098afebd6af4fcb22 Lawrence Melgarejo <Lawrence@bettermind.ph> 1776750744 +0800	commit: chore: align default SETUP_PASSWORD with AlphaClaw local fallback
+914b10af8ab1d7fe2615f7a098afebd6af4fcb22 0d46d0020b0182a6279002acc793a49afecd2f1a Lawrence Melgarejo <Lawrence@bettermind.ph> 1776814824 +0800	commit: chore: make openclaw.json.template os-agnostic and document lesson
+0d46d0020b0182a6279002acc793a49afecd2f1a 20825006a3dac983ed021df158399bab5c9a129d Lawrence Melgarejo <Lawrence@bettermind.ph> 1776816657 +0800	commit: chore: enforce upstream-compatible ghost orchestration policy

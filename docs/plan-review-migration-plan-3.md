@@ -39,7 +39,7 @@ Day 3: harden retry/backoff + write remaining E2E + file AlphaClaw cleanup PR + 
 
 This is 3–4 weeks of real engineering compressed into 72 hours. The plan correctly identifies the design principles but then attaches a timeline that ignores the work involved in standing up two greenfield repos from scratch (package.json, TypeScript config, CI, test harness, adapter library, MCP toolpack, orchestrator service). **Do not use this timeline. It will demoralize rather than focus.**
 
-### 2. Name confusion is live right now
+### 2. Name confusion is RESOLVED
 
 The plan body says "Perpetua-Tools" and "ὅραμα System" (orama-system). Section B links say `diazMelgarejo/Perplexity-Tools` and `diazMelgarejo/ultrathink-system`. The user's GitHub repos currently have the old names. Until the GitHub rename happens, every reference to PT and UTS in docs, scripts, and `package.json` will be ambiguous. The rename needs to happen (and be recorded) before any scaffolding code references the new names.
 
@@ -70,7 +70,7 @@ Package naming, export shape, semver strategy, and scoping all flow from whether
 
 This is the mockup design (placeholder) of what we will build:
 
-```
+```ascii
 alphaclaw-observability/
 │
 ├── README.md
@@ -138,7 +138,7 @@ Tag before removals. Strangler-fig. Green tests before cutover. These three cons
 
 ## Recommended modifications to the plan
 
-1. **Do the GitHub rename first** (Perplexity-Tools → Perpetua-Tools, ultrathink-system → orama-system) before any scaffolding references the new names.
+1. **DONE: GitHub rename** (Perplexity-Tools → Perpetua-Tools, ultrathink-system → orama-system) before any scaffolding references the new names.
 
 2. **Replace the 3-day timeline with milestone gates:**
    - Gate 0: Repos exist, CI scaffolded, adapter contract written (one-page interface doc)
