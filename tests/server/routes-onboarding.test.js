@@ -300,6 +300,11 @@ describe("server/routes/onboarding", () => {
         ok: false,
         statusText: "Not Found",
         json: async () => ({ message: "Not Found" }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        headers: { get: () => "" },
+        json: async () => [{ login: "make-stories" }],
       });
 
     const res = await request(app).post("/api/onboard/github/verify").send({
@@ -315,6 +320,39 @@ describe("server/routes/onboarding", () => {
       repoIsEmpty: false,
       tempDir: null,
     });
+  });
+
+  it("rejects new workspace repos with an owner typo during github verification", async () => {
+    const deps = createBaseDeps();
+    const app = createApp(deps);
+    global.fetch
+      .mockResolvedValueOnce({
+        ok: true,
+        headers: { get: () => "repo" },
+        json: async () => ({ login: "chrysbtest" }),
+      })
+      .mockResolvedValueOnce({
+        status: 404,
+        ok: false,
+        statusText: "Not Found",
+        json: async () => ({ message: "Not Found" }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        headers: { get: () => "" },
+        json: async () => [],
+      });
+
+    const res = await request(app).post("/api/onboard/github/verify").send({
+      repo: "chrybtest/test81",
+      token: "ghp_test_123456789",
+      mode: "new",
+    });
+
+    expect(res.status).toBe(400);
+    expect(res.body.ok).toBe(false);
+    expect(res.body.error).toContain('Repository owner "chrybtest"');
+    expect(res.body.error).toContain('authenticated GitHub user "chrysbtest"');
   });
 
   it("surfaces a hidden repo-name conflict during github verification", async () => {
