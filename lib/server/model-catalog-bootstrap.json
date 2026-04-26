@@ -1,9 +1,474 @@
 {
   "version": 1,
   "source": "openclaw models list --all --json",
-  "generatedAt": "2026-04-25T20:50:41.486Z",
-  "openclawVersion": "2026.4.23 (a979721)",
+  "generatedAt": "2026-04-26T15:23:20.263Z",
+  "openclawVersion": "2026.4.24 (cbcfdf6)",
   "models": [
+    {
+      "key": "amazon-bedrock/amazon.nova-2-lite-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Nova 2 Lite"
+    },
+    {
+      "key": "amazon-bedrock/amazon.nova-lite-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Nova Lite"
+    },
+    {
+      "key": "amazon-bedrock/amazon.nova-micro-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Nova Micro"
+    },
+    {
+      "key": "amazon-bedrock/amazon.nova-premier-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Nova Premier"
+    },
+    {
+      "key": "amazon-bedrock/amazon.nova-pro-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Nova Pro"
+    },
+    {
+      "key": "amazon-bedrock/anthropic.claude-3-5-haiku-20241022-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Claude Haiku 3.5"
+    },
+    {
+      "key": "amazon-bedrock/anthropic.claude-3-5-sonnet-20240620-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Claude Sonnet 3.5"
+    },
+    {
+      "key": "amazon-bedrock/anthropic.claude-3-5-sonnet-20241022-v2:0",
+      "provider": "amazon-bedrock",
+      "label": "Claude Sonnet 3.5 v2"
+    },
+    {
+      "key": "amazon-bedrock/anthropic.claude-3-7-sonnet-20250219-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Claude Sonnet 3.7"
+    },
+    {
+      "key": "amazon-bedrock/anthropic.claude-3-haiku-20240307-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Claude Haiku 3"
+    },
+    {
+      "key": "amazon-bedrock/anthropic.claude-haiku-4-5-20251001-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Claude Haiku 4.5"
+    },
+    {
+      "key": "amazon-bedrock/anthropic.claude-opus-4-1-20250805-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Claude Opus 4.1"
+    },
+    {
+      "key": "amazon-bedrock/anthropic.claude-opus-4-20250514-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Claude Opus 4"
+    },
+    {
+      "key": "amazon-bedrock/anthropic.claude-opus-4-5-20251101-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Claude Opus 4.5"
+    },
+    {
+      "key": "amazon-bedrock/anthropic.claude-opus-4-6-v1",
+      "provider": "amazon-bedrock",
+      "label": "Claude Opus 4.6"
+    },
+    {
+      "key": "amazon-bedrock/anthropic.claude-opus-4-7",
+      "provider": "amazon-bedrock",
+      "label": "Claude Opus 4.7"
+    },
+    {
+      "key": "amazon-bedrock/anthropic.claude-sonnet-4-20250514-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Claude Sonnet 4"
+    },
+    {
+      "key": "amazon-bedrock/anthropic.claude-sonnet-4-5-20250929-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Claude Sonnet 4.5"
+    },
+    {
+      "key": "amazon-bedrock/anthropic.claude-sonnet-4-6",
+      "provider": "amazon-bedrock",
+      "label": "Claude Sonnet 4.6"
+    },
+    {
+      "key": "amazon-bedrock/au.anthropic.claude-opus-4-6-v1",
+      "provider": "amazon-bedrock",
+      "label": "AU Anthropic Claude Opus 4.6"
+    },
+    {
+      "key": "amazon-bedrock/au.anthropic.claude-sonnet-4-6",
+      "provider": "amazon-bedrock",
+      "label": "AU Anthropic Claude Sonnet 4.6"
+    },
+    {
+      "key": "amazon-bedrock/deepseek.r1-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "DeepSeek-R1"
+    },
+    {
+      "key": "amazon-bedrock/deepseek.v3-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "DeepSeek-V3.1"
+    },
+    {
+      "key": "amazon-bedrock/deepseek.v3.2",
+      "provider": "amazon-bedrock",
+      "label": "DeepSeek-V3.2"
+    },
+    {
+      "key": "amazon-bedrock/eu.anthropic.claude-haiku-4-5-20251001-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Claude Haiku 4.5 (EU)"
+    },
+    {
+      "key": "amazon-bedrock/eu.anthropic.claude-opus-4-5-20251101-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Claude Opus 4.5 (EU)"
+    },
+    {
+      "key": "amazon-bedrock/eu.anthropic.claude-opus-4-6-v1",
+      "provider": "amazon-bedrock",
+      "label": "Claude Opus 4.6 (EU)"
+    },
+    {
+      "key": "amazon-bedrock/eu.anthropic.claude-opus-4-7",
+      "provider": "amazon-bedrock",
+      "label": "Claude Opus 4.7 (EU)"
+    },
+    {
+      "key": "amazon-bedrock/eu.anthropic.claude-sonnet-4-20250514-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Claude Sonnet 4 (EU)"
+    },
+    {
+      "key": "amazon-bedrock/eu.anthropic.claude-sonnet-4-5-20250929-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Claude Sonnet 4.5 (EU)"
+    },
+    {
+      "key": "amazon-bedrock/eu.anthropic.claude-sonnet-4-6",
+      "provider": "amazon-bedrock",
+      "label": "Claude Sonnet 4.6 (EU)"
+    },
+    {
+      "key": "amazon-bedrock/global.anthropic.claude-haiku-4-5-20251001-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Claude Haiku 4.5 (Global)"
+    },
+    {
+      "key": "amazon-bedrock/global.anthropic.claude-opus-4-5-20251101-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Claude Opus 4.5 (Global)"
+    },
+    {
+      "key": "amazon-bedrock/global.anthropic.claude-opus-4-6-v1",
+      "provider": "amazon-bedrock",
+      "label": "Claude Opus 4.6 (Global)"
+    },
+    {
+      "key": "amazon-bedrock/global.anthropic.claude-opus-4-7",
+      "provider": "amazon-bedrock",
+      "label": "Claude Opus 4.7 (Global)"
+    },
+    {
+      "key": "amazon-bedrock/global.anthropic.claude-sonnet-4-20250514-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Claude Sonnet 4 (Global)"
+    },
+    {
+      "key": "amazon-bedrock/global.anthropic.claude-sonnet-4-5-20250929-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Claude Sonnet 4.5 (Global)"
+    },
+    {
+      "key": "amazon-bedrock/global.anthropic.claude-sonnet-4-6",
+      "provider": "amazon-bedrock",
+      "label": "Claude Sonnet 4.6 (Global)"
+    },
+    {
+      "key": "amazon-bedrock/google.gemma-3-27b-it",
+      "provider": "amazon-bedrock",
+      "label": "Google Gemma 3 27B Instruct"
+    },
+    {
+      "key": "amazon-bedrock/google.gemma-3-4b-it",
+      "provider": "amazon-bedrock",
+      "label": "Gemma 3 4B IT"
+    },
+    {
+      "key": "amazon-bedrock/meta.llama3-1-405b-instruct-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Llama 3.1 405B Instruct"
+    },
+    {
+      "key": "amazon-bedrock/meta.llama3-1-70b-instruct-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Llama 3.1 70B Instruct"
+    },
+    {
+      "key": "amazon-bedrock/meta.llama3-1-8b-instruct-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Llama 3.1 8B Instruct"
+    },
+    {
+      "key": "amazon-bedrock/meta.llama3-2-11b-instruct-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Llama 3.2 11B Instruct"
+    },
+    {
+      "key": "amazon-bedrock/meta.llama3-2-1b-instruct-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Llama 3.2 1B Instruct"
+    },
+    {
+      "key": "amazon-bedrock/meta.llama3-2-3b-instruct-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Llama 3.2 3B Instruct"
+    },
+    {
+      "key": "amazon-bedrock/meta.llama3-2-90b-instruct-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Llama 3.2 90B Instruct"
+    },
+    {
+      "key": "amazon-bedrock/meta.llama3-3-70b-instruct-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Llama 3.3 70B Instruct"
+    },
+    {
+      "key": "amazon-bedrock/meta.llama4-maverick-17b-instruct-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Llama 4 Maverick 17B Instruct"
+    },
+    {
+      "key": "amazon-bedrock/meta.llama4-scout-17b-instruct-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Llama 4 Scout 17B Instruct"
+    },
+    {
+      "key": "amazon-bedrock/minimax.minimax-m2",
+      "provider": "amazon-bedrock",
+      "label": "MiniMax M2"
+    },
+    {
+      "key": "amazon-bedrock/minimax.minimax-m2.1",
+      "provider": "amazon-bedrock",
+      "label": "MiniMax M2.1"
+    },
+    {
+      "key": "amazon-bedrock/minimax.minimax-m2.5",
+      "provider": "amazon-bedrock",
+      "label": "MiniMax M2.5"
+    },
+    {
+      "key": "amazon-bedrock/mistral.devstral-2-123b",
+      "provider": "amazon-bedrock",
+      "label": "Devstral 2 123B"
+    },
+    {
+      "key": "amazon-bedrock/mistral.magistral-small-2509",
+      "provider": "amazon-bedrock",
+      "label": "Magistral Small 1.2"
+    },
+    {
+      "key": "amazon-bedrock/mistral.ministral-3-14b-instruct",
+      "provider": "amazon-bedrock",
+      "label": "Ministral 14B 3.0"
+    },
+    {
+      "key": "amazon-bedrock/mistral.ministral-3-3b-instruct",
+      "provider": "amazon-bedrock",
+      "label": "Ministral 3 3B"
+    },
+    {
+      "key": "amazon-bedrock/mistral.ministral-3-8b-instruct",
+      "provider": "amazon-bedrock",
+      "label": "Ministral 3 8B"
+    },
+    {
+      "key": "amazon-bedrock/mistral.mistral-large-3-675b-instruct",
+      "provider": "amazon-bedrock",
+      "label": "Mistral Large 3"
+    },
+    {
+      "key": "amazon-bedrock/mistral.pixtral-large-2502-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Pixtral Large (25.02)"
+    },
+    {
+      "key": "amazon-bedrock/mistral.voxtral-mini-3b-2507",
+      "provider": "amazon-bedrock",
+      "label": "Voxtral Mini 3B 2507"
+    },
+    {
+      "key": "amazon-bedrock/mistral.voxtral-small-24b-2507",
+      "provider": "amazon-bedrock",
+      "label": "Voxtral Small 24B 2507"
+    },
+    {
+      "key": "amazon-bedrock/moonshot.kimi-k2-thinking",
+      "provider": "amazon-bedrock",
+      "label": "Kimi K2 Thinking"
+    },
+    {
+      "key": "amazon-bedrock/moonshotai.kimi-k2.5",
+      "provider": "amazon-bedrock",
+      "label": "Kimi K2.5"
+    },
+    {
+      "key": "amazon-bedrock/nvidia.nemotron-nano-12b-v2",
+      "provider": "amazon-bedrock",
+      "label": "NVIDIA Nemotron Nano 12B v2 VL BF16"
+    },
+    {
+      "key": "amazon-bedrock/nvidia.nemotron-nano-3-30b",
+      "provider": "amazon-bedrock",
+      "label": "NVIDIA Nemotron Nano 3 30B"
+    },
+    {
+      "key": "amazon-bedrock/nvidia.nemotron-nano-9b-v2",
+      "provider": "amazon-bedrock",
+      "label": "NVIDIA Nemotron Nano 9B v2"
+    },
+    {
+      "key": "amazon-bedrock/nvidia.nemotron-super-3-120b",
+      "provider": "amazon-bedrock",
+      "label": "NVIDIA Nemotron 3 Super 120B A12B"
+    },
+    {
+      "key": "amazon-bedrock/openai.gpt-oss-120b-1:0",
+      "provider": "amazon-bedrock",
+      "label": "gpt-oss-120b"
+    },
+    {
+      "key": "amazon-bedrock/openai.gpt-oss-20b-1:0",
+      "provider": "amazon-bedrock",
+      "label": "gpt-oss-20b"
+    },
+    {
+      "key": "amazon-bedrock/openai.gpt-oss-safeguard-120b",
+      "provider": "amazon-bedrock",
+      "label": "GPT OSS Safeguard 120B"
+    },
+    {
+      "key": "amazon-bedrock/openai.gpt-oss-safeguard-20b",
+      "provider": "amazon-bedrock",
+      "label": "GPT OSS Safeguard 20B"
+    },
+    {
+      "key": "amazon-bedrock/qwen.qwen3-235b-a22b-2507-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Qwen3 235B A22B 2507"
+    },
+    {
+      "key": "amazon-bedrock/qwen.qwen3-32b-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Qwen3 32B (dense)"
+    },
+    {
+      "key": "amazon-bedrock/qwen.qwen3-coder-30b-a3b-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Qwen3 Coder 30B A3B Instruct"
+    },
+    {
+      "key": "amazon-bedrock/qwen.qwen3-coder-480b-a35b-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Qwen3 Coder 480B A35B Instruct"
+    },
+    {
+      "key": "amazon-bedrock/qwen.qwen3-coder-next",
+      "provider": "amazon-bedrock",
+      "label": "Qwen3 Coder Next"
+    },
+    {
+      "key": "amazon-bedrock/qwen.qwen3-next-80b-a3b",
+      "provider": "amazon-bedrock",
+      "label": "Qwen/Qwen3-Next-80B-A3B-Instruct"
+    },
+    {
+      "key": "amazon-bedrock/qwen.qwen3-vl-235b-a22b",
+      "provider": "amazon-bedrock",
+      "label": "Qwen/Qwen3-VL-235B-A22B-Instruct"
+    },
+    {
+      "key": "amazon-bedrock/us.anthropic.claude-haiku-4-5-20251001-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Claude Haiku 4.5 (US)"
+    },
+    {
+      "key": "amazon-bedrock/us.anthropic.claude-opus-4-1-20250805-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Claude Opus 4.1 (US)"
+    },
+    {
+      "key": "amazon-bedrock/us.anthropic.claude-opus-4-20250514-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Claude Opus 4 (US)"
+    },
+    {
+      "key": "amazon-bedrock/us.anthropic.claude-opus-4-5-20251101-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Claude Opus 4.5 (US)"
+    },
+    {
+      "key": "amazon-bedrock/us.anthropic.claude-opus-4-6-v1",
+      "provider": "amazon-bedrock",
+      "label": "Claude Opus 4.6 (US)"
+    },
+    {
+      "key": "amazon-bedrock/us.anthropic.claude-opus-4-7",
+      "provider": "amazon-bedrock",
+      "label": "Claude Opus 4.7 (US)"
+    },
+    {
+      "key": "amazon-bedrock/us.anthropic.claude-sonnet-4-20250514-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Claude Sonnet 4 (US)"
+    },
+    {
+      "key": "amazon-bedrock/us.anthropic.claude-sonnet-4-5-20250929-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Claude Sonnet 4.5 (US)"
+    },
+    {
+      "key": "amazon-bedrock/us.anthropic.claude-sonnet-4-6",
+      "provider": "amazon-bedrock",
+      "label": "Claude Sonnet 4.6 (US)"
+    },
+    {
+      "key": "amazon-bedrock/writer.palmyra-x4-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Palmyra X4"
+    },
+    {
+      "key": "amazon-bedrock/writer.palmyra-x5-v1:0",
+      "provider": "amazon-bedrock",
+      "label": "Palmyra X5"
+    },
+    {
+      "key": "amazon-bedrock/zai.glm-4.7",
+      "provider": "amazon-bedrock",
+      "label": "GLM-4.7"
+    },
+    {
+      "key": "amazon-bedrock/zai.glm-4.7-flash",
+      "provider": "amazon-bedrock",
+      "label": "GLM-4.7-Flash"
+    },
+    {
+      "key": "amazon-bedrock/zai.glm-5",
+      "provider": "amazon-bedrock",
+      "label": "GLM-5"
+    },
     {
       "key": "anthropic/claude-3-5-haiku-20241022",
       "provider": "anthropic",
@@ -120,6 +585,221 @@
       "label": "Claude Sonnet 4.6"
     },
     {
+      "key": "anthropic-vertex/claude-opus-4-6",
+      "provider": "anthropic-vertex",
+      "label": "Claude Opus 4.6"
+    },
+    {
+      "key": "anthropic-vertex/claude-sonnet-4-6",
+      "provider": "anthropic-vertex",
+      "label": "Claude Sonnet 4.6"
+    },
+    {
+      "key": "azure-openai-responses/gpt-4",
+      "provider": "azure-openai-responses",
+      "label": "GPT-4"
+    },
+    {
+      "key": "azure-openai-responses/gpt-4-turbo",
+      "provider": "azure-openai-responses",
+      "label": "GPT-4 Turbo"
+    },
+    {
+      "key": "azure-openai-responses/gpt-4.1",
+      "provider": "azure-openai-responses",
+      "label": "GPT-4.1"
+    },
+    {
+      "key": "azure-openai-responses/gpt-4.1-mini",
+      "provider": "azure-openai-responses",
+      "label": "GPT-4.1 mini"
+    },
+    {
+      "key": "azure-openai-responses/gpt-4.1-nano",
+      "provider": "azure-openai-responses",
+      "label": "GPT-4.1 nano"
+    },
+    {
+      "key": "azure-openai-responses/gpt-4o",
+      "provider": "azure-openai-responses",
+      "label": "GPT-4o"
+    },
+    {
+      "key": "azure-openai-responses/gpt-4o-2024-05-13",
+      "provider": "azure-openai-responses",
+      "label": "GPT-4o (2024-05-13)"
+    },
+    {
+      "key": "azure-openai-responses/gpt-4o-2024-08-06",
+      "provider": "azure-openai-responses",
+      "label": "GPT-4o (2024-08-06)"
+    },
+    {
+      "key": "azure-openai-responses/gpt-4o-2024-11-20",
+      "provider": "azure-openai-responses",
+      "label": "GPT-4o (2024-11-20)"
+    },
+    {
+      "key": "azure-openai-responses/gpt-4o-mini",
+      "provider": "azure-openai-responses",
+      "label": "GPT-4o mini"
+    },
+    {
+      "key": "azure-openai-responses/gpt-5",
+      "provider": "azure-openai-responses",
+      "label": "GPT-5"
+    },
+    {
+      "key": "azure-openai-responses/gpt-5-chat-latest",
+      "provider": "azure-openai-responses",
+      "label": "GPT-5 Chat Latest"
+    },
+    {
+      "key": "azure-openai-responses/gpt-5-codex",
+      "provider": "azure-openai-responses",
+      "label": "GPT-5-Codex"
+    },
+    {
+      "key": "azure-openai-responses/gpt-5-mini",
+      "provider": "azure-openai-responses",
+      "label": "GPT-5 Mini"
+    },
+    {
+      "key": "azure-openai-responses/gpt-5-nano",
+      "provider": "azure-openai-responses",
+      "label": "GPT-5 Nano"
+    },
+    {
+      "key": "azure-openai-responses/gpt-5-pro",
+      "provider": "azure-openai-responses",
+      "label": "GPT-5 Pro"
+    },
+    {
+      "key": "azure-openai-responses/gpt-5.1",
+      "provider": "azure-openai-responses",
+      "label": "GPT-5.1"
+    },
+    {
+      "key": "azure-openai-responses/gpt-5.1-chat-latest",
+      "provider": "azure-openai-responses",
+      "label": "GPT-5.1 Chat"
+    },
+    {
+      "key": "azure-openai-responses/gpt-5.1-codex",
+      "provider": "azure-openai-responses",
+      "label": "GPT-5.1 Codex"
+    },
+    {
+      "key": "azure-openai-responses/gpt-5.1-codex-max",
+      "provider": "azure-openai-responses",
+      "label": "GPT-5.1 Codex Max"
+    },
+    {
+      "key": "azure-openai-responses/gpt-5.1-codex-mini",
+      "provider": "azure-openai-responses",
+      "label": "GPT-5.1 Codex mini"
+    },
+    {
+      "key": "azure-openai-responses/gpt-5.2",
+      "provider": "azure-openai-responses",
+      "label": "GPT-5.2"
+    },
+    {
+      "key": "azure-openai-responses/gpt-5.2-chat-latest",
+      "provider": "azure-openai-responses",
+      "label": "GPT-5.2 Chat"
+    },
+    {
+      "key": "azure-openai-responses/gpt-5.2-codex",
+      "provider": "azure-openai-responses",
+      "label": "GPT-5.2 Codex"
+    },
+    {
+      "key": "azure-openai-responses/gpt-5.2-pro",
+      "provider": "azure-openai-responses",
+      "label": "GPT-5.2 Pro"
+    },
+    {
+      "key": "azure-openai-responses/gpt-5.3-chat-latest",
+      "provider": "azure-openai-responses",
+      "label": "GPT-5.3 Chat (latest)"
+    },
+    {
+      "key": "azure-openai-responses/gpt-5.3-codex",
+      "provider": "azure-openai-responses",
+      "label": "GPT-5.3 Codex"
+    },
+    {
+      "key": "azure-openai-responses/gpt-5.3-codex-spark",
+      "provider": "azure-openai-responses",
+      "label": "GPT-5.3 Codex Spark"
+    },
+    {
+      "key": "azure-openai-responses/gpt-5.4",
+      "provider": "azure-openai-responses",
+      "label": "GPT-5.4"
+    },
+    {
+      "key": "azure-openai-responses/gpt-5.4-mini",
+      "provider": "azure-openai-responses",
+      "label": "GPT-5.4 mini"
+    },
+    {
+      "key": "azure-openai-responses/gpt-5.4-nano",
+      "provider": "azure-openai-responses",
+      "label": "GPT-5.4 nano"
+    },
+    {
+      "key": "azure-openai-responses/gpt-5.4-pro",
+      "provider": "azure-openai-responses",
+      "label": "GPT-5.4 Pro"
+    },
+    {
+      "key": "azure-openai-responses/gpt-5.5",
+      "provider": "azure-openai-responses",
+      "label": "GPT-5.5"
+    },
+    {
+      "key": "azure-openai-responses/o1",
+      "provider": "azure-openai-responses",
+      "label": "o1"
+    },
+    {
+      "key": "azure-openai-responses/o1-pro",
+      "provider": "azure-openai-responses",
+      "label": "o1-pro"
+    },
+    {
+      "key": "azure-openai-responses/o3",
+      "provider": "azure-openai-responses",
+      "label": "o3"
+    },
+    {
+      "key": "azure-openai-responses/o3-deep-research",
+      "provider": "azure-openai-responses",
+      "label": "o3-deep-research"
+    },
+    {
+      "key": "azure-openai-responses/o3-mini",
+      "provider": "azure-openai-responses",
+      "label": "o3-mini"
+    },
+    {
+      "key": "azure-openai-responses/o3-pro",
+      "provider": "azure-openai-responses",
+      "label": "o3-pro"
+    },
+    {
+      "key": "azure-openai-responses/o4-mini",
+      "provider": "azure-openai-responses",
+      "label": "o4-mini"
+    },
+    {
+      "key": "azure-openai-responses/o4-mini-deep-research",
+      "provider": "azure-openai-responses",
+      "label": "o4-mini-deep-research"
+    },
+    {
       "key": "cerebras/gpt-oss-120b",
       "provider": "cerebras",
       "label": "GPT OSS 120B"
@@ -138,6 +818,231 @@
       "key": "cerebras/zai-glm-4.7",
       "provider": "cerebras",
       "label": "Z.AI GLM-4.7"
+    },
+    {
+      "key": "deepseek/deepseek-v4-flash",
+      "provider": "deepseek",
+      "label": "DeepSeek V4 Flash"
+    },
+    {
+      "key": "deepseek/deepseek-v4-pro",
+      "provider": "deepseek",
+      "label": "DeepSeek V4 Pro"
+    },
+    {
+      "key": "fireworks/accounts/fireworks/models/deepseek-v3p1",
+      "provider": "fireworks",
+      "label": "DeepSeek V3.1"
+    },
+    {
+      "key": "fireworks/accounts/fireworks/models/deepseek-v3p2",
+      "provider": "fireworks",
+      "label": "DeepSeek V3.2"
+    },
+    {
+      "key": "fireworks/accounts/fireworks/models/glm-4p5",
+      "provider": "fireworks",
+      "label": "GLM 4.5"
+    },
+    {
+      "key": "fireworks/accounts/fireworks/models/glm-4p5-air",
+      "provider": "fireworks",
+      "label": "GLM 4.5 Air"
+    },
+    {
+      "key": "fireworks/accounts/fireworks/models/glm-4p7",
+      "provider": "fireworks",
+      "label": "GLM 4.7"
+    },
+    {
+      "key": "fireworks/accounts/fireworks/models/glm-5",
+      "provider": "fireworks",
+      "label": "GLM 5"
+    },
+    {
+      "key": "fireworks/accounts/fireworks/models/glm-5p1",
+      "provider": "fireworks",
+      "label": "GLM 5.1"
+    },
+    {
+      "key": "fireworks/accounts/fireworks/models/gpt-oss-120b",
+      "provider": "fireworks",
+      "label": "GPT OSS 120B"
+    },
+    {
+      "key": "fireworks/accounts/fireworks/models/gpt-oss-20b",
+      "provider": "fireworks",
+      "label": "GPT OSS 20B"
+    },
+    {
+      "key": "fireworks/accounts/fireworks/models/kimi-k2-instruct",
+      "provider": "fireworks",
+      "label": "Kimi K2 Instruct"
+    },
+    {
+      "key": "fireworks/accounts/fireworks/models/kimi-k2-thinking",
+      "provider": "fireworks",
+      "label": "Kimi K2 Thinking"
+    },
+    {
+      "key": "fireworks/accounts/fireworks/models/kimi-k2p5",
+      "provider": "fireworks",
+      "label": "Kimi K2.5"
+    },
+    {
+      "key": "fireworks/accounts/fireworks/models/kimi-k2p6",
+      "provider": "fireworks",
+      "label": "Kimi K2.6"
+    },
+    {
+      "key": "fireworks/accounts/fireworks/models/minimax-m2p1",
+      "provider": "fireworks",
+      "label": "MiniMax-M2.1"
+    },
+    {
+      "key": "fireworks/accounts/fireworks/models/minimax-m2p5",
+      "provider": "fireworks",
+      "label": "MiniMax-M2.5"
+    },
+    {
+      "key": "fireworks/accounts/fireworks/models/minimax-m2p7",
+      "provider": "fireworks",
+      "label": "MiniMax-M2.7"
+    },
+    {
+      "key": "fireworks/accounts/fireworks/models/qwen3p6-plus",
+      "provider": "fireworks",
+      "label": "Qwen 3.6 Plus"
+    },
+    {
+      "key": "fireworks/accounts/fireworks/routers/kimi-k2p5-turbo",
+      "provider": "fireworks",
+      "label": "Kimi K2.5 Turbo (firepass)"
+    },
+    {
+      "key": "github-copilot/claude-haiku-4.5",
+      "provider": "github-copilot",
+      "label": "Claude Haiku 4.5"
+    },
+    {
+      "key": "github-copilot/claude-opus-4.5",
+      "provider": "github-copilot",
+      "label": "Claude Opus 4.5"
+    },
+    {
+      "key": "github-copilot/claude-opus-4.6",
+      "provider": "github-copilot",
+      "label": "Claude Opus 4.6"
+    },
+    {
+      "key": "github-copilot/claude-opus-4.7",
+      "provider": "github-copilot",
+      "label": "Claude Opus 4.7"
+    },
+    {
+      "key": "github-copilot/claude-sonnet-4",
+      "provider": "github-copilot",
+      "label": "Claude Sonnet 4"
+    },
+    {
+      "key": "github-copilot/claude-sonnet-4.5",
+      "provider": "github-copilot",
+      "label": "Claude Sonnet 4.5"
+    },
+    {
+      "key": "github-copilot/claude-sonnet-4.6",
+      "provider": "github-copilot",
+      "label": "Claude Sonnet 4.6"
+    },
+    {
+      "key": "github-copilot/gemini-2.5-pro",
+      "provider": "github-copilot",
+      "label": "Gemini 2.5 Pro"
+    },
+    {
+      "key": "github-copilot/gemini-3-flash-preview",
+      "provider": "github-copilot",
+      "label": "Gemini 3 Flash"
+    },
+    {
+      "key": "github-copilot/gemini-3-pro-preview",
+      "provider": "github-copilot",
+      "label": "Gemini 3 Pro Preview"
+    },
+    {
+      "key": "github-copilot/gemini-3.1-pro-preview",
+      "provider": "github-copilot",
+      "label": "Gemini 3.1 Pro Preview"
+    },
+    {
+      "key": "github-copilot/gpt-4.1",
+      "provider": "github-copilot",
+      "label": "GPT-4.1"
+    },
+    {
+      "key": "github-copilot/gpt-4o",
+      "provider": "github-copilot",
+      "label": "GPT-4o"
+    },
+    {
+      "key": "github-copilot/gpt-5",
+      "provider": "github-copilot",
+      "label": "GPT-5"
+    },
+    {
+      "key": "github-copilot/gpt-5-mini",
+      "provider": "github-copilot",
+      "label": "GPT-5-mini"
+    },
+    {
+      "key": "github-copilot/gpt-5.1",
+      "provider": "github-copilot",
+      "label": "GPT-5.1"
+    },
+    {
+      "key": "github-copilot/gpt-5.1-codex",
+      "provider": "github-copilot",
+      "label": "GPT-5.1-Codex"
+    },
+    {
+      "key": "github-copilot/gpt-5.1-codex-max",
+      "provider": "github-copilot",
+      "label": "GPT-5.1-Codex-max"
+    },
+    {
+      "key": "github-copilot/gpt-5.1-codex-mini",
+      "provider": "github-copilot",
+      "label": "GPT-5.1-Codex-mini"
+    },
+    {
+      "key": "github-copilot/gpt-5.2",
+      "provider": "github-copilot",
+      "label": "GPT-5.2"
+    },
+    {
+      "key": "github-copilot/gpt-5.2-codex",
+      "provider": "github-copilot",
+      "label": "GPT-5.2-Codex"
+    },
+    {
+      "key": "github-copilot/gpt-5.3-codex",
+      "provider": "github-copilot",
+      "label": "GPT-5.3-Codex"
+    },
+    {
+      "key": "github-copilot/gpt-5.4",
+      "provider": "github-copilot",
+      "label": "GPT-5.4"
+    },
+    {
+      "key": "github-copilot/gpt-5.4-mini",
+      "provider": "github-copilot",
+      "label": "GPT-5.4 Mini"
+    },
+    {
+      "key": "github-copilot/grok-code-fast-1",
+      "provider": "github-copilot",
+      "label": "Grok Code Fast 1"
     },
     {
       "key": "google/gemini-1.5-flash",
@@ -275,14 +1180,149 @@
       "label": "Gemma 4 31B"
     },
     {
-      "key": "groq/compound",
-      "provider": "groq",
-      "label": "Compound"
+      "key": "google-antigravity/claude-opus-4-5-thinking",
+      "provider": "google-antigravity",
+      "label": "Claude Opus 4.5 Thinking (Antigravity)"
     },
     {
-      "key": "groq/compound-mini",
-      "provider": "groq",
-      "label": "Compound Mini"
+      "key": "google-antigravity/claude-opus-4-6-thinking",
+      "provider": "google-antigravity",
+      "label": "Claude Opus 4.6 Thinking (Antigravity)"
+    },
+    {
+      "key": "google-antigravity/claude-sonnet-4-5",
+      "provider": "google-antigravity",
+      "label": "Claude Sonnet 4.5 (Antigravity)"
+    },
+    {
+      "key": "google-antigravity/claude-sonnet-4-5-thinking",
+      "provider": "google-antigravity",
+      "label": "Claude Sonnet 4.5 Thinking (Antigravity)"
+    },
+    {
+      "key": "google-antigravity/claude-sonnet-4-6",
+      "provider": "google-antigravity",
+      "label": "Claude Sonnet 4.6 (Antigravity)"
+    },
+    {
+      "key": "google-antigravity/gemini-3-flash",
+      "provider": "google-antigravity",
+      "label": "Gemini 3 Flash (Antigravity)"
+    },
+    {
+      "key": "google-antigravity/gemini-3.1-pro-high",
+      "provider": "google-antigravity",
+      "label": "Gemini 3.1 Pro High (Antigravity)"
+    },
+    {
+      "key": "google-antigravity/gemini-3.1-pro-low",
+      "provider": "google-antigravity",
+      "label": "Gemini 3.1 Pro Low (Antigravity)"
+    },
+    {
+      "key": "google-antigravity/gpt-oss-120b-medium",
+      "provider": "google-antigravity",
+      "label": "GPT-OSS 120B Medium (Antigravity)"
+    },
+    {
+      "key": "google-gemini-cli/gemini-2.0-flash",
+      "provider": "google-gemini-cli",
+      "label": "Gemini 2.0 Flash (Cloud Code Assist)"
+    },
+    {
+      "key": "google-gemini-cli/gemini-2.5-flash",
+      "provider": "google-gemini-cli",
+      "label": "Gemini 2.5 Flash (Cloud Code Assist)"
+    },
+    {
+      "key": "google-gemini-cli/gemini-2.5-pro",
+      "provider": "google-gemini-cli",
+      "label": "Gemini 2.5 Pro (Cloud Code Assist)"
+    },
+    {
+      "key": "google-gemini-cli/gemini-3-flash-preview",
+      "provider": "google-gemini-cli",
+      "label": "Gemini 3 Flash Preview (Cloud Code Assist)"
+    },
+    {
+      "key": "google-gemini-cli/gemini-3-pro-preview",
+      "provider": "google-gemini-cli",
+      "label": "Gemini 3 Pro Preview (Cloud Code Assist)"
+    },
+    {
+      "key": "google-gemini-cli/gemini-3.1-flash-lite-preview",
+      "provider": "google-gemini-cli",
+      "label": "Gemini 3.1 Flash Lite Preview (Cloud Code Assist)"
+    },
+    {
+      "key": "google-gemini-cli/gemini-3.1-pro-preview",
+      "provider": "google-gemini-cli",
+      "label": "Gemini 3.1 Pro Preview (Cloud Code Assist)"
+    },
+    {
+      "key": "google-vertex/gemini-1.5-flash",
+      "provider": "google-vertex",
+      "label": "Gemini 1.5 Flash (Vertex)"
+    },
+    {
+      "key": "google-vertex/gemini-1.5-flash-8b",
+      "provider": "google-vertex",
+      "label": "Gemini 1.5 Flash-8B (Vertex)"
+    },
+    {
+      "key": "google-vertex/gemini-1.5-pro",
+      "provider": "google-vertex",
+      "label": "Gemini 1.5 Pro (Vertex)"
+    },
+    {
+      "key": "google-vertex/gemini-2.0-flash",
+      "provider": "google-vertex",
+      "label": "Gemini 2.0 Flash (Vertex)"
+    },
+    {
+      "key": "google-vertex/gemini-2.0-flash-lite",
+      "provider": "google-vertex",
+      "label": "Gemini 2.0 Flash Lite (Vertex)"
+    },
+    {
+      "key": "google-vertex/gemini-2.5-flash",
+      "provider": "google-vertex",
+      "label": "Gemini 2.5 Flash (Vertex)"
+    },
+    {
+      "key": "google-vertex/gemini-2.5-flash-lite",
+      "provider": "google-vertex",
+      "label": "Gemini 2.5 Flash Lite (Vertex)"
+    },
+    {
+      "key": "google-vertex/gemini-2.5-flash-lite-preview-09-2025",
+      "provider": "google-vertex",
+      "label": "Gemini 2.5 Flash Lite Preview 09-25 (Vertex)"
+    },
+    {
+      "key": "google-vertex/gemini-2.5-pro",
+      "provider": "google-vertex",
+      "label": "Gemini 2.5 Pro (Vertex)"
+    },
+    {
+      "key": "google-vertex/gemini-3-flash-preview",
+      "provider": "google-vertex",
+      "label": "Gemini 3 Flash Preview (Vertex)"
+    },
+    {
+      "key": "google-vertex/gemini-3-pro-preview",
+      "provider": "google-vertex",
+      "label": "Gemini 3 Pro Preview (Vertex)"
+    },
+    {
+      "key": "google-vertex/gemini-3.1-pro-preview",
+      "provider": "google-vertex",
+      "label": "Gemini 3.1 Pro Preview (Vertex)"
+    },
+    {
+      "key": "google-vertex/gemini-3.1-pro-preview-customtools",
+      "provider": "google-vertex",
+      "label": "Gemini 3.1 Pro Preview Custom Tools (Vertex)"
     },
     {
       "key": "groq/deepseek-r1-distill-llama-70b",
@@ -293,6 +1333,16 @@
       "key": "groq/gemma2-9b-it",
       "provider": "groq",
       "label": "Gemma 2 9B"
+    },
+    {
+      "key": "groq/compound",
+      "provider": "groq",
+      "label": "Compound"
+    },
+    {
+      "key": "groq/compound-mini",
+      "provider": "groq",
+      "label": "Compound Mini"
     },
     {
       "key": "groq/llama-3.1-8b-instant",
@@ -365,6 +1415,111 @@
       "label": "Qwen3 32B"
     },
     {
+      "key": "huggingface/deepseek-ai/DeepSeek-R1-0528",
+      "provider": "huggingface",
+      "label": "DeepSeek-R1-0528"
+    },
+    {
+      "key": "huggingface/deepseek-ai/DeepSeek-V3.2",
+      "provider": "huggingface",
+      "label": "DeepSeek-V3.2"
+    },
+    {
+      "key": "huggingface/MiniMaxAI/MiniMax-M2.1",
+      "provider": "huggingface",
+      "label": "MiniMax-M2.1"
+    },
+    {
+      "key": "huggingface/MiniMaxAI/MiniMax-M2.5",
+      "provider": "huggingface",
+      "label": "MiniMax-M2.5"
+    },
+    {
+      "key": "huggingface/MiniMaxAI/MiniMax-M2.7",
+      "provider": "huggingface",
+      "label": "MiniMax-M2.7"
+    },
+    {
+      "key": "huggingface/moonshotai/Kimi-K2-Instruct",
+      "provider": "huggingface",
+      "label": "Kimi-K2-Instruct"
+    },
+    {
+      "key": "huggingface/moonshotai/Kimi-K2-Instruct-0905",
+      "provider": "huggingface",
+      "label": "Kimi-K2-Instruct-0905"
+    },
+    {
+      "key": "huggingface/moonshotai/Kimi-K2-Thinking",
+      "provider": "huggingface",
+      "label": "Kimi-K2-Thinking"
+    },
+    {
+      "key": "huggingface/moonshotai/Kimi-K2.5",
+      "provider": "huggingface",
+      "label": "Kimi-K2.5"
+    },
+    {
+      "key": "huggingface/moonshotai/Kimi-K2.6",
+      "provider": "huggingface",
+      "label": "Kimi-K2.6"
+    },
+    {
+      "key": "huggingface/Qwen/Qwen3-235B-A22B-Thinking-2507",
+      "provider": "huggingface",
+      "label": "Qwen3-235B-A22B-Thinking-2507"
+    },
+    {
+      "key": "huggingface/Qwen/Qwen3-Coder-480B-A35B-Instruct",
+      "provider": "huggingface",
+      "label": "Qwen3-Coder-480B-A35B-Instruct"
+    },
+    {
+      "key": "huggingface/Qwen/Qwen3-Coder-Next",
+      "provider": "huggingface",
+      "label": "Qwen3-Coder-Next"
+    },
+    {
+      "key": "huggingface/Qwen/Qwen3-Next-80B-A3B-Instruct",
+      "provider": "huggingface",
+      "label": "Qwen3-Next-80B-A3B-Instruct"
+    },
+    {
+      "key": "huggingface/Qwen/Qwen3-Next-80B-A3B-Thinking",
+      "provider": "huggingface",
+      "label": "Qwen3-Next-80B-A3B-Thinking"
+    },
+    {
+      "key": "huggingface/Qwen/Qwen3.5-397B-A17B",
+      "provider": "huggingface",
+      "label": "Qwen3.5-397B-A17B"
+    },
+    {
+      "key": "huggingface/XiaomiMiMo/MiMo-V2-Flash",
+      "provider": "huggingface",
+      "label": "MiMo-V2-Flash"
+    },
+    {
+      "key": "huggingface/zai-org/GLM-4.7",
+      "provider": "huggingface",
+      "label": "GLM-4.7"
+    },
+    {
+      "key": "huggingface/zai-org/GLM-4.7-Flash",
+      "provider": "huggingface",
+      "label": "GLM-4.7-Flash"
+    },
+    {
+      "key": "huggingface/zai-org/GLM-5",
+      "provider": "huggingface",
+      "label": "GLM-5"
+    },
+    {
+      "key": "huggingface/zai-org/GLM-5.1",
+      "provider": "huggingface",
+      "label": "GLM-5.1"
+    },
+    {
       "key": "kimi-coding/k2p6",
       "provider": "kimi-coding",
       "label": "Kimi K2.6"
@@ -387,6 +1542,16 @@
     {
       "key": "minimax/MiniMax-M2.7-highspeed",
       "provider": "minimax",
+      "label": "MiniMax-M2.7-highspeed"
+    },
+    {
+      "key": "minimax-cn/MiniMax-M2.7",
+      "provider": "minimax-cn",
+      "label": "MiniMax-M2.7"
+    },
+    {
+      "key": "minimax-cn/MiniMax-M2.7-highspeed",
+      "provider": "minimax-cn",
       "label": "MiniMax-M2.7-highspeed"
     },
     {
@@ -520,59 +1685,14 @@
       "label": "Pixtral Large (latest)"
     },
     {
-      "key": "openai-codex/gpt-5.1",
-      "provider": "openai-codex",
-      "label": "GPT-5.1"
+      "key": "ollama/gemma4:31b",
+      "provider": "ollama",
+      "label": "gemma4:31b"
     },
     {
-      "key": "openai-codex/gpt-5.1-codex-max",
-      "provider": "openai-codex",
-      "label": "GPT-5.1 Codex Max"
-    },
-    {
-      "key": "openai-codex/gpt-5.1-codex-mini",
-      "provider": "openai-codex",
-      "label": "GPT-5.1 Codex Mini"
-    },
-    {
-      "key": "openai-codex/gpt-5.2",
-      "provider": "openai-codex",
-      "label": "GPT-5.2"
-    },
-    {
-      "key": "openai-codex/gpt-5.2-codex",
-      "provider": "openai-codex",
-      "label": "GPT-5.2 Codex"
-    },
-    {
-      "key": "openai-codex/gpt-5.3-codex",
-      "provider": "openai-codex",
-      "label": "GPT-5.3 Codex"
-    },
-    {
-      "key": "openai-codex/gpt-5.4",
-      "provider": "openai-codex",
-      "label": "GPT-5.4"
-    },
-    {
-      "key": "openai-codex/gpt-5.4-mini",
-      "provider": "openai-codex",
-      "label": "GPT-5.4 Mini"
-    },
-    {
-      "key": "openai-codex/gpt-5.4-pro",
-      "provider": "openai-codex",
-      "label": "gpt-5.4-pro"
-    },
-    {
-      "key": "openai-codex/gpt-5.5",
-      "provider": "openai-codex",
-      "label": "GPT-5.5"
-    },
-    {
-      "key": "openai-codex/gpt-5.5-pro",
-      "provider": "openai-codex",
-      "label": "gpt-5.5-pro"
+      "key": "ollama/llama3.2:latest",
+      "provider": "ollama",
+      "label": "llama3.2:latest"
     },
     {
       "key": "openai/gpt-4",
@@ -710,6 +1830,11 @@
       "label": "GPT-5.3 Codex"
     },
     {
+      "key": "openai/gpt-5.3-codex-spark",
+      "provider": "openai",
+      "label": "GPT-5.3 Codex Spark"
+    },
+    {
       "key": "openai/gpt-5.4",
       "provider": "openai",
       "label": "GPT-5.4"
@@ -733,11 +1858,6 @@
       "key": "openai/gpt-5.5",
       "provider": "openai",
       "label": "GPT-5.5"
-    },
-    {
-      "key": "openai/gpt-5.5-pro",
-      "provider": "openai",
-      "label": "gpt-5.5-pro"
     },
     {
       "key": "openai/o1",
@@ -778,6 +1898,56 @@
       "key": "openai/o4-mini-deep-research",
       "provider": "openai",
       "label": "o4-mini-deep-research"
+    },
+    {
+      "key": "openai-codex/gpt-5.1",
+      "provider": "openai-codex",
+      "label": "GPT-5.1"
+    },
+    {
+      "key": "openai-codex/gpt-5.1-codex-max",
+      "provider": "openai-codex",
+      "label": "GPT-5.1 Codex Max"
+    },
+    {
+      "key": "openai-codex/gpt-5.1-codex-mini",
+      "provider": "openai-codex",
+      "label": "GPT-5.1 Codex Mini"
+    },
+    {
+      "key": "openai-codex/gpt-5.2",
+      "provider": "openai-codex",
+      "label": "GPT-5.2"
+    },
+    {
+      "key": "openai-codex/gpt-5.2-codex",
+      "provider": "openai-codex",
+      "label": "GPT-5.2 Codex"
+    },
+    {
+      "key": "openai-codex/gpt-5.3-codex",
+      "provider": "openai-codex",
+      "label": "GPT-5.3 Codex"
+    },
+    {
+      "key": "openai-codex/gpt-5.3-codex-spark",
+      "provider": "openai-codex",
+      "label": "GPT-5.3 Codex Spark"
+    },
+    {
+      "key": "openai-codex/gpt-5.4",
+      "provider": "openai-codex",
+      "label": "GPT-5.4"
+    },
+    {
+      "key": "openai-codex/gpt-5.4-mini",
+      "provider": "openai-codex",
+      "label": "GPT-5.4 Mini"
+    },
+    {
+      "key": "openai-codex/gpt-5.5",
+      "provider": "openai-codex",
+      "label": "GPT-5.5"
     },
     {
       "key": "opencode/big-pickle",
@@ -970,6 +2140,66 @@
       "label": "Qwen3.6 Plus"
     },
     {
+      "key": "opencode-go/glm-5",
+      "provider": "opencode-go",
+      "label": "GLM-5"
+    },
+    {
+      "key": "opencode-go/glm-5.1",
+      "provider": "opencode-go",
+      "label": "GLM-5.1"
+    },
+    {
+      "key": "opencode-go/kimi-k2.5",
+      "provider": "opencode-go",
+      "label": "Kimi K2.5"
+    },
+    {
+      "key": "opencode-go/kimi-k2.6",
+      "provider": "opencode-go",
+      "label": "Kimi K2.6 (3x limits)"
+    },
+    {
+      "key": "opencode-go/mimo-v2-omni",
+      "provider": "opencode-go",
+      "label": "MiMo V2 Omni"
+    },
+    {
+      "key": "opencode-go/mimo-v2-pro",
+      "provider": "opencode-go",
+      "label": "MiMo V2 Pro"
+    },
+    {
+      "key": "opencode-go/mimo-v2.5",
+      "provider": "opencode-go",
+      "label": "MiMo V2.5"
+    },
+    {
+      "key": "opencode-go/mimo-v2.5-pro",
+      "provider": "opencode-go",
+      "label": "MiMo V2.5 Pro"
+    },
+    {
+      "key": "opencode-go/minimax-m2.5",
+      "provider": "opencode-go",
+      "label": "MiniMax M2.5"
+    },
+    {
+      "key": "opencode-go/minimax-m2.7",
+      "provider": "opencode-go",
+      "label": "MiniMax M2.7"
+    },
+    {
+      "key": "opencode-go/qwen3.5-plus",
+      "provider": "opencode-go",
+      "label": "Qwen3.5 Plus"
+    },
+    {
+      "key": "opencode-go/qwen3.6-plus",
+      "provider": "opencode-go",
+      "label": "Qwen3.6 Plus"
+    },
+    {
       "key": "openrouter/~anthropic/claude-opus-latest",
       "provider": "openrouter",
       "label": "Anthropic: Claude Opus Latest"
@@ -1107,7 +2337,7 @@
     {
       "key": "openrouter/auto",
       "provider": "openrouter",
-      "label": "Auto"
+      "label": "Auto Router"
     },
     {
       "key": "openrouter/baidu/ernie-4.5-21b-a3b",
@@ -1190,14 +2420,19 @@
       "label": "DeepSeek: DeepSeek V3.2 Exp"
     },
     {
+      "key": "openrouter/deepseek/deepseek-v4-flash",
+      "provider": "openrouter",
+      "label": "DeepSeek: DeepSeek V4 Flash"
+    },
+    {
+      "key": "openrouter/deepseek/deepseek-v4-pro",
+      "provider": "openrouter",
+      "label": "DeepSeek: DeepSeek V4 Pro"
+    },
+    {
       "key": "openrouter/essentialai/rnj-1-instruct",
       "provider": "openrouter",
       "label": "EssentialAI: Rnj 1 Instruct"
-    },
-    {
-      "key": "openrouter/free",
-      "provider": "openrouter",
-      "label": "Free Models Router"
     },
     {
       "key": "openrouter/google/gemini-2.0-flash-001",
@@ -1262,7 +2497,7 @@
     {
       "key": "openrouter/google/gemma-4-26b-a4b-it",
       "provider": "openrouter",
-      "label": "Google: Gemma 4 26B A4B"
+      "label": "Google: Gemma 4 26B A4B "
     },
     {
       "key": "openrouter/google/gemma-4-26b-a4b-it:free",
@@ -1815,6 +3050,11 @@
       "label": "OpenAI: o4 Mini High"
     },
     {
+      "key": "openrouter/free",
+      "provider": "openrouter",
+      "label": "Free Models Router"
+    },
+    {
       "key": "openrouter/prime-intellect/intellect-3",
       "provider": "openrouter",
       "label": "Prime Intellect: INTELLECT-3"
@@ -1832,7 +3072,7 @@
     {
       "key": "openrouter/qwen/qwen-max",
       "provider": "openrouter",
-      "label": "Qwen: Qwen-Max"
+      "label": "Qwen: Qwen-Max "
     },
     {
       "key": "openrouter/qwen/qwen-plus",
@@ -2162,7 +3402,7 @@
     {
       "key": "openrouter/z-ai/glm-4-32b",
       "provider": "openrouter",
-      "label": "Z.ai: GLM 4 32B"
+      "label": "Z.ai: GLM 4 32B "
     },
     {
       "key": "openrouter/z-ai/glm-4.5",
@@ -2418,6 +3658,16 @@
       "key": "vercel-ai-gateway/deepseek/deepseek-v3.2-thinking",
       "provider": "vercel-ai-gateway",
       "label": "DeepSeek V3.2 Thinking"
+    },
+    {
+      "key": "vercel-ai-gateway/deepseek/deepseek-v4-flash",
+      "provider": "vercel-ai-gateway",
+      "label": "DeepSeek V4 Flash"
+    },
+    {
+      "key": "vercel-ai-gateway/deepseek/deepseek-v4-pro",
+      "provider": "vercel-ai-gateway",
+      "label": "DeepSeek V4 Pro"
     },
     {
       "key": "vercel-ai-gateway/google/gemini-2.0-flash",
@@ -2762,7 +4012,7 @@
     {
       "key": "vercel-ai-gateway/openai/gpt-5.2-pro",
       "provider": "vercel-ai-gateway",
-      "label": "GPT 5.2"
+      "label": "GPT 5.2 "
     },
     {
       "key": "vercel-ai-gateway/openai/gpt-5.3-chat",

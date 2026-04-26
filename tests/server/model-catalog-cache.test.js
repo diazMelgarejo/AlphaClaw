@@ -423,7 +423,7 @@ describe("server/model-catalog-cache", () => {
       shellCmd,
       parseJsonFromNoisyOutput,
       normalizeOnboardingModels: normalizeModels,
-      readOpenclawVersion: vi.fn(() => "2026.4.23"),
+      readOpenclawVersion: vi.fn(() => "2026.4.24"),
       logger,
     });
 
