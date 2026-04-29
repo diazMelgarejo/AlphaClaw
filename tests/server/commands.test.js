@@ -31,4 +31,42 @@ describe("server/commands", () => {
       cmd: "openclaw models list --all --json",
     });
   });
+
+  it("preserves timeout metadata on clawCmd failures", async () => {
+    const timeoutError = Object.assign(new Error("Command failed"), {
+      code: null,
+      killed: true,
+      signal: "SIGTERM",
+    });
+    const execMock = vi.fn((cmd, opts, callback) => {
+      callback(timeoutError, "", "");
+    });
+    const { createCommands } = loadCommandsModule({ execMock });
+    const { clawCmd } = createCommands({
+      gatewayEnv: () => ({ OPENCLAW_GATEWAY_TOKEN: "token" }),
+    });
+
+    const result = await clawCmd("nodes status --json", {
+      quiet: true,
+      timeoutMs: 1234,
+    });
+
+    expect(execMock).toHaveBeenCalledWith(
+      "openclaw nodes status --json",
+      expect.objectContaining({
+        timeout: 1234,
+        killSignal: "SIGTERM",
+      }),
+      expect.any(Function),
+    );
+    expect(result).toMatchObject({
+      ok: false,
+      stdout: "",
+      stderr: "",
+      code: null,
+      killed: true,
+      signal: "SIGTERM",
+      timedOut: true,
+    });
+  });
 });
