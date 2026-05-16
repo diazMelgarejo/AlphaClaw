@@ -327,8 +327,6 @@ if (fs.existsSync(envFilePath)) {
   console.log("[alphaclaw] Loaded .env");
 }
 
-const { buildSecretReplacements } = require("../lib/server/helpers");
-
 const runGitSync = () => {
   const githubToken = String(process.env.GITHUB_TOKEN || "").trim();
   const githubRepo = resolveGithubRepoPath(
