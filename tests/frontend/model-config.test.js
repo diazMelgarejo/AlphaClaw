@@ -31,6 +31,7 @@ describe("frontend/model-config", () => {
   it("picks featured models in defined preference order", async () => {
     const modelConfig = await loadModelConfig();
     const featured = modelConfig.getFeaturedModels([
+      { key: "openrouter/anthropic/claude-sonnet-4-6", label: "OpenRouter Sonnet 4.6" },
       { key: "google/gemini-3.1-pro-preview", label: "Gemini 3.1 Pro" },
       { key: "anthropic/claude-opus-4-7", label: "Opus 4.7" },
       { key: "anthropic/claude-opus-4-6", label: "Opus 4.6" },
@@ -44,10 +45,12 @@ describe("frontend/model-config", () => {
       "anthropic/claude-opus-4-6",
       "openai-codex/gpt-5.3-codex",
       "openai-codex/gpt-5.5",
+      "openrouter/anthropic/claude-sonnet-4-6",
       "google/gemini-3.1-pro-preview",
     ]);
     expect(featured[0]?.featuredLabel).toBe("Opus 4.7");
     expect(featured[3]?.featuredLabel).toBe("GPT-5.5");
-    expect(featured[4]?.featuredLabel).toBe("Gemini 3.1 Pro");
+    expect(featured[4]?.featuredLabel).toBe("OpenRouter Sonnet 4.6");
+    expect(featured[5]?.featuredLabel).toBe("Gemini 3.1 Pro");
   });
 });
