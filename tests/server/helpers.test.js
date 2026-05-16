@@ -58,6 +58,7 @@ describe("server/helpers", () => {
     const normalized = normalizeOnboardingModels([
       { key: "unknown/model-a", name: "Ignore me" },
       { key: "openai/gpt-5.1-codex", name: "OpenAI A" },
+      { key: "openrouter/anthropic/claude-sonnet-4-6", name: "OpenRouter Sonnet 4.6" },
       { key: "anthropic/claude-opus-4-6", name: "Opus 4.6" },
       { key: "zai/glm-5", name: "GLM 5" },
       { key: "minimax/MiniMax-M2.5", name: "MiniMax M2.5" },
@@ -73,24 +74,29 @@ describe("server/helpers", () => {
         label: "Opus 4.6",
       },
       {
-        key: "google/gemini-3.1-pro-preview",
-        provider: "google",
-        label: "google/gemini-3.1-pro-preview",
-      },
-      {
-        key: "minimax/MiniMax-M2.5",
-        provider: "minimax",
-        label: "MiniMax M2.5",
-      },
-      {
         key: "openai/gpt-5.1-codex",
         provider: "openai",
         label: "OpenAI A",
       },
       {
+        key: "openrouter/anthropic/claude-sonnet-4-6",
+        provider: "openrouter",
+        label: "OpenRouter Sonnet 4.6",
+      },
+      {
+        key: "google/gemini-3.1-pro-preview",
+        provider: "google",
+        label: "google/gemini-3.1-pro-preview",
+      },
+      {
         key: "zai/glm-5",
         provider: "zai",
         label: "GLM 5",
+      },
+      {
+        key: "minimax/MiniMax-M2.5",
+        provider: "minimax",
+        label: "MiniMax M2.5",
       },
     ]);
   });
