@@ -1,6 +1,11 @@
 ---
 name: macos-port-status
 description: Show AlphaClaw macOS port branch sync status, cherry-pick gaps, and test health
+version: "1.0"
+layer: "agent-local"
+agent_compatibility:
+  - Claude
+  - Codex
 ---
 
 Check AlphaClaw macOS port status:
