@@ -2,6 +2,11 @@
 name: cherry-pick-down
 description: Safely cherry-pick a commit from feature/MacOS-post-install down to pr-4-macos with upstream-compat check
 disable-model-invocation: true
+version: "1.0"
+layer: "agent-local"
+agent_compatibility:
+  - Claude
+  - Codex
 ---
 
 Before cherry-picking any commit to pr-4-macos:
