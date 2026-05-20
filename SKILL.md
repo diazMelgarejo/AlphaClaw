@@ -1,3 +1,15 @@
+---
+name: alphaclaw-skills
+description: Behavioral ruleset for the AlphaClaw repo — branch discipline, duplicate-file prevention, and macOS port invariants.
+version: "1.0"
+layer: "agent-local"
+agent_compatibility:
+  - Claude
+  - Codex
+  - Gemini
+  - Hermes
+---
+
 # AlphaClaw Agent Skills
 
 > **For agents:** This file is your behavioral ruleset for this repo. Read it before making any change. Rules here are derived from real bugs — every "never" has a story behind it.
@@ -161,3 +173,9 @@ All lessons, root-cause analyses, and architectural decisions:
 Session logs:
 - [2026-04-16](docs/superpowers/plans/2026-04-16-session-lessons.md) — dupe cleanup, vitest WAL fix, upstream 0.9.8 sync
 - [2026-04-13](docs/superpowers/plans/2026-04-13-alphaclaw-macos-pr.md) — macOS PR implementation plan
+
+## References
+
+- [`bin/orama-system/skills/openclaw-skills/references/openrouter-defaults.md`](../orama-system/bin/orama-system/skills/openclaw-skills/references/openrouter-defaults.md) — model routing source of truth
+- [`bin/orama-system/skills/openclaw-skills/references/universal-skill-protocol.md`](../orama-system/bin/orama-system/skills/openclaw-skills/references/universal-skill-protocol.md) — invocation envelope standard
+- [`bin/orama-system/skills/openclaw-skills/references/pt-orama-weave.md`](../orama-system/bin/orama-system/skills/openclaw-skills/references/pt-orama-weave.md) — how PT + orama-system cooperate
