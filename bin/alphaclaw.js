@@ -281,7 +281,7 @@ const runGitSync = () => {
   }
 
   const realGitPath = resolveRealGitPath({
-    shimPath: resolveGitShimPath({ env: process.env }),
+    shimPath: resolveGitShimPath(),
   });
   if (!realGitPath) {
     console.error(
@@ -634,7 +634,7 @@ if (fs.existsSync(hourlyGitSyncPath)) {
     }
 
     const cronFilePath = "/etc/cron.d/openclaw-hourly-sync";
-    if (shouldSkipSystemCronInstall({ env: process.env })) {
+    if (shouldSkipSystemCronInstall()) {
       console.log(
         "[alphaclaw] System cron setup skipped by ALPHACLAW_SKIP_SYSTEM_CRON_INSTALL",
       );
@@ -827,11 +827,10 @@ try {
 try {
   const gitAskPassSrc = path.join(__dirname, "..", "lib", "scripts", "git-askpass");
   const gitAskPassDest = resolveGitAskPassPath({
-    env: process.env,
     tmpDir: os.tmpdir(),
   });
   const gitShimTemplatePath = path.join(__dirname, "..", "lib", "scripts", "git");
-  const gitShimDest = resolveGitShimPath({ env: process.env });
+  const gitShimDest = resolveGitShimPath();
 
   if (fs.existsSync(gitAskPassSrc)) {
     fs.mkdirSync(path.dirname(gitAskPassDest), { recursive: true });
