@@ -322,7 +322,7 @@ if (fs.existsSync(envFilePath)) {
     if (eqIdx === -1) continue;
     const key = trimmed.slice(0, eqIdx);
     const value = trimmed.slice(eqIdx + 1);
-    if (value) process.env[key] = value;
+    if (value && !(key in process.env)) process.env[key] = value;
   }
   console.log("[alphaclaw] Loaded .env");
 }
