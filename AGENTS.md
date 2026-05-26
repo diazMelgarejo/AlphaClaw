@@ -79,6 +79,13 @@ Runtime model:
 - Before any destructive or ambiguity-prone record operation, use AskUserQuestions: ask the user which record to change, what status to apply, and whether deletion/replacement is truly intended.
 - Git attribution must stay policy-compliant: primary author may be one of the approved owner emails or an approved well-known AI author such as `Codex <codex@openai.com>`; `Co-authored-by` may include well-known public AI/helper domains and markers, but random/unattributable Gmail co-authors are blocked.
 
+### Security PR stacking directive
+
+- Before opening or preparing any security-remediation PR, read the canonical security policy in `../orama-system/docs/SECURITY-POLICY.md` and follow its "Security PR stacking and merge strategy" section.
+- Merge or revive existing security-priority branches before creating duplicate replacement branches.
+- Stack security PRs in policy-priority order: `PR1` starts from `main`; each `PR(N+1)` is rebased on the previous PR branch before opening.
+- Rebasing or force-updating an existing remote branch requires explicit current user authorization.
+
 ## Operations
 
 ### Release Flow (Beta -> Production)
