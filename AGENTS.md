@@ -245,3 +245,17 @@ Examples:
 - **QA test a URL:** "Load gstack. Run /qa https://..."
 - **Build a feature end-to-end:** "Load gstack. Run /autoplan, implement the plan, then run /ship"
 - **Plan before building:** "Load gstack. Run /office-hours then /autoplan. Save the plan, don't implement."
+
+## Cursor Cloud: git commits
+
+Cloud agents may inject `Co-authored-by` trailers via `~/.cursor/agent-hooks/…/commit-msg.cursor.co-author`. Run on VM boot:
+
+```bash
+bash scripts/git/apply-attribution-guard-all-repos.sh
+```
+
+Hook-free commits: `bash scripts/git/commit-clean.sh -m "type(scope): summary"`.
+
+**Fork policy:** `main` tracks upstream only. Integration branch: `feature/MacOS-post-install`. Open PRs from `cursor/sync-attribution-guards-6421` → `feature/MacOS-post-install` (not → `main`).
+
+See orama-system `docs/wiki/12-cursor-cloud-commit-attribution.md` and `docs/wiki/13-alphaclaw-fork-contrib-branches.md`.
