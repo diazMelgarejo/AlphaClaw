@@ -2,6 +2,7 @@ const {
   shouldSkipSystemCronInstall,
   resolveGitAskPassPath,
   resolveGitShimPath,
+  prependGitShimDirToPath,
   resolveRealGitPath,
   shouldRefreshHourlyGitSyncScript,
 } = require("../../lib/cli/git-runtime");
@@ -39,6 +40,47 @@ describe("cli/git runtime helpers", () => {
       }),
     ).toBe("/state/bin/git");
     expect(resolveGitShimPath({ env: {} })).toBe("/usr/local/bin/git");
+  });
+
+  it("prepends custom git shim directories to PATH", () => {
+    expect(
+      prependGitShimDirToPath({
+        env: {
+          ALPHACLAW_GIT_SHIM_PATH: "/state/bin/git",
+          PATH: "/usr/bin:/bin",
+        },
+        shimPath: "/state/bin/git",
+      }),
+    ).toBe("/state/bin:/usr/bin:/bin");
+
+    expect(
+      prependGitShimDirToPath({
+        env: {
+          ALPHACLAW_GIT_SHIM_PATH: "/state/bin/git",
+          PATH: "/state/bin:/usr/bin:/bin",
+        },
+        shimPath: "/state/bin/git",
+      }),
+    ).toBe("/state/bin:/usr/bin:/bin");
+
+    expect(
+      prependGitShimDirToPath({
+        env: {
+          ALPHACLAW_GIT_SHIM_PATH: "/state/bin/git",
+          PATH: "/usr/bin:/state/bin:/bin",
+        },
+        shimPath: "/state/bin/git",
+      }),
+    ).toBe("/state/bin:/usr/bin:/bin");
+
+    expect(
+      prependGitShimDirToPath({
+        env: {
+          PATH: "/usr/bin:/bin",
+        },
+        shimPath: "/usr/local/bin/git",
+      }),
+    ).toBe("/usr/bin:/bin");
   });
 
   it("resolves a real git path while skipping the installed shim", () => {

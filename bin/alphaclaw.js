@@ -9,6 +9,7 @@ const {
   shouldSkipSystemCronInstall,
   resolveGitAskPassPath,
   resolveGitShimPath,
+  prependGitShimDirToPath,
   normalizeGitSyncFilePath,
   validateGitSyncFilePath,
   resolveRealGitPath,
@@ -831,6 +832,9 @@ try {
   });
   const gitShimTemplatePath = path.join(__dirname, "..", "lib", "scripts", "git");
   const gitShimDest = resolveGitShimPath();
+  process.env.PATH = prependGitShimDirToPath({
+    shimPath: gitShimDest,
+  });
 
   if (fs.existsSync(gitAskPassSrc)) {
     fs.mkdirSync(path.dirname(gitAskPassDest), { recursive: true });
