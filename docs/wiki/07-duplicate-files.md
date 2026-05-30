@@ -88,8 +88,47 @@ Then add `npm run check:dupes` to the CI workflow.
 
 ---
 
+## .git internals variants — more dangerous than tracked files
+
+macOS also creates ` 2` / ` 3` duplicates **inside `.git/`** itself. These are more dangerous than tracked-file dupes because they corrupt git's own state:
+
+| File seen | Impact | Action |
+|-----------|--------|--------|
+| `.git/index 2`, `.git/index 3` | Stale staging-area snapshots from prior sessions. Different SHA + size from live `.git/index`. git ignores them but they confuse diagnostic tools. | Delete: `rm ".git/index 2" ".git/index 3"` (verify SHA differs from live index first — if identical, still safe to delete) |
+| `.git/refs/heads/main 2` | Ghost ref — `git repack -Ad` fatals on `bad object`. Remote tracking push/pull may silently target wrong ref. | Delete: `rm ".git/refs/heads/main 2"` (ref, not branch — no commits lost) |
+| `.git/refs/remotes/origin/feature/MacOS-post-install 2` | Stale remote-tracking snapshot. Causes `git remote prune` to warn. Contains same SHA as canonical ref — nothing unique. | `git remote prune origin` clears these automatically |
+
+**How these get created:** iCloud Drive provenance tracking (`com.apple.provenance` xattr) + Finder background sync. The `.git/` directory should never be in an iCloud-synced folder; if it is, use `brctl evict ~/.../repo/.git` or move the repo to `~/Developer/` (excluded from iCloud by default on macOS).
+
+### Prevention
+
+```bash
+# Add to session checklist — runs in <1s:
+find .git -name "* 2" -o -name "* 3" 2>/dev/null | grep -v "/objects/"
+# Expected: empty. Any result = stale macOS dup inside .git internals.
+
+# Clean remote-tracking ghost refs:
+git remote prune origin
+
+# Clean index dupes (verify non-identical first):
+shasum ".git/index" ".git/index 2" ".git/index 3" 2>/dev/null
+# If sizes/SHAs differ: they are stale; safe to delete
+rm ".git/index 2" ".git/index 3" 2>/dev/null || true
+```
+
+### Encounter log
+
+| Date | Repo | Files found | Unique content? | Action |
+|------|------|-------------|-----------------|--------|
+| 2026-04-16 | AlphaClaw | `lib/platform 2.js`, 12 others | Some had no canonical counterpart | Renamed canonical from ` 2` copies, deleted rest |
+| 2026-05-27 | orama/PT/agate | `.git/refs/heads/main 2` | No (same SHA) | `rm` + `scan_macos_ghost_git_refs()` added to repo_hygiene.py |
+| 2026-05-31 | AlphaClaw | `.git/index 2` (56208B), `.git/index 3` (59526B), `origin/feature/MacOS-post-install 2`, `origin/main 2`, `origin/main 3` | No (stale staging snapshots; remote refs pruned by `git remote prune`) | Remote refs pruned; `.git/index 2/3` pending deletion |
+
+---
+
 ## Related
 
 - [09 — Session Startup Checklist](09-session-checklist.md) — dupe check is step 1
 - [SKILL.md](../../SKILL.md) — the duplicate file rule is encoded as an agent skill
-- Discovered: 2026-04-16 session ([session log](../superpowers/plans/2026-04-16-session-lessons.md))
+- Discovered: 2026-04-16 session ([session log](../superpowers/plans/2026-04-16-session-plans.md))
+- orama LESSONS.md 2026-05-27 — ghost ref scanner added to repo_hygiene.py

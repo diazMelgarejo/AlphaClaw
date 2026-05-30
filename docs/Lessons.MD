@@ -71,3 +71,21 @@
 | 08 | [Subagent Bash](wiki/08-subagent-bash-permissions.md) | Permission inheritance gotcha |
 | 09 | [Session Checklist](wiki/09-session-checklist.md) | Full startup/shutdown command sequence |
 | 10 | [Root Cause Debugging](wiki/10-root-cause-debugging.md) | Mask vs fix, flakiness taxonomy, resource management |
+
+---
+
+## Cross-Repo Lesson Links
+
+AlphaClaw is Layer 1 (infra). orama-system (L3) and Perpetua-Tools (L2) share the same macOS/git environment and accumulate complementary lessons. Check sister docs when a problem feels familiar.
+
+| Topic | AlphaClaw doc | Sister doc |
+|-------|---------------|------------|
+| macOS ` 2`/` 3` duplicate files + `.git` internals | [wiki/07-duplicate-files.md](wiki/07-duplicate-files.md) | `orama-system/docs/LESSONS.md` §2026-05-27 "macOS ghost git refs" + `orama-system/scripts/review/repo_hygiene.py::scan_macos_ghost_git_refs()` |
+| Migration gate ladder (Gate 0→1→2→3→4) | N/A (AlphaClaw is target, not migrator) | Perpetua-Tools `docs/MIGRATION.md` (canonical) |
+| No sleep chains (`sleep N && cmd` blocked) | N/A (shell-level rule, Node project) | `orama-system/bin/orama-system/skills/no-sleep-chains/SKILL.md` |
+| Git identity + Cursor agent commit policy | `scripts/git/check_identity.sh` (Cursor-scoped 2026-05-31) | `orama-system/docs/wiki/08-git-hygiene-and-branching.md` (canonical policy) |
+| gbrain / tooling ops | N/A | `orama-system/bin/orama-system/gstack/SKILL.md` §GBrain Ops |
+
+**Quick paths** (relative from this repo root):
+- orama lessons: `../orama-system/docs/LESSONS.md`
+- PT lessons + migration: `../perplexity-api/Perpetua-Tools/docs/LESSONS.md` / `../perplexity-api/Perpetua-Tools/docs/MIGRATION.md`
