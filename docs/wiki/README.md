@@ -20,6 +20,7 @@
 | [09](09-session-checklist.md) | Session Startup Checklist | Commands to run at the start of every session before touching any code. |
 | [10](10-root-cause-debugging.md) | Root Cause Debugging | Mask vs. fix principle, test flakiness taxonomy (4 types), resource management checklist. |
 | [11](11-windows-dev.md) | Windows Dev Environment | Shims in LM Studio bin; resolve git dynamically from GitHub Desktop. Never symlink versioned install folders. |
+| [12](12-critique-of-naive-plan.md) | Critique of the Naive Plan | Anti-regression notes salvaged from 2026-04-15 drafts: what an early plan got wrong about this codebase (hardware-aware patches, SETUP_PASSWORD, hallucinated subsystems). |
 
 ---
 
