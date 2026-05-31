@@ -89,3 +89,15 @@ AlphaClaw is Layer 1 (infra). orama-system (L3) and Perpetua-Tools (L2) share th
 **Quick paths** (relative from this repo root):
 - orama lessons: `../orama-system/docs/LESSONS.md`
 - PT lessons + migration: `../perplexity-api/Perpetua-Tools/docs/LESSONS.md` / `../perplexity-api/Perpetua-Tools/docs/MIGRATION.md`
+
+---
+
+## Session 2026-05-31 — Migration audit, Gate-2 status, dedup
+
+| Topic | What happened | Details |
+|---|---|---|
+| Migration audit | PT has **absorbed** AlphaClaw's MCP+agents: `lib/mcp`(11 tools)→`packages/alphaclaw-mcp`(14), `lib/agents`→`packages/local-agents`. But overarching goal is **Gate-2 partial** (8 gaps); **do NOT delete `lib/mcp`+`lib/agents` yet** | → PT [alignment plan](../../perplexity-api/Perpetua-Tools/docs/2026-05-31-tri-repo-alignment-completion-plan.md) + [steelman](gate2-lib-mcp-deletion-steelman.md) |
+| Gate-2 live test | `npm install`+`build:ui`+server boot all GREEN on macOS arm64; adapter HTTP transport alive. Auth-gated 14-tool smoke-test still unproven (needs the user's `~/.alphaclaw` SETUP_PASSWORD — never hardcode) | run in MAIN session (subagent Bash can't do npm/node) |
+| `.mcp.json` dependency | registers `lib/mcp/alphaclaw-mcp.js` — must be repointed/removed when that file is retired | → [steelman](gate2-lib-mcp-deletion-steelman.md) |
+| Package rename | `@chrysb/alphaclaw` → `@diazmelgarejo/alphaclaw` on feature branch (`d9087ef`) | feature only, never pr-4-macos |
+| macOS ` 2` dups | quarantined repo-wide to `~/dup-quarantine-2026-05-31` (NOT OneDrive/iCloud — historical Finder/IDE) | → [wiki/07](wiki/07-duplicate-files.md) |
