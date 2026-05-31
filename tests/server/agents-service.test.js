@@ -1277,19 +1277,17 @@ describe("server/agents/service", () => {
 
     expect(result.channel).toBe("telegram");
     expect(writeEnvFile.mock.invocationCallOrder[0]).toBeLessThan(
-      fsMock.writeFileSync.mock.invocationCallOrder[0],
-    );
-    expect(writeEnvFile.mock.invocationCallOrder[0]).toBeLessThan(
       restartGateway.mock.invocationCallOrder[0],
     );
-    expect(restartGateway.mock.invocationCallOrder[0]).toBeLessThan(
-      fsMock.writeFileSync.mock.invocationCallOrder[0],
+    expect(clawCmd.mock.invocationCallOrder[clawCmd.mock.invocationCallOrder.length - 1]).toBeLessThan(
+      restartGateway.mock.invocationCallOrder[0],
     );
     expect(clawCmd).toHaveBeenNthCalledWith(
       1,
       "channels add --channel 'telegram' --name 'Telegram' --token '123:abc'",
       { quiet: true, timeoutMs: 30000 },
     );
+    expect(restartGateway).toHaveBeenCalledTimes(1);
   });
 
   it("creates a discord channel account via channels add cli", async () => {

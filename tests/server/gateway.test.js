@@ -66,9 +66,13 @@ describe("server/gateway restart behavior", () => {
     delete require.cache[modulePath];
   });
 
-  it("uses in-process restart when the gateway port is listening", async () => {
+  it("always cold-starts when the gateway port is listening", async () => {
     const managedChild = createChild();
-    const spawnMock = vi.fn().mockReturnValueOnce(managedChild);
+    const restartSupervisor = createChild();
+    const spawnMock = vi
+      .fn()
+      .mockReturnValueOnce(managedChild)
+      .mockReturnValueOnce(restartSupervisor);
     const execSyncMock = vi.fn(() => "");
     childProcess.spawn = spawnMock;
     childProcess.execSync = execSyncMock;
@@ -97,58 +101,9 @@ describe("server/gateway restart behavior", () => {
     await gateway.restartGateway(reloadEnv);
 
     expect(reloadEnv).toHaveBeenCalledTimes(1);
-    expect(spawnMock).toHaveBeenCalledTimes(1);
-    expect(execSyncMock).toHaveBeenCalledWith("openclaw gateway restart", {
-      env: expect.any(Object),
-      timeout: 90_000,
-      encoding: "utf8",
-    });
-    expect(managedChild.kill).not.toHaveBeenCalled();
-  });
-
-  it("falls back to force cold start when in-process restart fails", async () => {
-    const managedChild = createChild();
-    const restartSupervisor = createChild();
-    const spawnMock = vi
-      .fn()
-      .mockReturnValueOnce(managedChild)
-      .mockReturnValueOnce(restartSupervisor);
-    const execSyncMock = vi.fn((cmd) => {
-      if (String(cmd) === "openclaw gateway restart") {
-        throw new Error("restart failed");
-      }
-      return "";
-    });
-    childProcess.spawn = spawnMock;
-    childProcess.execSync = execSyncMock;
-    fs.existsSync = vi.fn(() => true);
-    let gatewayPortOpen = false;
-    net.createConnection = vi.fn(() => createSocket(() => gatewayPortOpen));
-    delete require.cache[modulePath];
-    const gateway = require(modulePath);
-    fs.readFileSync = vi.fn(() =>
-      JSON.stringify({
-        agents: {
-          defaults: {
-            model: {
-              primary: "openai/gpt-5.1-codex",
-            },
-          },
-        },
-      }),
-    );
-
-    await gateway.startGateway();
-    gatewayPortOpen = true;
-
-    const reloadEnv = vi.fn();
-    const restartPromise = gateway.restartGateway(reloadEnv);
-    await restartPromise;
-
-    expect(reloadEnv).toHaveBeenCalledTimes(1);
-    expect(execSyncMock).toHaveBeenCalledWith(
+    expect(execSyncMock).not.toHaveBeenCalledWith(
       "openclaw gateway restart",
-      expect.objectContaining({ encoding: "utf8" }),
+      expect.anything(),
     );
     expect(spawnMock).toHaveBeenCalledTimes(2);
     expect(spawnMock).toHaveBeenNthCalledWith(
