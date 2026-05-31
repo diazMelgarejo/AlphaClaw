@@ -464,7 +464,7 @@ each have their own pin and their own indexed pages, so semantic results
 match the actual code on disk in this worktree.
 
 Two indexed corpora available via the `gbrain` CLI:
-- This worktree's code (auto-pinned via `.gbrain-source`).
+- This worktree's code (auto-pinned via `.gbrain-source` → `gstack-code-claw-4dc4a8f3-aa4479`).
 - `~/.gstack/` curated memory (registered as `gstack-brain-lawrencecyremelgarejo` source via
   the existing federation pipeline).
 
@@ -479,6 +479,8 @@ Prefer gbrain when:
     `gbrain search "<terms>" --source gstack-brain-lawrencecyremelgarejo`
 
 Grep is still right for known exact strings, regex, multiline patterns, and
-file globs. Run `/sync-gbrain` after meaningful code changes.
+file globs. Run `/sync-gbrain` after meaningful code changes; for ongoing
+auto-sync across all worktrees, run `gbrain autopilot --install` once per
+machine — gbrain's daemon handles incremental refresh on a schedule.
 
 <!-- gstack-gbrain-search-guidance:end -->
