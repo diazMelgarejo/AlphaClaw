@@ -17,3 +17,7 @@ lib/public/css/vendor/
 
 # Local backups left by patching tools (setup_macos.py etc.) — keep on disk, never commit
 *.bak.[0-9]*
+
+# Superseded 2026-04-15 CLAUDE.md planning drafts — kept on disk for reference,
+# never committed. Unique content (§H Critique) lives in docs/wiki/12-critique-of-naive-plan.md
+2026-04-15-xCLAUDE-*.md
