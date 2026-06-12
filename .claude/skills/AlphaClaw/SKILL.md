@@ -4,77 +4,87 @@
 > Auto-generated skill from repository analysis
 
 ## Overview
-This skill teaches the core development patterns and conventions used in the AlphaClaw repository, a JavaScript backend project built with the Express framework. You'll learn how to structure files, write and organize code, and implement tests using the project's established standards.
+This skill teaches the core development patterns and conventions used in the AlphaClaw repository, a TypeScript backend project built with the Express framework. You'll learn how to structure files, write imports/exports, and follow commit and testing conventions to ensure consistency and maintainability in your contributions.
 
 ## Coding Conventions
 
 ### File Naming
 - Use **kebab-case** for all file names.
-  - Example:  
-    ```
-    user-controller.js
-    auth-service.js
-    index.js
-    ```
+
+  **Example:**
+  ```
+  user-controller.ts
+  order-service.ts
+  ```
 
 ### Import Style
-- Always use **relative imports**.
-  - Example:
-    ```js
-    import { getUser } from './user-service.js';
-    import { logger } from '../utils/logger.js';
-    ```
+- Use **relative imports** for referencing local modules.
+
+  **Example:**
+  ```typescript
+  import { getUser } from './user-service';
+  import { Order } from '../models/order';
+  ```
 
 ### Export Style
-- Use **named exports** exclusively.
-  - Example:
-    ```js
-    // user-service.js
-    export function getUser(id) { ... }
-    export function createUser(data) { ... }
-    ```
+- Use **named exports** for all modules.
+
+  **Example:**
+  ```typescript
+  // user-service.ts
+  export function getUser(id: string) { ... }
+  export function createUser(data: UserData) { ... }
+  ```
+
+  ```typescript
+  // Importing named exports
+  import { getUser, createUser } from './user-service';
+  ```
 
 ### Commit Patterns
-- Commit messages are freeform, often prefixed with `recovery`, and average 105 characters.
-  - Example:
-    ```
-    recovery: fixed session restoration after server restart by updating token validation logic
-    ```
+- Commit messages are **freeform** (no strict type or prefix required).
+- Average commit message length: **62 characters**.
+- Prefixes are sometimes used but not enforced.
+
+  **Example:**
+  ```
+  Add endpoint for updating user profile information
+  ```
 
 ## Workflows
 
-### [No Automated Workflows Detected]
-There are currently no automated workflows (such as CI/CD or deployment scripts) detected in this repository.
+*(No automated workflows detected in this repository.)*
 
 ## Testing Patterns
 
-- **Framework:** [Vitest](https://vitest.dev/)
-- **Test File Pattern:** All test files use the `*.test.js` naming convention.
-  - Example:
-    ```
-    user-controller.test.js
-    auth-service.test.js
-    ```
-- **Test Example:**
-    ```js
-    // user-controller.test.js
-    import { describe, it, expect } from 'vitest';
-    import { getUser } from './user-controller.js';
+- **Test file naming:** Use `*.test.*` pattern for test files.
 
-    describe('getUser', () => {
-      it('returns user data for valid ID', () => {
-        const user = getUser(1);
-        expect(user).toBeDefined();
-      });
+  **Example:**
+  ```
+  user-controller.test.ts
+  order-service.test.ts
+  ```
+
+- **Testing framework:** Not explicitly detected. (Check project dependencies or ask the maintainer.)
+
+- **Test location:** Test files are typically placed alongside the files they test or in a dedicated `tests` directory.
+
+  **Example Test File:**
+  ```typescript
+  // user-controller.test.ts
+  import { getUser } from './user-controller';
+
+  describe('getUser', () => {
+    it('should return user data for valid ID', () => {
+      // test implementation
     });
-    ```
+  });
+  ```
 
 ## Commands
-
-| Command        | Purpose                                      |
-|----------------|----------------------------------------------|
-| /test          | Run all tests with Vitest                    |
-| /lint          | (If applicable) Lint codebase for style      |
-| /commit-guide  | Show commit message conventions              |
-| /conventions   | Show coding conventions summary              |
+| Command | Purpose |
+|---------|---------|
+| /test   | Run all tests in the repository |
+| /lint   | Check code for style and formatting issues |
+| /build  | Build the TypeScript project |
 ```
