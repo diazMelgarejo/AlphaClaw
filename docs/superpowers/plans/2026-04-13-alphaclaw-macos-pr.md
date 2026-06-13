@@ -1,3 +1,5 @@
+> ✅ **RESOLVED 2026-06-14** — macOS compatibility shipped on `feature/MacOS-post-install` (the canonical macOS PR branch).
+
 # AlphaClaw macOS Compatibility PR Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
