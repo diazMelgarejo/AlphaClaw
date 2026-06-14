@@ -35,10 +35,10 @@
     "express": "^4.21.0",
     "http-proxy": "^1.18.1",
     "openclaw": "2026.5.6",
-    "ws": "^8.19.0"
+    "ws": "^8.20.1"
   },
   "devDependencies": {
-    "@vitest/coverage-v8": "^4.0.18",
+    "@vitest/coverage-v8": "^4.1.8",
     "@xterm/addon-fit": "^0.10.0",
     "@xterm/xterm": "^5.5.0",
     "chart.js": "^4.5.1",
@@ -48,7 +48,7 @@
     "preact": "^10.27.2",
     "supertest": "^7.2.2",
     "tailwindcss": "3.4.17",
-    "vitest": "^4.0.18",
+    "vitest": "^4.1.8",
     "wouter-preact": "^3.7.1"
   },
   "engines": {
