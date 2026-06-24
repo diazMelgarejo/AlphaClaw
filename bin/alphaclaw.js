@@ -762,27 +762,6 @@ if (fs.existsSync(hourlyGitSyncPath)) {
         "  <key>StandardErrorPath</key>",
         `  <string>${logPath}</string>`,
         "</dict></plist>",
-    } else {
-    if (fs.existsSync(syncCronConfig)) {
-      try {
-        const cfg = JSON.parse(fs.readFileSync(syncCronConfig, "utf8"));
-        cronEnabled = cfg.enabled !== false;
-        const schedule = String(cfg.schedule || "").trim();
-        if (/^(\S+\s+){4}\S+$/.test(schedule)) cronSchedule = schedule;
-      } catch {}
-    }
-
-    const cronFilePath = "/etc/cron.d/openclaw-hourly-sync";
-    if (shouldSkipSystemCronInstall()) {
-      console.log(
-        "[alphaclaw] System cron setup skipped by ALPHACLAW_SKIP_SYSTEM_CRON_INSTALL",
-      );
-    } else if (cronEnabled) {
-      const cronContent = [
-        "SHELL=/bin/bash",
-        "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
-        `${cronSchedule} root bash "${hourlyGitSyncPath}" >> /var/log/openclaw-hourly-sync.log 2>&1`,
-        "",
       ].join("\n");
       try {
         fs.mkdirSync(plistDir, { recursive: true });
@@ -797,20 +776,40 @@ if (fs.existsSync(hourlyGitSyncPath)) {
         );
       }
     } else {
-      const cronConfig = readSystemCronConfig({
-        fs,
-        openclawDir,
-        platform: process.platform,
-      });
-      const cronStatus = applySystemCronConfig({
-        fs,
-        openclawDir,
-        nextConfig: cronConfig,
-        platform: process.platform,
-      });
-      console.log(
-        `[alphaclaw] System cron ${cronStatus.enabled ? "configured" : "disabled"} (${cronStatus.installMethod})`,
-      );
+      // Linux: inline cron install with ALPHACLAW_SKIP_SYSTEM_CRON_INSTALL support
+      let cronEnabled = true;
+      let cronSchedule = "0 * * * *";
+      const syncCronConfig = path.join(openclawDir, "cron", "system-sync.json");
+      if (fs.existsSync(syncCronConfig)) {
+        try {
+          const cfg = JSON.parse(fs.readFileSync(syncCronConfig, "utf8"));
+          cronEnabled = cfg.enabled !== false;
+          const schedule = String(cfg.schedule || "").trim();
+          if (/^(\S+\s+){4}\S+$/.test(schedule)) cronSchedule = schedule;
+        } catch {}
+      }
+      const cronFilePath = "/etc/cron.d/openclaw-hourly-sync";
+      if (shouldSkipSystemCronInstall()) {
+        console.log(
+          "[alphaclaw] System cron setup skipped by ALPHACLAW_SKIP_SYSTEM_CRON_INSTALL",
+        );
+      } else if (cronEnabled) {
+        const cronContent = [
+          "SHELL=/bin/bash",
+          "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+          `${cronSchedule} root bash "${hourlyGitSyncPath}" >> /var/log/openclaw-hourly-sync.log 2>&1`,
+          "",
+        ].join("\n");
+        try {
+          fs.writeFileSync(cronFilePath, cronContent, { mode: 0o644 });
+          console.log("[alphaclaw] System cron entry installed");
+        } catch (cronErr) {
+          console.log(`[alphaclaw] Cron install skipped: ${cronErr.message}`);
+        }
+      } else {
+        try { fs.unlinkSync(cronFilePath); } catch {}
+        console.log("[alphaclaw] System cron entry disabled");
+      }
     }
   } catch (e) {
     console.log(`[alphaclaw] Cron setup skipped: ${e.message}`);
