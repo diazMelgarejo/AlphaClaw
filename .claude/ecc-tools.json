@@ -2,11 +2,11 @@
   "version": "1.3",
   "schemaVersion": "1.0",
   "generatedBy": "ecc-tools",
-  "generatedAt": "2026-06-12T23:15:00.573Z",
+  "generatedAt": "2026-06-24T04:13:18.380Z",
   "repo": "https://github.com/diazMelgarejo/AlphaClaw",
   "referenceSetReadiness": {
-    "score": 0,
-    "present": 0,
+    "score": 14,
+    "present": 1,
     "total": 7,
     "items": [
       {
@@ -40,8 +40,12 @@
       {
         "id": "harness-compatibility",
         "label": "Harness compatibility",
-        "status": "missing",
-        "evidence": [],
+        "status": "present",
+        "evidence": [
+          ".agents/skills/AlphaClaw/SKILL.md",
+          ".agents/skills/AlphaClaw/agents/openai.yaml",
+          ".claude/agents/upstream-compat-reviewer.md"
+        ],
         "recommendation": "Add cross-harness, adapter-compliance, or harness-audit evidence for Claude, Codex, OpenCode, Zed, dmux, and agent surfaces."
       },
       {
@@ -61,21 +65,25 @@
     ]
   },
   "profiles": {
-    "requested": "developer",
-    "recommended": "developer",
+    "requested": "full",
+    "recommended": "full",
     "effective": "developer",
-    "requestedAlias": "developer",
-    "recommendedAlias": "developer",
+    "requestedAlias": "full",
+    "recommendedAlias": "full",
     "effectiveAlias": "developer"
   },
-  "requestedProfile": "developer",
+  "requestedProfile": "full",
   "profile": "developer",
-  "recommendedProfile": "developer",
+  "recommendedProfile": "full",
   "effectiveProfile": "developer",
   "tier": "free",
   "requestedComponents": [
     "repo-baseline",
-    "workflow-automation"
+    "workflow-automation",
+    "security-audits",
+    "research-tooling",
+    "team-rollout",
+    "governance-controls"
   ],
   "selectedComponents": [
     "repo-baseline",
@@ -84,10 +92,19 @@
   "requestedAddComponents": [],
   "requestedRemoveComponents": [],
   "blockedRemovalComponents": [],
-  "tierFilteredComponents": [],
+  "tierFilteredComponents": [
+    "security-audits",
+    "research-tooling",
+    "team-rollout",
+    "governance-controls"
+  ],
   "requestedRootPackages": [
     "runtime-core",
-    "workflow-pack"
+    "workflow-pack",
+    "agentshield-pack",
+    "research-pack",
+    "team-config-sync",
+    "enterprise-controls"
   ],
   "selectedRootPackages": [
     "runtime-core",
@@ -95,7 +112,11 @@
   ],
   "requestedPackages": [
     "runtime-core",
-    "workflow-pack"
+    "workflow-pack",
+    "agentshield-pack",
+    "research-pack",
+    "team-config-sync",
+    "enterprise-controls"
   ],
   "requestedAddPackages": [],
   "requestedRemovePackages": [],
@@ -108,8 +129,18 @@
     "workflow-pack"
   ],
   "blockedRemovalPackages": [],
-  "tierFilteredRootPackages": [],
-  "tierFilteredPackages": [],
+  "tierFilteredRootPackages": [
+    "agentshield-pack",
+    "research-pack",
+    "team-config-sync",
+    "enterprise-controls"
+  ],
+  "tierFilteredPackages": [
+    "agentshield-pack",
+    "research-pack",
+    "team-config-sync",
+    "enterprise-controls"
+  ],
   "conflictingPackages": [],
   "dependencyGraph": {
     "runtime-core": [],
@@ -123,7 +154,11 @@
   ],
   "requestedModules": [
     "runtime-core",
-    "workflow-pack"
+    "workflow-pack",
+    "agentshield-pack",
+    "research-pack",
+    "team-config-sync",
+    "enterprise-controls"
   ],
   "selectedModules": [
     "runtime-core",
@@ -143,7 +178,10 @@
     ".codex/agents/explorer.toml",
     ".codex/agents/reviewer.toml",
     ".codex/agents/docs-researcher.toml",
-    ".claude/homunculus/instincts/inherited/AlphaClaw-instincts.yaml"
+    ".claude/homunculus/instincts/inherited/AlphaClaw-instincts.yaml",
+    ".claude/commands/feature-development.md",
+    ".claude/commands/test-driven-development.md",
+    ".claude/commands/refactoring.md"
   ],
   "packageFiles": {
     "runtime-core": [
@@ -157,6 +195,11 @@
       ".codex/agents/reviewer.toml",
       ".codex/agents/docs-researcher.toml",
       ".claude/homunculus/instincts/inherited/AlphaClaw-instincts.yaml"
+    ],
+    "workflow-pack": [
+      ".claude/commands/feature-development.md",
+      ".claude/commands/test-driven-development.md",
+      ".claude/commands/refactoring.md"
     ]
   },
   "moduleFiles": {
@@ -171,6 +214,11 @@
       ".codex/agents/reviewer.toml",
       ".codex/agents/docs-researcher.toml",
       ".claude/homunculus/instincts/inherited/AlphaClaw-instincts.yaml"
+    ],
+    "workflow-pack": [
+      ".claude/commands/feature-development.md",
+      ".claude/commands/test-driven-development.md",
+      ".claude/commands/refactoring.md"
     ]
   },
   "files": [
@@ -223,14 +271,46 @@
       "moduleId": "runtime-core",
       "path": ".claude/homunculus/instincts/inherited/AlphaClaw-instincts.yaml",
       "description": "Continuous-learning instincts derived from repository patterns."
+    },
+    {
+      "moduleId": "workflow-pack",
+      "path": ".claude/commands/feature-development.md",
+      "description": "Workflow command scaffold for feature-development."
+    },
+    {
+      "moduleId": "workflow-pack",
+      "path": ".claude/commands/test-driven-development.md",
+      "description": "Workflow command scaffold for test-driven-development."
+    },
+    {
+      "moduleId": "workflow-pack",
+      "path": ".claude/commands/refactoring.md",
+      "description": "Workflow command scaffold for refactoring."
     }
   ],
-  "workflows": [],
+  "workflows": [
+    {
+      "command": "feature-development",
+      "path": ".claude/commands/feature-development.md"
+    },
+    {
+      "command": "test-driven-development",
+      "path": ".claude/commands/test-driven-development.md"
+    },
+    {
+      "command": "refactoring",
+      "path": ".claude/commands/refactoring.md"
+    }
+  ],
   "adapters": {
     "claudeCode": {
       "skillPath": ".claude/skills/AlphaClaw/SKILL.md",
       "identityPath": ".claude/identity.json",
-      "commandPaths": []
+      "commandPaths": [
+        ".claude/commands/feature-development.md",
+        ".claude/commands/test-driven-development.md",
+        ".claude/commands/refactoring.md"
+      ]
     },
     "codex": {
       "configPath": ".codex/config.toml",

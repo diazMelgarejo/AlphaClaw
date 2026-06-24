@@ -15,6 +15,9 @@ lib/public/css/vendor/
 # gbrain per-worktree code-source pin (local-only, kubectl-style context)
 .gbrain-source
 
+# hook log dir (session-local, never commit)
+.claude/hooks/.logs/
+
 # Local backups left by patching tools (setup_macos.py etc.) — keep on disk, never commit
 *.bak.[0-9]*
 
