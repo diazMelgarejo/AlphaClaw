@@ -1,5 +1,5 @@
 # Instincts generated from https://github.com/diazMelgarejo/AlphaClaw
-# Generated: 2026-05-31T01:51:31.560Z
+# Generated: 2026-06-12T23:15:15.130Z
 # Version: 2.0
 # NOTE: This file supplements (does not replace) any existing curated instincts.
 # High-confidence manually curated instincts should be preserved alongside these.
@@ -17,11 +17,11 @@ source_repo: https://github.com/diazMelgarejo/AlphaClaw
 
 ## Action
 
-Write detailed commit messages (~105 characters for first line)
+Write moderate-length commit messages (~62 characters)
 
 ## Evidence
 
-- Average commit message length: 105 chars
+- Average commit message length: 62 chars
 - Based on 1 commits
 
 ---
@@ -105,68 +105,8 @@ Place tests in the tests/ or __tests__/ directory, mirroring src structure
 - Tests live in dedicated test folders
 
 ---
-id: AlphaClaw-test-framework
-trigger: "when writing tests"
-confidence: 0.9
-domain: testing
-source: repo-analysis
-source_repo: https://github.com/diazMelgarejo/AlphaClaw
----
-
-# AlphaClaw Test Framework
-
-## Action
-
-Use vitest as the test framework
-
-## Evidence
-
-- Test framework detected: vitest
-- File pattern: *.test.js
-
----
-id: AlphaClaw-test-naming
-trigger: "when creating a test file"
-confidence: 0.85
-domain: testing
-source: repo-analysis
-source_repo: https://github.com/diazMelgarejo/AlphaClaw
----
-
-# AlphaClaw Test Naming
-
-## Action
-
-Name test files using the pattern: *.test.js
-
-## Evidence
-
-- File pattern: *.test.js
-- Consistent across test files
-
----
-id: AlphaClaw-test-types
-trigger: "when planning tests for a feature"
-confidence: 0.7
-domain: testing
-source: repo-analysis
-source_repo: https://github.com/diazMelgarejo/AlphaClaw
----
-
-# AlphaClaw Test Types
-
-## Action
-
-Write unit, integration tests to match project standards
-
-## Evidence
-
-- Test types detected: unit, integration
-- Coverage config: yes
-
----
 id: alphaclaw-instinct-file-naming
-trigger: "When creating a new source file"
+trigger: "When creating a new file"
 confidence: 0.9
 domain: code-style
 source: repo-analysis
@@ -181,7 +121,7 @@ Name the file using kebab-case
 
 ## Evidence
 
-- Pattern in namingConventions.files: kebab-case
+- Pattern in namingConventions.files
 
 ---
 id: alphaclaw-instinct-function-naming
@@ -196,15 +136,15 @@ source_repo: diazMelgarejo/AlphaClaw
 
 ## Action
 
-Use camelCase for the function name
+Name the function using camelCase
 
 ## Evidence
 
-- Pattern in namingConventions.functions: camelCase
+- Pattern in namingConventions.functions
 
 ---
 id: alphaclaw-instinct-class-naming
-trigger: "When creating a new class"
+trigger: "When defining a new class"
 confidence: 0.9
 domain: code-style
 source: repo-analysis
@@ -215,11 +155,11 @@ source_repo: diazMelgarejo/AlphaClaw
 
 ## Action
 
-Use PascalCase for the class name
+Name the class using PascalCase
 
 ## Evidence
 
-- Pattern in namingConventions.classes: PascalCase
+- Pattern in namingConventions.classes
 
 ---
 id: alphaclaw-instinct-constant-naming
@@ -234,11 +174,11 @@ source_repo: diazMelgarejo/AlphaClaw
 
 ## Action
 
-Use SCREAMING_SNAKE_CASE for the constant name
+Name the constant using SCREAMING_SNAKE_CASE
 
 ## Evidence
 
-- Pattern in namingConventions.constants: SCREAMING_SNAKE_CASE
+- Pattern in namingConventions.constants
 
 ---
 id: alphaclaw-instinct-import-style
@@ -257,11 +197,11 @@ Use relative import paths
 
 ## Evidence
 
-- Pattern in importStyle: relative
+- Pattern in importStyle
 
 ---
 id: alphaclaw-instinct-export-style
-trigger: "When exporting functions or variables"
+trigger: "When exporting modules or functions"
 confidence: 0.8
 domain: code-style
 source: repo-analysis
@@ -276,105 +216,29 @@ Use named exports
 
 ## Evidence
 
-- Pattern in exportStyle: named
+- Pattern in exportStyle
 
 ---
-id: alphaclaw-instinct-test-file-pattern
-trigger: "When creating a test file"
-confidence: 0.9
-domain: testing
-source: repo-analysis
-source_repo: diazMelgarejo/AlphaClaw
----
-
-# Alphaclaw Instinct Test File Pattern
-
-## Action
-
-Name the file with the pattern *.test.js
-
-## Evidence
-
-- Pattern in testing.filePattern: *.test.js
-
----
-id: alphaclaw-instinct-test-framework
-trigger: "When writing tests"
-confidence: 0.9
-domain: testing
-source: repo-analysis
-source_repo: diazMelgarejo/AlphaClaw
----
-
-# Alphaclaw Instinct Test Framework
-
-## Action
-
-Use the Vitest framework
-
-## Evidence
-
-- Pattern in testing.framework: vitest
-
----
-id: alphaclaw-instinct-test-type
-trigger: "When organizing tests"
+id: alphaclaw-instinct-test-location
+trigger: "When adding new tests"
 confidence: 0.8
 domain: testing
 source: repo-analysis
 source_repo: diazMelgarejo/AlphaClaw
 ---
 
-# Alphaclaw Instinct Test Type
+# Alphaclaw Instinct Test Location
 
 ## Action
 
-Include both unit and integration tests
+Place test files in a separate directory from source files
 
 ## Evidence
 
-- Pattern in testing.testTypes: unit, integration
+- Pattern in architecture.folderStructure.testLocation
 
 ---
-id: alphaclaw-instinct-test-coverage
-trigger: "When configuring tests"
-confidence: 0.8
-domain: testing
-source: repo-analysis
-source_repo: diazMelgarejo/AlphaClaw
----
-
-# Alphaclaw Instinct Test Coverage
-
-## Action
-
-Enable coverage reporting
-
-## Evidence
-
-- Pattern in testing.coverageConfig: true
-
----
-id: alphaclaw-instinct-commit-prefix
-trigger: "When making a commit related to recovery"
-confidence: 0.9
-domain: git
-source: repo-analysis
-source_repo: diazMelgarejo/AlphaClaw
----
-
-# Alphaclaw Instinct Commit Prefix
-
-## Action
-
-Prefix the commit message with 'recovery:'
-
-## Evidence
-
-- Seen in commit: recovery: staged-uncommitted work — enforce 3-tier IP resolution standards and template os-agnostic paths
-
----
-id: alphaclaw-instinct-commit-length
+id: alphaclaw-instinct-commit-format
 trigger: "When writing a commit message"
 confidence: 0.7
 domain: git
@@ -382,32 +246,13 @@ source: repo-analysis
 source_repo: diazMelgarejo/AlphaClaw
 ---
 
-# Alphaclaw Instinct Commit Length
+# Alphaclaw Instinct Commit Format
 
 ## Action
 
-Aim for detailed commit messages averaging around 100 characters
+Write a freeform message without a strict prefix, typically describing the action and scope (e.g., 'Bump the npm_and_yarn group across 1 directory with 14 updates')
 
 ## Evidence
 
-- Pattern in commits.averageLength: 105
-
----
-id: alphaclaw-instinct-error-handling
-trigger: "When handling errors in code"
-confidence: 0.8
-domain: code-style
-source: repo-analysis
-source_repo: diazMelgarejo/AlphaClaw
----
-
-# Alphaclaw Instinct Error Handling
-
-## Action
-
-Use try-catch blocks for error handling
-
-## Evidence
-
-- Pattern in errorHandling.style: try-catch
+- Seen in commit example: 'Bump the npm_and_yarn group across 1 directory with 14 updates'
 
