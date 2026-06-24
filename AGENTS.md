@@ -71,6 +71,21 @@ Runtime model:
 - **This file (`AGENTS.md`):** Project-level guidance for coding agents working on the AlphaClaw codebase — architecture, conventions, release flow, UI patterns, etc.
 - **`lib/setup/core-prompts/AGENTS.md`:** Runtime prompt injected into the OpenClaw agent's system prompt. Only write there when the guidance is meant for the deployed agent's behavior, not for coding on this project.
 
+### Prime directives for agent-maintained records
+
+- Treat vulnerability memory, lessons, audits, and review ledgers as append-only historical records. Do not erase, delete, replace, truncate, or rewrite prior entries unless the user explicitly instructs that exact destructive action.
+- When a record is stale, defunct, remediated, duplicated, or superseded, update it additively: add or change status/notes/feedback fields, append a follow-up entry, or link to the replacement. Preserve the original evidence and dates.
+- For JSON records, load and write with structured parsers (`json.load` / `json.dump(..., indent=4)` in Python). Never hand-edit by string concatenation, ad hoc patches, or regex substitutions.
+- Before any destructive or ambiguity-prone record operation, use AskUserQuestions: ask the user which record to change, what status to apply, and whether deletion/replacement is truly intended.
+- Git attribution must stay policy-compliant: primary author may be one of the approved owner emails or an approved well-known AI author such as `Codex <codex@openai.com>`; `Co-authored-by` may include well-known public AI/helper domains and markers, but random/unattributable Gmail co-authors are blocked.
+
+### Security PR stacking directive
+
+- Before opening or preparing any security-remediation PR, read the canonical security policy in `../orama-system/docs/SECURITY-POLICY.md` and follow its "Security PR stacking and merge strategy" section.
+- Merge or revive existing security-priority branches before creating duplicate replacement branches.
+- Stack security PRs in policy-priority order: `PR1` starts from `main`; each `PR(N+1)` is rebased on the previous PR branch before opening.
+- Rebasing or force-updating an existing remote branch requires explicit current user authorization.
+
 ## Operations
 
 ### Release Flow (Beta -> Production)
@@ -245,3 +260,17 @@ Examples:
 - **QA test a URL:** "Load gstack. Run /qa https://..."
 - **Build a feature end-to-end:** "Load gstack. Run /autoplan, implement the plan, then run /ship"
 - **Plan before building:** "Load gstack. Run /office-hours then /autoplan. Save the plan, don't implement."
+
+## Cursor Cloud: git commits
+
+Cloud agents may inject `Co-authored-by` trailers via `~/.cursor/agent-hooks/…/commit-msg.cursor.co-author`. Run on VM boot:
+
+```bash
+bash scripts/git/apply-attribution-guard-all-repos.sh
+```
+
+Hook-free commits: `bash scripts/git/commit-clean.sh -m "type(scope): summary"`.
+
+**Fork policy:** `main` tracks upstream only. Integration branch: `feature/MacOS-post-install`. Open PRs from `cursor/sync-attribution-guards-6421` → `feature/MacOS-post-install` (not → `main`).
+
+See orama-system `docs/wiki/12-cursor-cloud-commit-attribution.md` and `docs/wiki/13-alphaclaw-fork-contrib-branches.md`.
