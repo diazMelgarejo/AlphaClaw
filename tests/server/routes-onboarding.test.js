@@ -74,6 +74,7 @@ const createBaseDeps = ({ onboarded = false, hasCodexOauth = false } = {}) => {
     startGateway: vi.fn(),
     platform: "linux",
     execFileSyncImpl: vi.fn(() => ""),
+    runOnboardedBootSequence: vi.fn(),
   };
 };
 
@@ -414,7 +415,7 @@ describe("server/routes/onboarding", () => {
 
     expect(res.status).toBe(200);
     expect(res.body).toEqual({ ok: true });
-    expect(deps.startGateway).toHaveBeenCalledTimes(1);
+    expect(deps.runOnboardedBootSequence).toHaveBeenCalledTimes(1);
     expect(deps.authProfiles.upsertApiKeyProfileForEnvVar).toHaveBeenCalledWith(
       "openai",
       "sk-test-123456789",
@@ -561,6 +562,40 @@ describe("server/routes/onboarding", () => {
       expect.stringContaining('"schedule": "0 * * * *"'),
     );
     expect(deps.execFileSyncImpl).not.toHaveBeenCalled();
+
+  it("keeps cron config but skips system cron writes when disabled by runtime env", async () => {
+    const previousValue = process.env.ALPHACLAW_SKIP_SYSTEM_CRON_INSTALL;
+    process.env.ALPHACLAW_SKIP_SYSTEM_CRON_INSTALL = "true";
+    try {
+      const deps = createBaseDeps();
+      deps.fs.readFileSync.mockImplementation((p) => {
+        if (p === "/tmp/openclaw/openclaw.json") return "{}";
+        if (p === path.join(kSetupDir, "core-prompts", "TOOLS.md")) return "Setup: {{SETUP_UI_URL}}";
+        if (p === path.join(kSetupDir, "hourly-git-sync.sh")) return "echo Auto-commit hourly sync";
+        return "{}";
+      });
+      const app = createApp(deps);
+      mockGithubVerifyAndCreate();
+
+      const res = await request(app).post("/api/onboard").send(makeValidBody());
+
+      expect(res.status).toBe(200);
+      expect(deps.fs.writeFileSync).toHaveBeenCalledWith(
+        "/tmp/openclaw/cron/system-sync.json",
+        expect.stringContaining('"enabled": true'),
+      );
+      expect(deps.fs.writeFileSync).not.toHaveBeenCalledWith(
+        "/etc/cron.d/openclaw-hourly-sync",
+        expect.anything(),
+        expect.anything(),
+      );
+    } finally {
+      if (previousValue === undefined) {
+        delete process.env.ALPHACLAW_SKIP_SYSTEM_CRON_INSTALL;
+      } else {
+        process.env.ALPHACLAW_SKIP_SYSTEM_CRON_INSTALL = previousValue;
+      }
+    }
   });
 
   it("rejects onboarding when workspace repo already exists", async () => {

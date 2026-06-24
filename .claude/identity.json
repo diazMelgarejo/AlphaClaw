@@ -2,14 +2,14 @@
   "version": "2.0",
   "technicalLevel": "technical",
   "preferredStyle": {
-    "verbosity": "detailed",
+    "verbosity": "minimal",
     "codeComments": true,
     "explanations": true
   },
   "domains": [
-    "typescript",
+    "javascript",
     "express"
   ],
   "suggestedBy": "ecc-tools-repo-analysis",
-  "createdAt": "2026-06-12T23:15:15.130Z"
+  "createdAt": "2026-06-24T04:15:55.824Z"
 }

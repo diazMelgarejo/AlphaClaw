@@ -1,8 +1,29 @@
 # Instincts generated from https://github.com/diazMelgarejo/AlphaClaw
-# Generated: 2026-06-12T23:15:15.130Z
+# Generated: 2026-06-24T04:15:55.824Z
 # Version: 2.0
 # NOTE: This file supplements (does not replace) any existing curated instincts.
 # High-confidence manually curated instincts should be preserved alongside these.
+
+---
+id: AlphaClaw-commit-conventional
+trigger: "when writing a commit message"
+confidence: 0.85
+domain: git
+source: repo-analysis
+source_repo: https://github.com/diazMelgarejo/AlphaClaw
+---
+
+# AlphaClaw Commit Conventional
+
+## Action
+
+Use conventional commit format with prefixes: docs, fix, chore, feat, merge
+
+## Evidence
+
+- 86 commits analyzed
+- Detected conventional commit pattern
+- Examples: Setup: support read-only OpenClaw onboarding, merge: upstream/main (0.9.3) into pr-4-macos + resolve read-only onboarding conflicts
 
 ---
 id: AlphaClaw-commit-length
@@ -22,7 +43,7 @@ Write moderate-length commit messages (~62 characters)
 ## Evidence
 
 - Average commit message length: 62 chars
-- Based on 1 commits
+- Based on 86 commits
 
 ---
 id: AlphaClaw-naming-files
@@ -105,8 +126,289 @@ Place tests in the tests/ or __tests__/ directory, mirroring src structure
 - Tests live in dedicated test folders
 
 ---
+id: AlphaClaw-test-framework
+trigger: "when writing tests"
+confidence: 0.9
+domain: testing
+source: repo-analysis
+source_repo: https://github.com/diazMelgarejo/AlphaClaw
+---
+
+# AlphaClaw Test Framework
+
+## Action
+
+Use vitest as the test framework
+
+## Evidence
+
+- Test framework detected: vitest
+- File pattern: *.test.js
+
+---
+id: AlphaClaw-test-naming
+trigger: "when creating a test file"
+confidence: 0.85
+domain: testing
+source: repo-analysis
+source_repo: https://github.com/diazMelgarejo/AlphaClaw
+---
+
+# AlphaClaw Test Naming
+
+## Action
+
+Name test files using the pattern: *.test.js
+
+## Evidence
+
+- File pattern: *.test.js
+- Consistent across test files
+
+---
+id: AlphaClaw-test-types
+trigger: "when planning tests for a feature"
+confidence: 0.7
+domain: testing
+source: repo-analysis
+source_repo: https://github.com/diazMelgarejo/AlphaClaw
+---
+
+# AlphaClaw Test Types
+
+## Action
+
+Write unit, integration tests to match project standards
+
+## Evidence
+
+- Test types detected: unit, integration
+- Coverage config: yes
+
+---
+id: AlphaClaw-workflow-feature-development
+trigger: "when implementing a new feature"
+confidence: 0.9
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/diazMelgarejo/AlphaClaw
+---
+
+# AlphaClaw Workflow Feature Development
+
+## Action
+
+Follow the feature-development workflow:
+1. Add feature implementation
+2. Add tests for feature
+3. Update documentation
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~16x per month
+- Files: lib/public/js/components/*, lib/public/js/components/general/*, lib/public/js/components/onboarding/*
+
+---
+id: AlphaClaw-workflow-test-driven-development
+trigger: "when adding new functionality"
+confidence: 0.65
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/diazMelgarejo/AlphaClaw
+---
+
+# AlphaClaw Workflow Test Driven Development
+
+## Action
+
+Follow the test-driven-development workflow:
+1. Write failing test
+2. Implement code to pass test
+3. Refactor if needed
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~3x per month
+- Files: **/*.test.*, **/*.spec.*, src/**/*
+
+---
+id: AlphaClaw-workflow-refactoring
+trigger: "when refactoring code"
+confidence: 0.75
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/diazMelgarejo/AlphaClaw
+---
+
+# AlphaClaw Workflow Refactoring
+
+## Action
+
+Follow the refactoring workflow:
+1. Ensure tests pass before refactor
+2. Refactor code structure
+3. Verify tests still pass
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~5x per month
+- Files: src/**/*
+
+---
+id: AlphaClaw-workflow-feature-development-with-tests-and-docs
+trigger: "when doing feature development with tests and docs"
+confidence: 0.7
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/diazMelgarejo/AlphaClaw
+---
+
+# AlphaClaw Workflow Feature Development With Tests And Docs
+
+## Action
+
+Follow the feature-development-with-tests-and-docs workflow:
+1. Modify or add implementation files (e.g., bin/alphaclaw.js, lib/server/..., lib/platform.js, etc.)
+2. Update or add corresponding test files (e.g., tests/server/..., tests/frontend/...)
+3. Update documentation files (e.g., README.md, AGENTS.md, docs/Lessons.MD, docs/wiki/...)
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~4x per month
+- Files: bin/alphaclaw.js, lib/server/*.js, lib/platform.js
+
+---
+id: AlphaClaw-workflow-merge-upstream-and-resolve-conflicts
+trigger: "when doing merge upstream and resolve conflicts"
+confidence: 0.6
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/diazMelgarejo/AlphaClaw
+---
+
+# AlphaClaw Workflow Merge Upstream And Resolve Conflicts
+
+## Action
+
+Follow the merge-upstream-and-resolve-conflicts workflow:
+1. Merge upstream/main or upstream release branch into working branch
+2. Resolve merge conflicts, often with per-file or per-block strategies
+3. Preserve custom guards or invariants (e.g., read-only onboarding logic)
+4. Update package-lock.json and other affected files
+5. Run and fix tests as needed
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~2x per month
+- Files: bin/alphaclaw.js, lib/server/onboarding/index.js, lib/server/routes/system.js
+
+---
+id: AlphaClaw-workflow-platform-specific-support-and-testing
+trigger: "when doing platform specific support and testing"
+confidence: 0.6
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/diazMelgarejo/AlphaClaw
+---
+
+# AlphaClaw Workflow Platform Specific Support And Testing
+
+## Action
+
+Follow the platform-specific-support-and-testing workflow:
+1. Add or update platform detection and logic (e.g., lib/platform.js, bin/alphaclaw.js)
+2. Update or add platform-specific scripts or templates (e.g., lib/scripts/macos-hourly-sync.plist.template)
+3. Add or update tests for platform-specific code (e.g., tests/server/platform.test.js, tests/server/system-cron.test.js)
+4. Update documentation with platform-specific notes
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~2x per month
+- Files: lib/platform.js, bin/alphaclaw.js, lib/scripts/*.plist.template
+
+---
+id: AlphaClaw-workflow-test-failure-triage-and-fix
+trigger: "when doing test failure triage and fix"
+confidence: 0.6
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/diazMelgarejo/AlphaClaw
+---
+
+# AlphaClaw Workflow Test Failure Triage And Fix
+
+## Action
+
+Follow the test-failure-triage-and-fix workflow:
+1. Identify failing/flaky tests
+2. Diagnose root cause (e.g., merge residue, environment changes, resource leaks)
+3. Update test files and sometimes related implementation files
+4. Update documentation or lessons with root cause and fix details
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~2x per month
+- Files: tests/server/*.test.js, tests/frontend/*.test.js, lib/server/onboarding/index.js
+
+---
+id: AlphaClaw-workflow-documentation-knowledge-system-update
+trigger: "when doing documentation knowledge system update"
+confidence: 0.65
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/diazMelgarejo/AlphaClaw
+---
+
+# AlphaClaw Workflow Documentation Knowledge System Update
+
+## Action
+
+Follow the documentation-knowledge-system-update workflow:
+1. Add or update docs/Lessons.MD with session logs or lessons
+2. Add or update docs/wiki/*.md with detailed articles
+3. Update SKILL.md or CLAUDE.md to reference new knowledge
+4. Link lessons across files for discoverability
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~3x per month
+- Files: docs/Lessons.MD, docs/wiki/*.md, SKILL.md
+
+---
+id: AlphaClaw-workflow-ci-config-and-cross-platform-test-matrix-update
+trigger: "when doing ci config and cross platform test matrix update"
+confidence: 0.6
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/diazMelgarejo/AlphaClaw
+---
+
+# AlphaClaw Workflow Ci Config And Cross Platform Test Matrix Update
+
+## Action
+
+Follow the ci-config-and-cross-platform-test-matrix-update workflow:
+1. Update .github/workflows/ci.yml to add new OS matrix entries or test steps
+2. Update or add scripts/tests to support new CI paths
+3. Update package.json/package-lock.json if needed for platform-specific deps
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~2x per month
+- Files: .github/workflows/ci.yml, package.json, package-lock.json
+
+---
 id: alphaclaw-instinct-file-naming
-trigger: "When creating a new file"
+trigger: "When creating or renaming a file"
 confidence: 0.9
 domain: code-style
 source: repo-analysis
@@ -117,15 +419,16 @@ source_repo: diazMelgarejo/AlphaClaw
 
 ## Action
 
-Name the file using kebab-case
+Use kebab-case for file names
 
 ## Evidence
 
-- Pattern in namingConventions.files
+- Pattern in codeStyle.namingConventions.files
+- All files in lib/, tests/, docs/ follow kebab-case
 
 ---
 id: alphaclaw-instinct-function-naming
-trigger: "When defining a new function"
+trigger: "When defining a function"
 confidence: 0.9
 domain: code-style
 source: repo-analysis
@@ -136,15 +439,15 @@ source_repo: diazMelgarejo/AlphaClaw
 
 ## Action
 
-Name the function using camelCase
+Use camelCase for function names
 
 ## Evidence
 
-- Pattern in namingConventions.functions
+- Pattern in codeStyle.namingConventions.functions
 
 ---
 id: alphaclaw-instinct-class-naming
-trigger: "When defining a new class"
+trigger: "When defining a class"
 confidence: 0.9
 domain: code-style
 source: repo-analysis
@@ -155,15 +458,15 @@ source_repo: diazMelgarejo/AlphaClaw
 
 ## Action
 
-Name the class using PascalCase
+Use PascalCase for class names
 
 ## Evidence
 
-- Pattern in namingConventions.classes
+- Pattern in codeStyle.namingConventions.classes
 
 ---
 id: alphaclaw-instinct-constant-naming
-trigger: "When declaring a constant"
+trigger: "When defining a constant"
 confidence: 0.9
 domain: code-style
 source: repo-analysis
@@ -174,41 +477,41 @@ source_repo: diazMelgarejo/AlphaClaw
 
 ## Action
 
-Name the constant using SCREAMING_SNAKE_CASE
+Use SCREAMING_SNAKE_CASE for constant names
 
 ## Evidence
 
-- Pattern in namingConventions.constants
+- Pattern in codeStyle.namingConventions.constants
 
 ---
-id: alphaclaw-instinct-import-style
+id: alphaclaw-instinct-relative-imports
 trigger: "When importing modules"
-confidence: 0.8
+confidence: 0.85
 domain: code-style
 source: repo-analysis
 source_repo: diazMelgarejo/AlphaClaw
 ---
 
-# Alphaclaw Instinct Import Style
+# Alphaclaw Instinct Relative Imports
 
 ## Action
 
-Use relative import paths
+Use relative imports
 
 ## Evidence
 
-- Pattern in importStyle
+- Pattern in codeStyle.importStyle
 
 ---
-id: alphaclaw-instinct-export-style
-trigger: "When exporting modules or functions"
-confidence: 0.8
+id: alphaclaw-instinct-named-exports
+trigger: "When exporting functions, classes, or objects"
+confidence: 0.85
 domain: code-style
 source: repo-analysis
 source_repo: diazMelgarejo/AlphaClaw
 ---
 
-# Alphaclaw Instinct Export Style
+# Alphaclaw Instinct Named Exports
 
 ## Action
 
@@ -216,43 +519,245 @@ Use named exports
 
 ## Evidence
 
-- Pattern in exportStyle
+- Pattern in codeStyle.exportStyle
 
 ---
-id: alphaclaw-instinct-test-location
-trigger: "When adding new tests"
+id: alphaclaw-instinct-vitest-pattern
+trigger: "When writing tests"
+confidence: 0.9
+domain: testing
+source: repo-analysis
+source_repo: diazMelgarejo/AlphaClaw
+---
+
+# Alphaclaw Instinct Vitest Pattern
+
+## Action
+
+Use vitest as the testing framework and place tests in *.test.js files
+
+## Evidence
+
+- Pattern in testing.framework
+- Pattern in testing.filePattern
+- Files in tests/server/*.test.js
+
+---
+id: alphaclaw-instinct-test-types
+trigger: "When designing test suites"
 confidence: 0.8
 domain: testing
 source: repo-analysis
 source_repo: diazMelgarejo/AlphaClaw
 ---
 
-# Alphaclaw Instinct Test Location
+# Alphaclaw Instinct Test Types
 
 ## Action
 
-Place test files in a separate directory from source files
+Include both unit and integration tests
 
 ## Evidence
 
-- Pattern in architecture.folderStructure.testLocation
+- Pattern in testing.testTypes
+- Presence of both unit and integration tests in tests/
 
 ---
-id: alphaclaw-instinct-commit-format
+id: alphaclaw-instinct-test-coverage
+trigger: "When configuring tests"
+confidence: 0.8
+domain: testing
+source: repo-analysis
+source_repo: diazMelgarejo/AlphaClaw
+---
+
+# Alphaclaw Instinct Test Coverage
+
+## Action
+
+Enable and enforce test coverage reporting
+
+## Evidence
+
+- Pattern in testing.coverageConfig
+- Presence of coverage settings in CI config
+
+---
+id: alphaclaw-instinct-try-catch-errors
+trigger: "When handling errors in code"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: diazMelgarejo/AlphaClaw
+---
+
+# Alphaclaw Instinct Try Catch Errors
+
+## Action
+
+Use try-catch blocks for error handling
+
+## Evidence
+
+- Pattern in errorHandling.style
+
+---
+id: alphaclaw-instinct-conventional-commits
 trigger: "When writing a commit message"
+confidence: 0.9
+domain: git
+source: repo-analysis
+source_repo: diazMelgarejo/AlphaClaw
+---
+
+# Alphaclaw Instinct Conventional Commits
+
+## Action
+
+Use conventional commit prefixes (e.g., fix, feat, docs, chore, test, merge)
+
+## Evidence
+
+- Pattern in commits.prefixes
+- Examples: fix(macos): extract bin-path resolution into lib/platform.js
+
+---
+id: alphaclaw-instinct-commit-length
+trigger: "When composing a commit message"
 confidence: 0.7
 domain: git
 source: repo-analysis
 source_repo: diazMelgarejo/AlphaClaw
 ---
 
-# Alphaclaw Instinct Commit Format
+# Alphaclaw Instinct Commit Length
 
 ## Action
 
-Write a freeform message without a strict prefix, typically describing the action and scope (e.g., 'Bump the npm_and_yarn group across 1 directory with 14 updates')
+Keep commit messages concise (average ~62 characters)
 
 ## Evidence
 
-- Seen in commit example: 'Bump the npm_and_yarn group across 1 directory with 14 updates'
+- Pattern in commits.averageLength
+- Examples in commits.examples
+
+---
+id: alphaclaw-instinct-feature-dev-workflow
+trigger: "When adding a new capability, platform support, or major fix"
+confidence: 0.95
+domain: workflow
+source: repo-analysis
+source_repo: diazMelgarejo/AlphaClaw
+---
+
+# Alphaclaw Instinct Feature Dev Workflow
+
+## Action
+
+Update implementation, add/update tests, and update documentation in a coordinated sequence
+
+## Evidence
+
+- Workflow: feature-development-with-tests-and-docs
+- Commit sequences and files in workflow example
+
+---
+id: alphaclaw-instinct-merge-upstream-workflow
+trigger: "When upstream changes need to be integrated into a long-lived PR or feature branch"
+confidence: 0.95
+domain: workflow
+source: repo-analysis
+source_repo: diazMelgarejo/AlphaClaw
+---
+
+# Alphaclaw Instinct Merge Upstream Workflow
+
+## Action
+
+Merge upstream, resolve conflicts, preserve custom logic, update lockfiles, and fix tests as needed
+
+## Evidence
+
+- Workflow: merge-upstream-and-resolve-conflicts
+- Commit sequences and files in workflow example
+
+---
+id: alphaclaw-instinct-platform-support-workflow
+trigger: "When adding support for a new OS or fixing platform-specific bugs"
+confidence: 0.9
+domain: workflow
+source: repo-analysis
+source_repo: diazMelgarejo/AlphaClaw
+---
+
+# Alphaclaw Instinct Platform Support Workflow
+
+## Action
+
+Update platform logic, scripts, tests, and documentation for the new platform
+
+## Evidence
+
+- Workflow: platform-specific-support-and-testing
+- Commit sequences and files in workflow example
+
+---
+id: alphaclaw-instinct-test-failure-fix-workflow
+trigger: "When tests fail after a merge, refactor, or platform update"
+confidence: 0.9
+domain: workflow
+source: repo-analysis
+source_repo: diazMelgarejo/AlphaClaw
+---
+
+# Alphaclaw Instinct Test Failure Fix Workflow
+
+## Action
+
+Identify failing tests, diagnose root cause, fix tests/implementation, and document the fix
+
+## Evidence
+
+- Workflow: test-failure-triage-and-fix
+- Commit sequences and files in workflow example
+
+---
+id: alphaclaw-instinct-docs-knowledge-update-workflow
+trigger: "When new lessons are learned, new workflows established, or after significant merges/fixes"
+confidence: 0.95
+domain: workflow
+source: repo-analysis
+source_repo: diazMelgarejo/AlphaClaw
+---
+
+# Alphaclaw Instinct Docs Knowledge Update Workflow
+
+## Action
+
+Update docs/Lessons.MD, docs/wiki, and cross-link knowledge files
+
+## Evidence
+
+- Workflow: documentation-knowledge-system-update
+- Commit sequences and files in workflow example
+
+---
+id: alphaclaw-instinct-ci-matrix-update-workflow
+trigger: "When adding platform support or improving test coverage in CI"
+confidence: 0.85
+domain: workflow
+source: repo-analysis
+source_repo: diazMelgarejo/AlphaClaw
+---
+
+# Alphaclaw Instinct Ci Matrix Update Workflow
+
+## Action
+
+Update CI config, scripts, and package files to support new platforms or test suites
+
+## Evidence
+
+- Workflow: ci-config-and-cross-platform-test-matrix-update
+- Commit sequences and files in workflow example
 
