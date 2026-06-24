@@ -33,6 +33,7 @@ describe("frontend/model-config", () => {
     const featured = modelConfig.getFeaturedModels([
       { key: "openrouter/anthropic/claude-sonnet-4-6", label: "OpenRouter Sonnet 4.6" },
       { key: "google/gemini-3.1-pro-preview", label: "Gemini 3.1 Pro" },
+      { key: "anthropic/claude-opus-4-8", label: "Opus 4.8" },
       { key: "anthropic/claude-opus-4-7", label: "Opus 4.7" },
       { key: "anthropic/claude-opus-4-6", label: "Opus 4.6" },
       { key: "openai-codex/gpt-5.3-codex", label: "Codex 5.3" },
@@ -41,6 +42,7 @@ describe("frontend/model-config", () => {
     ]);
 
     expect(featured.map((entry) => entry.key)).toEqual([
+      "anthropic/claude-opus-4-8",
       "anthropic/claude-opus-4-7",
       "anthropic/claude-opus-4-6",
       "openai-codex/gpt-5.3-codex",
@@ -48,9 +50,10 @@ describe("frontend/model-config", () => {
       "openrouter/anthropic/claude-sonnet-4-6",
       "google/gemini-3.1-pro-preview",
     ]);
-    expect(featured[0]?.featuredLabel).toBe("Opus 4.7");
-    expect(featured[3]?.featuredLabel).toBe("GPT-5.5");
-    expect(featured[4]?.featuredLabel).toBe("OpenRouter Sonnet 4.6");
+    expect(featured[0]?.featuredLabel).toBe("Opus 4.8");
+    expect(featured[1]?.featuredLabel).toBe("Opus 4.7");
+    expect(featured[4]?.featuredLabel).toBe("GPT-5.5");
+    expect(featured[5]?.featuredLabel).toBe("OpenRouter Sonnet 4.6");
     expect(featured[5]?.featuredLabel).toBe("Gemini 3.1 Pro");
   });
 });
