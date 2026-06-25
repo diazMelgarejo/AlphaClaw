@@ -514,7 +514,7 @@ describe("server/routes/onboarding", () => {
 
     expect(res.status).toBe(200);
     expect(res.body).toEqual({ ok: true });
-    expect(deps.startGateway).toHaveBeenCalledTimes(1);
+    expect(deps.runOnboardedBootSequence).toHaveBeenCalledTimes(1);
     expect(deps.ensureGatewayProxyConfig).not.toHaveBeenCalled();
     expect(deps.authProfiles.upsertApiKeyProfileForEnvVar).not.toHaveBeenCalled();
     expect(deps.authProfiles.syncConfigAuthReferencesForAgent).not.toHaveBeenCalled();
@@ -562,6 +562,7 @@ describe("server/routes/onboarding", () => {
       expect.stringContaining('"schedule": "0 * * * *"'),
     );
     expect(deps.execFileSyncImpl).not.toHaveBeenCalled();
+  });
 
   it("keeps cron config but skips system cron writes when disabled by runtime env", async () => {
     const previousValue = process.env.ALPHACLAW_SKIP_SYSTEM_CRON_INSTALL;

@@ -6,14 +6,14 @@ const os = require("os");
 const path = require("path");
 const { execSync } = require("child_process");
 const {
-  shouldSkipSystemCronInstall,
-  resolveGitAskPassPath,
-  resolveGitShimPath,
-  prependGitShimDirToPath,
   normalizeGitSyncFilePath,
   validateGitSyncFilePath,
 } = require("../lib/cli/git-sync");
 const {
+  shouldSkipSystemCronInstall,
+  resolveGitAskPassPath,
+  resolveGitShimPath,
+  prependGitShimDirToPath,
   resolveRealGitPath,
   shouldRefreshHourlyGitSyncScript,
 } = require("../lib/cli/git-runtime");
