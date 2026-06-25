@@ -54,6 +54,6 @@ describe("frontend/model-config", () => {
     expect(featured[1]?.featuredLabel).toBe("Opus 4.7");
     expect(featured[4]?.featuredLabel).toBe("GPT-5.5");
     expect(featured[5]?.featuredLabel).toBe("OpenRouter Sonnet 4.6");
-    expect(featured[5]?.featuredLabel).toBe("Gemini 3.1 Pro");
+    expect(featured[6]?.featuredLabel).toBe("Gemini 3.1 Pro");
   });
 });
