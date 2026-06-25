@@ -696,6 +696,17 @@ describe("server/routes/system", () => {
       schedule: "0 * * * MON",
     });
 
+    expect(res.status).toBe(400);
+    expect(res.body).toEqual({
+      ok: false,
+      error: "schedule must be a 5-field cron string",
+    });
+    expect(deps.fs.writeFileSync).not.toHaveBeenCalledWith(
+      "/tmp/openclaw/cron/system-sync.json",
+      expect.anything(),
+    );
+  });
+
   it("updates sync cron config without touching system cron when disabled by runtime env", async () => {
     const previousValue = process.env.ALPHACLAW_SKIP_SYSTEM_CRON_INSTALL;
     process.env.ALPHACLAW_SKIP_SYSTEM_CRON_INSTALL = "true";
@@ -818,25 +829,6 @@ describe("server/routes/system", () => {
     );
   });
 
-  it("rejects non-boolean OpenAI-compatible API feature updates", async () => {
-    const deps = createSystemDeps();
-    const app = createApp(deps);
-
-    const res = await request(app)
-      .put("/api/alphaclaw/config/features/openai-compat-api")
-      .send({ enabled: "yes" });
-
-    expect(res.status).toBe(400);
-    expect(res.body).toEqual({
-      ok: false,
-      error: "schedule must be a 5-field cron string",
-    });
-    expect(deps.fs.writeFileSync).not.toHaveBeenCalledWith(
-      "/etc/cron.d/openclaw-hourly-sync",
-      expect.anything(),
-    );
-  });
-
   it("updates sync cron config for the managed scheduler on macOS", async () => {
     const deps = createSystemDeps();
     deps.platform = "darwin";
@@ -867,8 +859,7 @@ describe("server/routes/system", () => {
     );
   });
 
-  // (assertion closing the "rejects non-boolean OpenAI-compatible API" test from main)
-  it("rejects non-boolean OpenAI-compatible API feature updates (alpha)", async () => {
+  it("rejects non-boolean OpenAI-compatible API feature updates", async () => {
     const deps = createSystemDeps();
     const app = createApp(deps);
 
