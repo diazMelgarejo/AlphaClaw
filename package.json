@@ -34,8 +34,8 @@
     "@chrysb/alphaclaw": "^0.9.9",
     "express": "^4.21.0",
     "http-proxy": "^1.18.1",
-    "openclaw": "2026.5.28",
-    "ws": "^8.20.1"
+    "openclaw": "2026.6.11",
+    "ws": "^8.21.0"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^4.1.8",
