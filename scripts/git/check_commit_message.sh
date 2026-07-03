@@ -6,18 +6,26 @@ set -euo pipefail
 msg_file="${1:?commit message file required}"
 [[ -f "$msg_file" ]] || { echo "ERROR: missing commit message file: $msg_file" >&2; exit 1; }
 
-# Explicit allowlist entries (lowercase match) — always permitted in Co-authored-by.
+# Explicit allowlist entries (case-insensitive — stored lowercase, matched after tolower).
+# Add any personal/org domain here that is NOT covered by WELL_KNOWN_COAUTHOR_DOMAIN_SUFFIXES.
+# All Anthropic model variants (Claude Sonnet, Opus 4.8, Haiku, etc.) are explicitly authorized
+# via noreply@anthropic.com — never ban by model tier.
 ALLOWED_EXACT_COAUTHOR_EMAILS=(
   cursoragent@cursor.com
+  lawrence@bettermind.ph
+  lawrence@cyre.me
+  noreply@anthropic.com
 )
 
-# Only these @gmail.com addresses may appear in Co-authored-by (lowercase match).
+# Only these @gmail.com / @googlemail.com addresses may appear in Co-authored-by.
 ALLOWED_GMAIL_COAUTHORS=(
   diazmelgarejo@gmail.com
-  lawrence@cyre.me
 )
 
 # Public agent / vendor domains (match email domain or subdomain).
+# Mainstream AI models and autonomous coding agents are allowed co-authors — the
+# only hard ban is the VERBOTEN pattern (private pattern lib). Extend as new
+# mainstream agents appear; keep in sync with scripts/git/check_identity.sh.
 WELL_KNOWN_COAUTHOR_DOMAIN_SUFFIXES=(
   openai.com
   anthropic.com
@@ -30,12 +38,26 @@ WELL_KNOWN_COAUTHOR_DOMAIN_SUFFIXES=(
   azure.com
   perplexity.ai
   x.ai
+  coderabbit.ai
+  mistral.ai
+  deepseek.com
+  cohere.com
+  meta.com
+  sourcegraph.com
+  devin.ai
+  codeium.com
+  nousresearch.com
 )
 
 # Match in Co-authored-by display name / address when domain alone is ambiguous.
+# "claude" covers all tiers: Claude Opus 4.8, Sonnet 4.6, Haiku 4.5, Fable 5, etc.
+# "opus" and "fable" added as explicit belt-and-suspenders entries for
+# Claude Opus 4.8 and Claude Fable 5 (user-authorized 2026-07-02).
 WELL_KNOWN_COAUTHOR_NAME_MARKERS=(
   codex
   claude
+  opus
+  fable
   anthropic
   cursor
   cursoragent
@@ -47,6 +69,19 @@ WELL_KNOWN_COAUTHOR_NAME_MARKERS=(
   microsoft
   perplexity
   grok
+  coderabbit
+  coderabbitai
+  mistral
+  deepseek
+  cohere
+  llama
+  devin
+  cody
+  codeium
+  windsurf
+  qwen
+  hermes
+  nousresearch
 )
 
 email_domain_ok() {
@@ -81,6 +116,9 @@ coauthor_line_ok() {
   fi
 
   if [[ -n "$email_lc" ]]; then
+    # Email was parsed — gate on email policy only; never fall through to
+    # marker check. A display name containing "hermes" or "nousresearch"
+    # must not override a rejected email address.
     local exact
     for exact in "${ALLOWED_EXACT_COAUTHOR_EMAILS[@]}"; do
       if [[ "$email_lc" == "$exact" ]]; then
@@ -94,8 +132,12 @@ coauthor_line_ok() {
     if email_domain_ok "$email_lc"; then
       return 0
     fi
+    # Email present but not in any allowlist — reject; do NOT fall to markers.
+    return 1
   fi
 
+  # No email parsed (display-name-only line) — accept if a known tool marker
+  # appears anywhere in the lowercased line.
   local marker
   for marker in "${WELL_KNOWN_COAUTHOR_NAME_MARKERS[@]}"; do
     if [[ "$line_lc" == *"$marker"* ]]; then
