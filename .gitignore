@@ -1,7 +1,11 @@
 node_modules/
 .DS_Store
 .env
-.cursor/
+.cursor/*
+!.cursor/commands/
+!.cursor/commands/**
+!.cursor/commands/
+!.cursor/commands/**
 coverage/
 workspace/.openclaw/
 
