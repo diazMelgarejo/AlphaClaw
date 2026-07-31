@@ -12,7 +12,7 @@
 | [01](01-branch-roles.md) | Branch Roles & Data Flow | Never commit to `main`. Work on `pr-4-macos`, save lessons to `feature/MacOS-post-install`. |
 | [02](02-macos-bin-path.md) | macOS Bin-Path & SIP | Darwin routes shims to `~/.local/bin`, not `/usr/local/bin`. SIP blocks the latter. |
 | [03](03-gateway-config.md) | Gateway Config Sanitization | Every provider in `openclaw.json` must have `models: []`. Missing it = 30s silent timeout. |
-| [04](04-cron-scheduler.md) | macOS Cron / LaunchAgent | `/etc/cron.d` is root-only on macOS. Use the in-process managed scheduler. Named cron tokens crash the parser. |
+| [04](04-cron-scheduler.md) | macOS Cron / LaunchAgent | `/etc/cron.d` is root-only on macOS. Use the in-process managed scheduler. Cron tests must pass explicit `platform` — never assert `/etc/cron.d/` on darwin. |
 | [05](05-merge-conflicts.md) | Merge Conflict Patterns | Read-only onboarding guard must stay inside `!validatedReadOnlyMode`. Re-run onboarding tests after any conflict. |
 | [06](06-vitest-sqlite-flake.md) | Vitest + SQLite WAL Flake | WAL lock race history; `singleFork` rejected upstream. Correct fix: `DatabaseSync.close()` in `afterEach`. |
 | [07](07-duplicate-files.md) | Prevent Duplicate Files | macOS "keep both" creates `file 2.js`. Never use Finder on tracked files. Run the dupe check command. |
@@ -57,4 +57,4 @@
 
 ---
 
-*Last updated: 2026-04-19*
+*Last updated: 2026-07-31*
