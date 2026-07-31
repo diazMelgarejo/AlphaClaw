@@ -67,6 +67,24 @@ describe("frontend/api", () => {
     expect(result).toEqual({ ok: true });
   });
 
+  it("fetchOnboardProgress returns the current onboarding milestone", async () => {
+    const payload = {
+      active: true,
+      stage: "running_openclaw_onboard",
+      message: "Running openclaw onboard...",
+    };
+    global.fetch.mockResolvedValue(mockJsonResponse(200, payload));
+    const api = await loadApiModule();
+
+    const result = await api.fetchOnboardProgress();
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      "/api/onboard/progress",
+      expect.objectContaining({ headers: expect.any(Headers) }),
+    );
+    expect(result).toEqual(payload);
+  });
+
   it("verifyGithubOnboardingRepo posts repo, token, and mode", async () => {
     global.fetch.mockResolvedValue(mockJsonResponse(200, { ok: true, repoExists: true }));
     const api = await loadApiModule();
@@ -309,7 +327,7 @@ describe("frontend/api", () => {
 
     const result = await api.sendDoctorCardFix({
       cardId: 7,
-      sessionId: "session-123",
+      sessionKey: "agent:main:telegram:direct:1050",
       replyChannel: "telegram",
       replyTo: "1050",
       prompt: "Use a more focused fix request",
@@ -320,7 +338,7 @@ describe("frontend/api", () => {
       expect.objectContaining({
         method: "POST",
         body: JSON.stringify({
-          sessionId: "session-123",
+          sessionKey: "agent:main:telegram:direct:1050",
           replyChannel: "telegram",
           replyTo: "1050",
           prompt: "Use a more focused fix request",
@@ -636,5 +654,32 @@ describe("frontend/api", () => {
     );
     expectLastFetchHeaders("application/json");
     expect(result).toEqual({ ok: true });
+  });
+
+  it("resumeWatchdogChannels posts to the resume endpoint and returns the result", async () => {
+    const payload = {
+      ok: true,
+      result: { ok: true, results: [{ channel: "telegram", ok: true }] },
+    };
+    global.fetch.mockResolvedValue(mockJsonResponse(200, payload));
+    const api = await loadApiModule();
+
+    const result = await api.resumeWatchdogChannels();
+
+    const [url, options] = global.fetch.mock.calls.at(-1);
+    expect(url).toBe("/api/watchdog/resume-channels");
+    expect(options.method).toBe("POST");
+    expect(result).toEqual(payload);
+  });
+
+  it("resumeWatchdogChannels surfaces server error messages", async () => {
+    global.fetch.mockResolvedValue(
+      mockJsonResponse(409, { ok: false, error: "no_suppressed_channels" }),
+    );
+    const api = await loadApiModule();
+
+    await expect(api.resumeWatchdogChannels()).rejects.toThrow(
+      "no_suppressed_channels",
+    );
   });
 });
