@@ -84,7 +84,46 @@ Named tokens now return HTTP 400 from `PUT /api/sync-cron`:
 
 ## Tests
 
+### Test layout (platform-aware)
+
+Cron install behavior is **platform-dependent**. Tests must mirror production branching — never assume `os.platform()` is linux when asserting `/etc/cron.d/` writes.
+
+| Layer | File | What it proves |
+|-------|------|----------------|
+| Contract | `onboarding-cron.test.js` → `buildManagedCronContent` | `ALPHACLAW_ROOT_DIR` present on **both** linux and darwin |
+| Paths | `onboarding-cron.test.js` → `getSystemCronPaths` | linux → `/etc/cron.d/openclaw-hourly-sync`; darwin → managed scheduler + `cron/system-sync.json` |
+| Integration | `onboarding-cron.test.js` → `installHourlyGitSyncCron` | linux writes `/etc/cron.d/`; darwin starts managed scheduler (no `/etc/cron.d/` write) |
+| System cron | `system-cron.test.js` | Named-token rejection, install/disable/re-enable, return contract |
+
+Shared fixture: `tests/server/fixtures/cron-memory-fs.js` (`createCronMemoryFs`, `seedCronOpenclawDir`) — use this instead of duplicating in-memory `fs` doubles.
+
+### CI failure: macOS-only onboarding cron test (2026-07-31)
+
+**Symptom:** GitHub Actions `onboarding-cron.test.js` → `writes ALPHACLAW_ROOT_DIR into the generated system cron file` failed on **macos-latest** only (778/779 pass). Linux passed.
+
+**Root cause:** Upstream merge (wright-io PR #107 / `cac34c9`) added `onboarding-cron.test.js` that called `installHourlyGitSyncCron()` **without** `platform: "linux"`. On darwin, `applySystemCronConfig()` correctly skips `/etc/cron.d/` (root-only, EACCES) and uses the in-process managed scheduler instead. The test expected a write to `/etc/cron.d/openclaw-hourly-sync` that **never happens on macOS by design**.
+
+**Why `system-cron.test.js` was fine:** It already passed explicit `platform: "linux"` / `"darwin"` to install helpers. The new onboarding test did not.
+
+**Fix (PR after #22 merge):** Replace linux-only assertions with layered platform-aware coverage aligned to `system-cron.test.js`:
+
+1. `buildManagedCronContent` contract — both platforms, `ALPHACLAW_ROOT_DIR` line
+2. `getSystemCronPaths` — install backend mapping per platform
+3. `installHourlyGitSyncCron` — linux writes `/etc/cron.d/`; darwin uses managed scheduler + JSON config
+
+**Rule for agents:** When porting or writing cron tests, **always** pass explicit `platform` to install helpers, or split linux/darwin cases with `it.each`. Never assert `/etc/cron.d/` file existence without `platform: "linux"`.
+
+### Current test inventory
+
 ```
+tests/server/fixtures/cron-memory-fs.js
+  shared in-memory fs + openclaw dir seeding
+
+tests/server/onboarding-cron.test.js
+  ✓ buildManagedCronContent includes ALPHACLAW_ROOT_DIR (linux + darwin)
+  ✓ getSystemCronPaths maps install backend per platform
+  ✓ installHourlyGitSyncCron: linux writes /etc/cron.d; darwin uses managed scheduler
+
 tests/server/system-cron.test.js
   ✓ rejects named cron tokens
   ✓ writes /etc/cron.d/openclaw-hourly-sync on linux install
@@ -100,4 +139,5 @@ tests/server/system-cron.test.js
 
 - [02 — macOS Bin-Path & SIP](02-macos-bin-path.md) — same root-path ownership pattern
 - PR commits: `2d3cd2c`, `7cfa041`, `a05cbe9`–`4cba0d8`
+- CI fix: platform-aware `onboarding-cron.test.js` (post–PR #22, branch `cursor/cron-platform-tests-f559`)
 - [macOS post-install lessons](../macos-post-install-lessons.md) § Bug Archaeology

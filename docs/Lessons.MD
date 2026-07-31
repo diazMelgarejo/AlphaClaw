@@ -92,6 +92,18 @@ AlphaClaw is Layer 1 (infra). orama-system (L3) and Perpetua-Tools (L2) share th
 
 ---
 
+## Session 2026-07-31 — Upstream sync, garrytan cherry-pick, macOS CI cron fix
+
+| Topic | What happened | Details |
+|---|---|---|
+| Upstream sync PR #22 | Merged `chrysb/main` into `feature/MacOS-post-install` with garrytan safe-mode cherry-pick + `@diazmelgarejo/alphaclaw@0.9.33.9` | → [wiki/01](wiki/01-branch-roles.md) |
+| Cherry-pick hygiene | Conflict markers left in `vitest.config.js` at first attempt — history rewritten before merge | → [wiki/05](wiki/05-merge-conflicts.md) |
+| macOS CI cron test | `onboarding-cron.test.js` failed on `macos-latest` only: asserted `/etc/cron.d/` write without `platform: "linux"` | → [wiki/04](wiki/04-cron-scheduler.md) § CI failure |
+| Apex DMG URL | `updates.alphaclaw.md/desktop/prod/alphaclaw-mac-latest.dmg` is AlphaClaw Apex (Electron), not npm harness — private `alphaclaw-nexus` build | N/A (commercial desktop, separate from fork) |
+| Gate-2 D3 status | PT absorbed MCP/agents into packages; `lib/mcp` + `lib/agents` on feature branch **not** retired yet | → PT alignment plan |
+
+---
+
 ## Session 2026-05-31 — Migration audit, Gate-2 status, dedup
 
 | Topic | What happened | Details |
