@@ -15,6 +15,7 @@ const createHarness = ({
   clawCmdImpl,
   resolveSetupUrl = () => "https://setup.example.com",
   resolveGatewayHealthUrl = () => "http://127.0.0.1:18789/health",
+  resolveGatewayReadyzUrl = () => "",
   fetchImpl = async () => ({
     ok: true,
     status: 200,
@@ -49,6 +50,7 @@ const createHarness = ({
     reloadEnv,
     resolveSetupUrl,
     resolveGatewayHealthUrl,
+    resolveGatewayReadyzUrl,
   });
 
   return {
@@ -547,6 +549,74 @@ describe("server/watchdog", () => {
     expect(watchdog.getStatus().uptimeMs).toBe(0);
   });
 
+  it("pauses recovery when OpenClaw exits with EX_CONFIG", async () => {
+    const { watchdog, clawCmd, launchGatewayProcess, notifier } = createHarness({
+      autoRepair: true,
+    });
+
+    watchdog.onGatewayExit({
+      code: 78,
+      expectedExit: false,
+      stderrTail: ["Invalid config"],
+    });
+    await flushMicrotasks();
+
+    expect(watchdog.getStatus()).toEqual(
+      expect.objectContaining({
+        lifecycle: "configuration_error",
+        health: "unhealthy",
+        crashCountInWindow: 0,
+      }),
+    );
+    expect(clawCmd).not.toHaveBeenCalled();
+    expect(launchGatewayProcess).not.toHaveBeenCalled();
+    expect(
+      notifier.notify.mock.calls.some((call) =>
+        String(call?.[0] || "").includes("Gateway configuration invalid"),
+      ),
+    ).toBe(true);
+  });
+
+  it("latches EX_CONFIG across in-flight and periodic health checks", async () => {
+    vi.useFakeTimers();
+    let resolveHealthCheck;
+    const healthCheck = new Promise((resolve) => {
+      resolveHealthCheck = resolve;
+    });
+    const { watchdog, clawCmd, launchGatewayProcess } = createHarness({
+      autoRepair: true,
+      fetchImpl: async () => healthCheck,
+    });
+
+    watchdog.onGatewayLaunch({
+      startedAt: Date.now() - 60_000,
+      pid: 1234,
+    });
+    await vi.advanceTimersByTimeAsync(0);
+
+    watchdog.onGatewayExit({
+      code: 78,
+      expectedExit: false,
+      stderrTail: ["Invalid config"],
+    });
+    resolveHealthCheck({
+      ok: true,
+      status: 200,
+      text: async () => JSON.stringify({ ok: true, status: "live" }),
+    });
+    await vi.advanceTimersByTimeAsync(120_000);
+
+    expect(watchdog.getStatus()).toEqual(
+      expect.objectContaining({
+        lifecycle: "configuration_error",
+        health: "unhealthy",
+      }),
+    );
+    expect(clawCmd).not.toHaveBeenCalled();
+    expect(launchGatewayProcess).not.toHaveBeenCalled();
+    watchdog.stop();
+  });
+
   it("clears uptimeStartedAt on expected restart", () => {
     const { watchdog } = createHarness();
 
@@ -645,5 +715,173 @@ describe("server/watchdog", () => {
       autoRepair: true,
       notificationsEnabled: false,
     });
+  });
+
+  const buildSafeModeFetch = (gatewayState) => async (url) => {
+    if (String(url).includes("/readyz")) {
+      return {
+        ok: true,
+        status: 200,
+        text: async () =>
+          JSON.stringify({
+            ready: true,
+            failing: [],
+            ...(gatewayState.suppressed.length > 0
+              ? { suppressed: gatewayState.suppressed }
+              : {}),
+          }),
+      };
+    }
+    return {
+      ok: true,
+      status: 200,
+      text: async () => JSON.stringify({ ok: true, status: "live" }),
+    };
+  };
+
+  it("detects gateway safe mode from readyz and notifies once", async () => {
+    vi.useFakeTimers();
+    const gatewayState = { suppressed: ["telegram", "discord"] };
+    const { watchdog, insertWatchdogEvent, notifier } = createHarness({
+      autoRepair: false,
+      resolveGatewayReadyzUrl: () => "http://127.0.0.1:18789/readyz",
+      fetchImpl: buildSafeModeFetch(gatewayState),
+    });
+
+    watchdog.start();
+    await vi.advanceTimersByTimeAsync(10);
+
+    expect(watchdog.getStatus()).toEqual(
+      expect.objectContaining({
+        lifecycle: "running",
+        health: "healthy",
+        safeMode: true,
+        suppressedChannels: ["telegram", "discord"],
+      }),
+    );
+    expect(insertWatchdogEvent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        eventType: "safe_mode",
+        status: "failed",
+        details: expect.objectContaining({
+          suppressed: ["telegram", "discord"],
+        }),
+      }),
+    );
+    const safeModeNotices = () =>
+      notifier.notify.mock.calls.filter((call) =>
+        String(call?.[0] || "").includes("safe mode"),
+      );
+    expect(safeModeNotices()).toHaveLength(1);
+
+    // Subsequent checks with unchanged suppression must not re-notify.
+    await vi.advanceTimersByTimeAsync(120_000);
+    expect(safeModeNotices()).toHaveLength(1);
+    watchdog.stop();
+  });
+
+  it("clears safe mode and notifies recovery when suppression ends", async () => {
+    vi.useFakeTimers();
+    const gatewayState = { suppressed: ["telegram"] };
+    const { watchdog, insertWatchdogEvent, notifier } = createHarness({
+      autoRepair: false,
+      resolveGatewayReadyzUrl: () => "http://127.0.0.1:18789/readyz",
+      fetchImpl: buildSafeModeFetch(gatewayState),
+    });
+
+    watchdog.start();
+    await vi.advanceTimersByTimeAsync(10);
+    expect(watchdog.getStatus().safeMode).toBe(true);
+
+    gatewayState.suppressed = [];
+    await vi.advanceTimersByTimeAsync(120_000);
+
+    expect(watchdog.getStatus()).toEqual(
+      expect.objectContaining({ safeMode: false, suppressedChannels: [] }),
+    );
+    expect(insertWatchdogEvent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        eventType: "safe_mode",
+        status: "ok",
+        details: expect.objectContaining({ recovered: true }),
+      }),
+    );
+    expect(
+      notifier.notify.mock.calls.some((call) =>
+        String(call?.[0] || "").includes("safe mode cleared"),
+      ),
+    ).toBe(true);
+    watchdog.stop();
+  });
+
+  it("resumeChannels issues channels.start for each suppressed channel", async () => {
+    vi.useFakeTimers();
+    const gatewayState = { suppressed: ["telegram", "discord"] };
+    const startCalls = [];
+    const { watchdog } = createHarness({
+      autoRepair: false,
+      resolveGatewayReadyzUrl: () => "http://127.0.0.1:18789/readyz",
+      fetchImpl: buildSafeModeFetch(gatewayState),
+      clawCmdImpl: async (command) => {
+        if (command.startsWith("gateway call channels.start")) {
+          startCalls.push(command);
+          return { ok: true, stdout: "{}" };
+        }
+        return { ok: true, stdout: "" };
+      },
+    });
+
+    watchdog.start();
+    await vi.advanceTimersByTimeAsync(10);
+    expect(watchdog.getStatus().safeMode).toBe(true);
+
+    gatewayState.suppressed = [];
+    const resultPromise = watchdog.resumeChannels();
+    await vi.advanceTimersByTimeAsync(10);
+    const result = await resultPromise;
+
+    expect(result.ok).toBe(true);
+    expect(startCalls).toEqual([
+      `gateway call channels.start --params '{"channel":"telegram"}'`,
+      `gateway call channels.start --params '{"channel":"discord"}'`,
+    ]);
+    expect(watchdog.getStatus()).toEqual(
+      expect.objectContaining({ safeMode: false, suppressedChannels: [] }),
+    );
+    watchdog.stop();
+  });
+
+  it("resumeChannels skips when no channels are suppressed", async () => {
+    const { watchdog, clawCmd } = createHarness({ autoRepair: false });
+
+    const result = await watchdog.resumeChannels();
+
+    expect(result).toEqual({
+      ok: false,
+      skipped: true,
+      reason: "no_suppressed_channels",
+    });
+    expect(clawCmd).not.toHaveBeenCalled();
+  });
+
+  it("clears safe-mode status when the gateway exits", async () => {
+    vi.useFakeTimers();
+    const gatewayState = { suppressed: ["telegram"] };
+    const { watchdog } = createHarness({
+      autoRepair: false,
+      resolveGatewayReadyzUrl: () => "http://127.0.0.1:18789/readyz",
+      fetchImpl: buildSafeModeFetch(gatewayState),
+    });
+
+    watchdog.start();
+    await vi.advanceTimersByTimeAsync(10);
+    expect(watchdog.getStatus().safeMode).toBe(true);
+
+    watchdog.onGatewayExit({ code: 1, expectedExit: false });
+
+    expect(watchdog.getStatus()).toEqual(
+      expect.objectContaining({ safeMode: false, suppressedChannels: [] }),
+    );
+    watchdog.stop();
   });
 });
