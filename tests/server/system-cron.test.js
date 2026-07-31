@@ -1,5 +1,5 @@
 const path = require("path");
-
+const { kRootDir } = require("../../lib/server/constants");
 const {
   installHourlyGitSyncCron,
 } = require("../../lib/server/onboarding/cron");
@@ -9,65 +9,12 @@ const {
   kSystemCronPath,
   stopManagedScheduler,
 } = require("../../lib/server/system-cron");
+const {
+  createCronMemoryFs,
+  seedCronOpenclawDir,
+} = require("./fixtures/cron-memory-fs");
 
-const createMemoryFs = () => {
-  const files = new Map();
-  const dirs = new Set();
-
-  const ensureParentDirs = (targetPath) => {
-    let current = path.dirname(targetPath);
-    while (current && !dirs.has(current)) {
-      dirs.add(current);
-      const parent = path.dirname(current);
-      if (parent === current) break;
-      current = parent;
-    }
-  };
-
-  return {
-    files,
-    dirs,
-    existsSync: vi.fn((targetPath) => files.has(targetPath) || dirs.has(targetPath)),
-    mkdirSync: vi.fn((targetPath) => {
-      dirs.add(targetPath);
-      ensureParentDirs(targetPath);
-    }),
-    readFileSync: vi.fn((targetPath) => {
-      if (targetPath.endsWith("hourly-git-sync.sh")) {
-        return "echo sync";
-      }
-      if (files.has(targetPath)) {
-        return files.get(targetPath);
-      }
-      throw Object.assign(new Error(`ENOENT: ${targetPath}`), { code: "ENOENT" });
-    }),
-    writeFileSync: vi.fn((targetPath, contents) => {
-      ensureParentDirs(targetPath);
-      files.set(targetPath, String(contents));
-    }),
-    rmSync: vi.fn((targetPath) => {
-      files.delete(targetPath);
-      dirs.delete(targetPath);
-    }),
-    readdirSync: vi.fn((targetPath) => {
-      if (!dirs.has(targetPath)) return [];
-      return [];
-    }),
-    statSync: vi.fn((targetPath) => {
-      if (dirs.has(targetPath)) {
-        return { isDirectory: () => true, isFile: () => false, mode: 0o755 };
-      }
-      if (files.has(targetPath)) {
-        return { isDirectory: () => false, isFile: () => true, mode: 0o644 };
-      }
-      throw Object.assign(new Error(`ENOENT: ${targetPath}`), { code: "ENOENT" });
-    }),
-    copyFileSync: vi.fn((sourcePath, targetPath) => {
-      ensureParentDirs(targetPath);
-      files.set(targetPath, String(files.get(sourcePath) || ""));
-    }),
-  };
-};
+const kRootDirLine = `ALPHACLAW_ROOT_DIR=${kRootDir}`;
 
 describe("server/system-cron", () => {
   afterEach(() => {
@@ -80,11 +27,9 @@ describe("server/system-cron", () => {
   });
 
   it("writes /etc/cron.d/openclaw-hourly-sync on linux install", async () => {
-    const fs = createMemoryFs();
+    const fs = createCronMemoryFs();
     const openclawDir = "/tmp/openclaw-linux";
-    fs.dirs.add(path.join(openclawDir, "cron"));
-    fs.dirs.add(path.join(openclawDir, ".alphaclaw"));
-    fs.files.set(path.join(openclawDir, "openclaw.json"), "{}");
+    seedCronOpenclawDir(fs, openclawDir);
 
     const result = await installHourlyGitSyncCron({
       fs,
@@ -97,6 +42,7 @@ describe("server/system-cron", () => {
     expect(fs.files.has(kSystemCronPath)).toBe(true);
     const cronContent = fs.files.get(kSystemCronPath);
     expect(cronContent).toContain("0 * * * *");
+    expect(cronContent).toContain(kRootDirLine);
     expect(
       getSystemCronStatus({ fs, openclawDir, platform: "linux" }),
     ).toEqual(
@@ -110,11 +56,9 @@ describe("server/system-cron", () => {
   });
 
   it("darwin: disable stops scheduler; re-enable restarts it", async () => {
-    const fs = createMemoryFs();
+    const fs = createCronMemoryFs();
     const openclawDir = "/tmp/openclaw-roundtrip";
-    fs.dirs.add(path.join(openclawDir, "cron"));
-    fs.dirs.add(path.join(openclawDir, ".alphaclaw"));
-    fs.files.set(path.join(openclawDir, "openclaw.json"), "{}");
+    seedCronOpenclawDir(fs, openclawDir);
     const cronStatus = (installed) =>
       getSystemCronStatus({ fs, openclawDir, platform: "darwin" }).installed === installed;
 
@@ -144,11 +88,9 @@ describe("server/system-cron", () => {
   });
 
   it("return value equals getSystemCronStatus().installed on darwin", async () => {
-    const fs = createMemoryFs();
+    const fs = createCronMemoryFs();
     const openclawDir = "/tmp/openclaw-retval-darwin";
-    fs.dirs.add(path.join(openclawDir, "cron"));
-    fs.dirs.add(path.join(openclawDir, ".alphaclaw"));
-    fs.files.set(path.join(openclawDir, "openclaw.json"), "{}");
+    seedCronOpenclawDir(fs, openclawDir);
 
     const result = await installHourlyGitSyncCron({
       fs,
@@ -165,11 +107,9 @@ describe("server/system-cron", () => {
   });
 
   it("return value equals getSystemCronStatus().installed on linux", async () => {
-    const fs = createMemoryFs();
+    const fs = createCronMemoryFs();
     const openclawDir = "/tmp/openclaw-retval-linux";
-    fs.dirs.add(path.join(openclawDir, "cron"));
-    fs.dirs.add(path.join(openclawDir, ".alphaclaw"));
-    fs.files.set(path.join(openclawDir, "openclaw.json"), "{}");
+    seedCronOpenclawDir(fs, openclawDir);
 
     const result = await installHourlyGitSyncCron({
       fs,
@@ -184,11 +124,9 @@ describe("server/system-cron", () => {
   });
 
   it("activates the managed scheduler after macOS install", async () => {
-    const fs = createMemoryFs();
+    const fs = createCronMemoryFs();
     const openclawDir = "/tmp/openclaw";
-    fs.dirs.add(path.join(openclawDir, "cron"));
-    fs.dirs.add(path.join(openclawDir, ".alphaclaw"));
-    fs.files.set(path.join(openclawDir, "openclaw.json"), "{}");
+    seedCronOpenclawDir(fs, openclawDir);
 
     const result = await installHourlyGitSyncCron({
       fs,
