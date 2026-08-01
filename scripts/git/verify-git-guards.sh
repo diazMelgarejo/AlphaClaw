@@ -53,7 +53,11 @@ case "$email_lc" in
     ok "user.email=${email_lc}"
     ;;
   *)
-    fail "user.email=${email_lc:-<unset>} — expected cyre gmail/cyre.me or Codex"
+    if private_owner_email_ok "$email_lc" "$REPO_ROOT"; then
+      ok "user.email=<configured private owner email>"
+    else
+      fail "user.email=${email_lc:-<unset>} — expected diazmelgarejo@gmail.com, lawrence@cyre.me, configured private owner email, or codex@openai.com"
+    fi
     ;;
 esac
 
@@ -114,6 +118,17 @@ if [[ -x scripts/git/scan-tracked-banned-tokens.sh ]]; then
   else
     fail "banned token found in tracked files"
   fi
+fi
+
+if [[ -x "$REPO_ROOT/scripts/git/commit_clean_test.sh" ]]; then
+  if out="$(bash "$REPO_ROOT/scripts/git/commit_clean_test.sh" 2>&1)"; then
+    ok "commit-clean empty-commit guards"
+  else
+    printf '%s\n' "$out" >&2
+    fail "commit_clean_test.sh failed (run scripts/git/commit_clean_test.sh)"
+  fi
+else
+  fail "commit_clean_test.sh missing or not executable"
 fi
 
 if [[ "$errors" -gt 0 ]]; then
