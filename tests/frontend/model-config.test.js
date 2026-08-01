@@ -5,6 +5,9 @@ describe("frontend/model-config", () => {
   it("maps openai-codex auth provider to openai", async () => {
     const modelConfig = await loadModelConfig();
     expect(modelConfig.getAuthProviderFromModelProvider("openai-codex")).toBe("openai");
+    expect(modelConfig.getAuthProviderFromModelProvider("minimax-portal")).toBe(
+      "minimax",
+    );
     expect(modelConfig.getAuthProviderFromModelProvider("volcengine-plan")).toBe(
       "volcengine",
     );
@@ -28,6 +31,7 @@ describe("frontend/model-config", () => {
   it("picks featured models in defined preference order", async () => {
     const modelConfig = await loadModelConfig();
     const featured = modelConfig.getFeaturedModels([
+      { key: "openrouter/anthropic/claude-sonnet-4-6", label: "OpenRouter Sonnet 4.6" },
       { key: "google/gemini-3.1-pro-preview", label: "Gemini 3.1 Pro" },
       { key: "anthropic/claude-opus-4-8", label: "Opus 4.8" },
       { key: "anthropic/claude-opus-4-7", label: "Opus 4.7" },
@@ -44,13 +48,15 @@ describe("frontend/model-config", () => {
       "anthropic/claude-opus-4-6",
       "openai/gpt-5.6-sol",
       "openai/gpt-5.5",
+      "openrouter/anthropic/claude-sonnet-4-6",
       "google/gemini-3.1-pro-preview",
     ]);
     expect(featured[0]?.featuredLabel).toBe("Opus 4.8");
     expect(featured[1]?.featuredLabel).toBe("Opus 4.7");
     expect(featured[3]?.featuredLabel).toBe("GPT-5.6 Sol");
     expect(featured[4]?.featuredLabel).toBe("GPT-5.5");
-    expect(featured[5]?.featuredLabel).toBe("Gemini 3.1 Pro");
+    expect(featured[5]?.featuredLabel).toBe("OpenRouter Sonnet 4.6");
+    expect(featured[6]?.featuredLabel).toBe("Gemini 3.1 Pro");
   });
 
   it("removes deprecated Codex 5.3 models from onboarding", async () => {

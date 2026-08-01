@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "xcode": {
+      "command": "xcrun",
+      "args": ["mcpbridge"],
+      "type": "stdio"
+    },
+    "alphaclaw": {
+      "command": "node",
+      "args": ["lib/mcp/alphaclaw-mcp.js"],
+      "type": "stdio"
+    }
+  }
+}
