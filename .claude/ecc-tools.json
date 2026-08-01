@@ -51,8 +51,11 @@
       {
         "id": "security-evidence",
         "label": "Security evidence",
-        "status": "missing",
-        "evidence": [],
+        "status": "present",
+        "evidence": [
+          "scripts/git/audit_attribution.sh",
+          "scripts/git/audit_engine.py"
+        ],
         "recommendation": "Attach security evidence such as SBOMs, SARIF, audit reports, or AgentShield evidence packs."
       },
       {
