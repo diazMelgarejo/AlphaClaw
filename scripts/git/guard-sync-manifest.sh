@@ -37,6 +37,7 @@ GUARD_SYNC_EXECUTABLES=(
   remind-pr-body-append-only.sh
   publish-clean-branch.sh
   verify-pr-body-not-clobbered.sh
+  scrub_dsstore.sh
 )
 
 # Non-executable policy/data files (mode 0644 when synced).
@@ -52,3 +53,6 @@ GUARD_PARITY_REQUIRED=(
   "${GUARD_SYNC_EXECUTABLES[@]}"
   "${GUARD_SYNC_DATA_FILES[@]}"
 )
+
+# Dirty guard-sync paths with GUARD_SYNC_ON_DIRTY=skip — not success, not a hard failure.
+GUARD_SYNC_EXIT_DIRTY_SKIP=2

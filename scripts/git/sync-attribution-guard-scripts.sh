@@ -14,8 +14,11 @@ if ! target="$(git -C "$target_input" rev-parse --show-toplevel 2>/dev/null)"; t
 fi
 
 # Fail-closed: scan workspace siblings before any overwrite (GUARD_SYNC_E_DIVERGENCE).
-if [[ "${GUARD_SYNC_SKIP_DIVERGENCE_CHECK:-0}" != "1" ]] \
-  && [[ -x "$SCRIPT_DIR/check-guard-sync-divergence.sh" ]]; then
+if [[ "${GUARD_SYNC_SKIP_DIVERGENCE_CHECK:-0}" != "1" ]]; then
+  if [[ ! -x "$SCRIPT_DIR/check-guard-sync-divergence.sh" ]]; then
+    echo "error: check-guard-sync-divergence.sh missing or not executable" >&2
+    exit 1
+  fi
   WORKSPACE_ROOT="${WORKSPACE_ROOT:-$(cd "$source_root/.." && pwd)}" \
     bash "$SCRIPT_DIR/check-guard-sync-divergence.sh" --workspace || exit 1
 fi
@@ -59,9 +62,25 @@ guard_sync_dirty_paths() {
   return 0
 }
 
-guard_sync_dirty_paths "$source_root" "canonical repo ($source_root)" || exit 1
+# GUARD_SYNC_ON_DIRTY=skip — cloud install/start: warn and skip overwrite (exit
+# GUARD_SYNC_EXIT_DIRTY_SKIP) instead of failing the whole VM boot when agent
+# worktrees are mid-PR dirty.
+_guard_sync_abort_if_dirty() {
+  local root="$1"
+  local label="$2"
+  if guard_sync_dirty_paths "$root" "$label"; then
+    return 0
+  fi
+  if [[ "${GUARD_SYNC_ON_DIRTY:-fail}" == "skip" ]]; then
+    echo "warn: skipping sync for $label (GUARD_SYNC_ON_DIRTY=skip; dirty guard-sync paths preserved)" >&2
+    exit "${GUARD_SYNC_EXIT_DIRTY_SKIP:-2}"
+  fi
+  exit 1
+}
+
+_guard_sync_abort_if_dirty "$source_root" "canonical repo ($source_root)"
 if [[ "$(cd "$source_root" && pwd)" != "$(cd "$target" && pwd)" ]]; then
-  guard_sync_dirty_paths "$target" "target repo ($target)" || exit 1
+  _guard_sync_abort_if_dirty "$target" "target repo ($target)"
 fi
 
 atomic_install_file() {
@@ -214,11 +233,26 @@ for rel in "${GUARD_SYNC_DATA_FILES[@]}"; do
 done
 
 # Cursor Cloud agent helpers (orama canonical — synced to PT + AlphaClaw, not periscope).
-for cursor_rel in append-pr-body.sh; do
+for cursor_rel in \
+  append-pr-body.sh \
+  grant-pr-body-human-override.sh \
+  pr-body-grant-lib.py; do
   [[ -f "$source_root/scripts/cursor/$cursor_rel" ]] || continue
   atomic_install_file \
     "$source_root/scripts/cursor/$cursor_rel" \
     "$target/scripts/cursor/$cursor_rel" \
+    0755
+done
+
+for cursor_hook_rel in \
+  hooks/pr-body-guard-core.py \
+  hooks/pr-body-backup-lib.sh \
+  hooks/before-shell-pr-body-guard.sh \
+  hooks/before-mcp-pr-body-guard.sh; do
+  [[ -f "$source_root/scripts/cursor/$cursor_hook_rel" ]] || continue
+  atomic_install_file \
+    "$source_root/scripts/cursor/$cursor_hook_rel" \
+    "$target/scripts/cursor/$cursor_hook_rel" \
     0755
 done
 if [[ -f "$source_root/.cursor/commands/pr.md" ]]; then
