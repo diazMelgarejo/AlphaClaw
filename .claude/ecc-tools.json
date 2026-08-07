@@ -2,11 +2,11 @@
   "version": "1.3",
   "schemaVersion": "1.0",
   "generatedBy": "ecc-tools",
-  "generatedAt": "2026-06-24T04:13:18.380Z",
+  "generatedAt": "2026-08-06T04:06:54.860Z",
   "repo": "https://github.com/diazMelgarejo/AlphaClaw",
   "referenceSetReadiness": {
-    "score": 14,
-    "present": 1,
+    "score": 29,
+    "present": 2,
     "total": 7,
     "items": [
       {
@@ -69,15 +69,15 @@
   },
   "profiles": {
     "requested": "full",
-    "recommended": "full",
+    "recommended": "security",
     "effective": "developer",
     "requestedAlias": "full",
-    "recommendedAlias": "full",
+    "recommendedAlias": "security",
     "effectiveAlias": "developer"
   },
   "requestedProfile": "full",
   "profile": "developer",
-  "recommendedProfile": "full",
+  "recommendedProfile": "security",
   "effectiveProfile": "developer",
   "tier": "free",
   "requestedComponents": [
@@ -303,6 +303,10 @@
     {
       "command": "refactoring",
       "path": ".claude/commands/refactoring.md"
+    },
+    {
+      "command": "feature-development",
+      "path": ".claude/commands/feature-development.md"
     }
   ],
   "adapters": {
