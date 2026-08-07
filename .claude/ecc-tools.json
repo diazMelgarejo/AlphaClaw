@@ -2,7 +2,7 @@
   "version": "1.3",
   "schemaVersion": "1.0",
   "generatedBy": "ecc-tools",
-  "generatedAt": "2026-08-06T04:06:54.860Z",
+  "generatedAt": "2026-08-07T22:48:00.000Z",
   "repo": "https://github.com/diazMelgarejo/AlphaClaw",
   "referenceSetReadiness": {
     "score": 29,
@@ -44,7 +44,9 @@
         "evidence": [
           ".agents/skills/AlphaClaw/SKILL.md",
           ".agents/skills/AlphaClaw/agents/openai.yaml",
-          ".claude/agents/upstream-compat-reviewer.md"
+          ".claude/agents/upstream-compat-reviewer.md",
+          ".claude/hooks/check-gstack.sh",
+          ".claude/settings.json"
         ],
         "recommendation": "Add cross-harness, adapter-compliance, or harness-audit evidence for Claude, Codex, OpenCode, Zed, dmux, and agent surfaces."
       },
