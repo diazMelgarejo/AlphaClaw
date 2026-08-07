@@ -1,5 +1,5 @@
 # Instincts generated from https://github.com/diazMelgarejo/AlphaClaw
-# Generated: 2026-08-07T00:00:00.000Z (synthesized)
+# Generated: 2026-08-07T22:48:00.000Z (integrative union v0+v0b+v1.1+v3)
 # Version: 2.0
 # NOTE: Harmonized integration-base instincts (36) with PR #30 ECC bundle (12 shared).
 # PR #30 subset merged via updated evidence counts; fork workflow instincts preserved.
@@ -762,3 +762,172 @@ Update CI config, scripts, and package files to support new platforms or test su
 - Workflow: ci-config-and-cross-platform-test-matrix-update
 - Commit sequences and files in workflow example
 
+id: alphaclaw-instinct-commit-format
+trigger: "When writing a commit message"
+confidence: 0.7
+domain: git
+source: repo-analysis
+source_repo: diazMelgarejo/AlphaClaw
+---
+
+# Alphaclaw Instinct Commit Format
+
+## Action
+
+Write a freeform message without a strict prefix, typically describing the action and scope (e.g., 'Bump the npm_and_yarn group across 1 directory with 14 updates')
+
+## Evidence
+
+- Seen in commit example: 'Bump the npm_and_yarn group across 1 directory with 14 updates'
+
+id: alphaclaw-instinct-commit-prefix
+trigger: "When making a commit related to recovery"
+confidence: 0.9
+domain: git
+source: repo-analysis
+source_repo: diazMelgarejo/AlphaClaw
+---
+
+# Alphaclaw Instinct Commit Prefix
+
+## Action
+
+Prefix the commit message with 'recovery:'
+
+## Evidence
+
+- Seen in commit: recovery: staged-uncommitted work — enforce 3-tier IP resolution standards and template os-agnostic paths
+
+---
+id: alphaclaw-instinct-error-handling
+trigger: "When handling errors in code"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: diazMelgarejo/AlphaClaw
+---
+
+# Alphaclaw Instinct Error Handling
+
+## Action
+
+Use try-catch blocks for error handling
+
+## Evidence
+
+- Pattern in errorHandling.style: try-catch
+
+id: alphaclaw-instinct-export-style
+trigger: "When exporting functions or variables"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: diazMelgarejo/AlphaClaw
+---
+
+# Alphaclaw Instinct Export Style
+
+## Action
+
+Use named exports
+
+## Evidence
+
+- Pattern in exportStyle: named
+
+---
+id: alphaclaw-instinct-import-style
+trigger: "When importing modules"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: diazMelgarejo/AlphaClaw
+---
+
+# Alphaclaw Instinct Import Style
+
+## Action
+
+Use relative import paths
+
+## Evidence
+
+- Pattern in importStyle: relative
+
+---
+id: alphaclaw-instinct-test-file-pattern
+trigger: "When creating a test file"
+confidence: 0.9
+domain: testing
+source: repo-analysis
+source_repo: diazMelgarejo/AlphaClaw
+---
+
+# Alphaclaw Instinct Test File Pattern
+
+## Action
+
+Name the file with the pattern *.test.js
+
+## Evidence
+
+- Pattern in testing.filePattern: *.test.js
+
+---
+id: alphaclaw-instinct-test-framework
+trigger: "When writing tests"
+confidence: 0.9
+domain: testing
+source: repo-analysis
+source_repo: diazMelgarejo/AlphaClaw
+---
+
+# Alphaclaw Instinct Test Framework
+
+## Action
+
+Use the Vitest framework
+
+## Evidence
+
+- Pattern in testing.framework: vitest
+
+---
+id: alphaclaw-instinct-test-location
+trigger: "When adding new tests"
+confidence: 0.8
+domain: testing
+source: repo-analysis
+source_repo: diazMelgarejo/AlphaClaw
+---
+
+# Alphaclaw Instinct Test Location
+
+## Action
+
+Place test files in a separate directory from source files
+
+## Evidence
+
+- Pattern in architecture.folderStructure.testLocation
+
+---
+id: alphaclaw-instinct-test-type
+trigger: "When organizing tests"
+confidence: 0.8
+domain: testing
+source: repo-analysis
+source_repo: diazMelgarejo/AlphaClaw
+---
+
+# Alphaclaw Instinct Test Type
+
+## Action
+
+Include both unit and integration tests
+
+## Evidence
+
+- Pattern in testing.testTypes: unit, integration
+
+---
