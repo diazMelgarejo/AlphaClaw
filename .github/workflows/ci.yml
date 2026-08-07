@@ -40,6 +40,9 @@ jobs:
           mkdir -p ~/.local/bin
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
+      - name: ECC manifest guard
+        run: bash scripts/check-ecc-manifest.sh
+
       - name: Install dependencies
         run: npm install
 

@@ -10,6 +10,22 @@
     "javascript",
     "express"
   ],
-  "suggestedBy": "ecc-tools-repo-analysis (synthesized with integration-base)",
-  "createdAt": "2026-08-07T00:00:00.000Z"
+  "suggestedBy": "ecc-tools integrative synthesis (v0 d038eb8 + v1.1 16392c8 + v3 94f8a90 + textual resynthesis)",
+  "createdAt": "2026-08-07T00:00:00.000Z",
+  "synthesis": {
+    "method": "orama-cidf-integrative-merge",
+    "commits": {
+      "v0_proto": "d038eb8",
+      "v1_1": "16392c8",
+      "v2_harmonize_rejected": "eb10e75",
+      "v3_synthesize": "94f8a90"
+    },
+    "instinctCount": 45,
+    "skillSources": [
+      "integration-base ECC artifacts",
+      "PR #30 ECC Tools repo analysis",
+      "uploaded alphaclaw-conventions textual resynthesis"
+    ],
+    "note": "Never replace prior ECC versions; union instincts and interleave SKILL additions."
+  }
 }
