@@ -1,7 +1,8 @@
 # Instincts generated from https://github.com/diazMelgarejo/AlphaClaw
-# Generated: 2026-06-24T04:15:55.824Z
+# Generated: 2026-08-07T00:00:00.000Z (synthesized)
 # Version: 2.0
-# NOTE: This file supplements (does not replace) any existing curated instincts.
+# NOTE: Harmonized integration-base instincts (36) with PR #30 ECC bundle (12 shared).
+# PR #30 subset merged via updated evidence counts; fork workflow instincts preserved.
 # High-confidence manually curated instincts should be preserved alongside these.
 
 ---
@@ -21,7 +22,7 @@ Use conventional commit format with prefixes: docs, fix, chore, feat, merge
 
 ## Evidence
 
-- 86 commits analyzed
+- 100 commits analyzed
 - Detected conventional commit pattern
 - Examples: Setup: support read-only OpenClaw onboarding, merge: upstream/main (0.9.3) into pr-4-macos + resolve read-only onboarding conflicts
 
@@ -43,7 +44,7 @@ Write moderate-length commit messages (~62 characters)
 ## Evidence
 
 - Average commit message length: 62 chars
-- Based on 86 commits
+- Based on 100 commits
 
 ---
 id: AlphaClaw-naming-files
