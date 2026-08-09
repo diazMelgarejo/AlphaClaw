@@ -50,6 +50,7 @@
     "vitest": "^4.0.18",
     "wouter-preact": "^3.7.1"
   },
+  "packageManager": "pnpm@10.26.0",
   "engines": {
     "node": ">=22.22.3 <23 || >=24.15.0 <25 || >=25.9.0"
   },
