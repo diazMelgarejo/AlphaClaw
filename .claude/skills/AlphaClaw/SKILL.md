@@ -52,18 +52,6 @@ Follow these commit message conventions based on 100 analyzed commits.
 *Commit message example*
 
 ```text
-Setup: support read-only OpenClaw onboarding
-```
-
-*Commit message example*
-
-```text
-merge: upstream/main (0.9.3) into pr-4-macos + resolve read-only onboarding conflicts
-```
-
-*Commit message example*
-
-```text
 fix(macos): extract bin-path resolution into lib/platform.js
 ```
 
@@ -82,19 +70,27 @@ docs: add macOS post-install lessons learned
 *Commit message example*
 
 ```text
-Add macOS support
-```
-
-*Commit message example*
-
-```text
-Merge main into pr-4-macos and resolve read-only onboarding conflicts.
+merge: upstream/main (0.9.3) into pr-4-macos + resolve read-only onboarding conflicts
 ```
 
 *Commit message example*
 
 ```text
 fix(platform): address code review issues in lib/platform.js + alphaclaw.js wiring
+```
+
+*Historical commit examples (predating strict conventional commit enforcement)*
+
+```text
+Setup: support read-only OpenClaw onboarding
+```
+
+```text
+Add macOS support
+```
+
+```text
+Merge main into pr-4-macos and resolve read-only onboarding conflicts.
 ```
 
 ## Architecture
@@ -133,7 +129,7 @@ This project uses **hybrid** module organization.
 
 *Preferred import style*
 
-```typescript
+```javascript
 // Use relative imports
 import { Button } from '../components/Button'
 import { useAuth } from './hooks/useAuth'
@@ -141,11 +137,10 @@ import { useAuth } from './hooks/useAuth'
 
 *Preferred export style*
 
-```typescript
+```javascript
 // Use named exports
 export function calculateTotal() { ... }
 export const TAX_RATE = 0.1
-export interface Order { ... }
 ```
 
 ## Testing
@@ -217,7 +212,7 @@ Standard feature implementation workflow
 - `**/api/**`
 
 **Example commit sequence**:
-```
+```text
 Add macOS support
 Setup: support read-only OpenClaw onboarding
 Merge main into pr-4-macos and resolve read-only onboarding conflicts.
@@ -240,7 +235,7 @@ Test-first development workflow (TDD)
 - `src/**/*`
 
 **Example commit sequence**:
-```
+```text
 test: add tests for user validation
 feat: implement user validation
 ```
@@ -260,7 +255,7 @@ Code refactoring and cleanup workflow
 - `src/**/*`
 
 **Example commit sequence**:
-```
+```text
 Merge main into pr-4-macos and resolve read-only onboarding conflicts.
 docs(plan): add macOS PR implementation plan for feature/MacOS-post-install
 merge: upstream/main (0.9.3) into pr-4-macos + resolve read-only onboarding conflicts

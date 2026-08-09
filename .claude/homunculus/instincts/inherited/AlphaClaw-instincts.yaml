@@ -17,7 +17,7 @@ source_repo: https://github.com/diazMelgarejo/AlphaClaw
 
 ## Action
 
-Use conventional commit format with prefixes: docs, fix, chore, feat, merge
+Use conventional commit format with prefixes: docs, fix, chore, feat, merge, test
 
 ## Evidence
 

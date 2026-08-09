@@ -1,16 +1,12 @@
 node_modules/
 .DS_Store
 .env
-<<<<<<< HEAD
+.env.local
 .cursor/*
 !.cursor/commands/
 !.cursor/commands/**
-!.cursor/commands/
-!.cursor/commands/**
-=======
-.env.local
-.cursor/
->>>>>>> 6fb28ca (chore(gitignore): ignore .env.local)
+!.cursor/rules/
+!.cursor/rules/**
 coverage/
 workspace/.openclaw/
 
