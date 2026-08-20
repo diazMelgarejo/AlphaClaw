@@ -21,11 +21,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.26.0
+
       - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: "npm"
+          cache: "pnpm"
 
       - name: Verify arch (macOS)
         if: runner.os == 'macOS'
@@ -33,27 +38,27 @@ jobs:
           echo "arch: $(uname -m) | node: $(node --version)"
           [ "$(uname -m)" = "x86_64" ] && echo "::warning::Rosetta x64 shell — esbuild arch mismatch risk" || true
 
-      - name: Set sudo-free npm prefix (macOS)
+      - name: Set sudo-free pnpm prefix (macOS)
         if: runner.os == 'macOS'
         run: |
-          npm config set prefix ~/.local
+          pnpm config set global-bin-dir ~/.local/bin
           mkdir -p ~/.local/bin
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Install dependencies
-        run: npm install
+        run: pnpm install
 
       - name: Build UI
-        run: npm run build:ui
+        run: pnpm run build:ui
 
       - name: Full test suite
-        run: npm test
+        run: pnpm test
 
       - name: Watchdog tests
-        run: npm run test:watchdog
+        run: pnpm run test:watchdog
 
       - name: Coverage
-        run: npm run test:coverage
+        run: pnpm run test:coverage
 
       - name: Upload coverage
         if: matrix.os == 'ubuntu-latest'
