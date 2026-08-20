@@ -2,11 +2,11 @@
   "version": "1.3",
   "schemaVersion": "1.0",
   "generatedBy": "ecc-tools",
-  "generatedAt": "2026-08-06T04:06:54.860Z",
+  "generatedAt": "2026-06-24T04:13:18.380Z",
   "repo": "https://github.com/diazMelgarejo/AlphaClaw",
   "referenceSetReadiness": {
-    "score": 29,
-    "present": 2,
+    "score": 14,
+    "present": 1,
     "total": 7,
     "items": [
       {
@@ -68,22 +68,25 @@
     ]
   },
   "profiles": {
-    "requested": "security",
-    "recommended": "security",
+    "requested": "full",
+    "recommended": "full",
     "effective": "developer",
-    "requestedAlias": "security",
-    "recommendedAlias": "security",
+    "requestedAlias": "full",
+    "recommendedAlias": "full",
     "effectiveAlias": "developer"
   },
-  "requestedProfile": "security",
+  "requestedProfile": "full",
   "profile": "developer",
-  "recommendedProfile": "security",
+  "recommendedProfile": "full",
   "effectiveProfile": "developer",
   "tier": "free",
   "requestedComponents": [
     "repo-baseline",
     "workflow-automation",
-    "security-audits"
+    "security-audits",
+    "research-tooling",
+    "team-rollout",
+    "governance-controls"
   ],
   "selectedComponents": [
     "repo-baseline",
@@ -93,12 +96,18 @@
   "requestedRemoveComponents": [],
   "blockedRemovalComponents": [],
   "tierFilteredComponents": [
-    "security-audits"
+    "security-audits",
+    "research-tooling",
+    "team-rollout",
+    "governance-controls"
   ],
   "requestedRootPackages": [
     "runtime-core",
     "workflow-pack",
-    "agentshield-pack"
+    "agentshield-pack",
+    "research-pack",
+    "team-config-sync",
+    "enterprise-controls"
   ],
   "selectedRootPackages": [
     "runtime-core",
@@ -107,7 +116,10 @@
   "requestedPackages": [
     "runtime-core",
     "workflow-pack",
-    "agentshield-pack"
+    "agentshield-pack",
+    "research-pack",
+    "team-config-sync",
+    "enterprise-controls"
   ],
   "requestedAddPackages": [],
   "requestedRemovePackages": [],
@@ -121,10 +133,16 @@
   ],
   "blockedRemovalPackages": [],
   "tierFilteredRootPackages": [
-    "agentshield-pack"
+    "agentshield-pack",
+    "research-pack",
+    "team-config-sync",
+    "enterprise-controls"
   ],
   "tierFilteredPackages": [
-    "agentshield-pack"
+    "agentshield-pack",
+    "research-pack",
+    "team-config-sync",
+    "enterprise-controls"
   ],
   "conflictingPackages": [],
   "dependencyGraph": {
@@ -140,7 +158,10 @@
   "requestedModules": [
     "runtime-core",
     "workflow-pack",
-    "agentshield-pack"
+    "agentshield-pack",
+    "research-pack",
+    "team-config-sync",
+    "enterprise-controls"
   ],
   "selectedModules": [
     "runtime-core",
