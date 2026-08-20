@@ -7,6 +7,22 @@ const createSystemDeps = () => {
   const deps = {
     fs: {
       existsSync: vi.fn(() => true),
+      lstatSync: vi.fn((targetPath) => ({
+        isSymbolicLink: () => targetPath === "/tmp/openclaw",
+      })),
+      readlinkSync: vi.fn((targetPath) =>
+        targetPath === "/tmp/openclaw" ? "/Users/test/.openclaw" : "",
+      ),
+      realpathSync: vi.fn((targetPath) => {
+        if (targetPath === "/tmp/openclaw") return "/Users/test/.openclaw";
+        if (targetPath === "/tmp/openclaw/openclaw.json")
+          return "/Users/test/.openclaw/openclaw.json";
+        if (targetPath === "/tmp/openclaw/skills/control-ui/SKILL.md")
+          return "/Users/test/.openclaw/skills/control-ui/SKILL.md";
+        if (targetPath === "/tmp/alphaclaw/onboarded.json")
+          return "/tmp/alphaclaw/onboarded.json";
+        return targetPath;
+      }),
       readFileSync: vi.fn(() => {
         throw new Error("no config");
       }),
@@ -95,6 +111,10 @@ const createSystemDeps = () => {
       removeApiKeyProfileForEnvVar: vi.fn(),
     },
     OPENCLAW_DIR: "/tmp/openclaw",
+    kOnboardingMarkerPath: "/tmp/alphaclaw/onboarded.json",
+    kControlUiSkillPath: "/tmp/openclaw/skills/control-ui/SKILL.md",
+    platform: "linux",
+    execFileSyncImpl: vi.fn(() => ""),
     ensureGatewayProxyConfig: vi.fn(() => false),
     getBaseUrl: vi.fn(() => "https://setup.example.com"),
   };
@@ -365,6 +385,16 @@ describe("server/routes/system", () => {
   it("reports running gateway status on GET /api/status", async () => {
     const deps = createSystemDeps();
     deps.fs.existsSync.mockReturnValue(true);
+    deps.fs.readFileSync.mockImplementation((targetPath) => {
+      if (targetPath === "/tmp/alphaclaw/onboarded.json") {
+        return JSON.stringify({
+          onboarded: true,
+          readOnly: true,
+          reason: "read_only_complete",
+        });
+      }
+      throw new Error("no config");
+    });
     deps.isGatewayRunning.mockResolvedValue(true);
     const app = createApp(deps);
 
@@ -386,6 +416,20 @@ describe("server/routes/system", () => {
         syncCron: expect.objectContaining({
           enabled: true,
           schedule: "0 * * * *",
+        }),
+        diagnostics: expect.objectContaining({
+          readOnlyMode: true,
+          onboardingReason: "read_only_complete",
+          openclawDir: "/tmp/openclaw",
+          openclawDirIsSymlink: true,
+          openclawDirLinkTarget: "/Users/test/.openclaw",
+          resolvedOpenclawDir: "/Users/test/.openclaw",
+          configPath: "/tmp/openclaw/openclaw.json",
+          resolvedConfigPath: "/Users/test/.openclaw/openclaw.json",
+          controlUiSkillExists: true,
+          resolvedControlUiSkillPath:
+            "/Users/test/.openclaw/skills/control-ui/SKILL.md",
+          openclawVersionSource: "openclaw --version",
         }),
       }),
     );
@@ -640,6 +684,29 @@ describe("server/routes/system", () => {
     expect(res.body.ok).toBe(true);
   });
 
+  it("rejects named cron tokens on PUT /api/sync-cron", async () => {
+    const deps = createSystemDeps();
+    deps.fs.readFileSync.mockReturnValueOnce(
+      JSON.stringify({ enabled: true, schedule: "0 * * * *" }),
+    );
+    const app = createApp(deps);
+
+    const res = await request(app).put("/api/sync-cron").send({
+      enabled: true,
+      schedule: "0 * * * MON",
+    });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toEqual({
+      ok: false,
+      error: "schedule must be a 5-field cron string",
+    });
+    expect(deps.fs.writeFileSync).not.toHaveBeenCalledWith(
+      "/tmp/openclaw/cron/system-sync.json",
+      expect.anything(),
+    );
+  });
+
   it("updates sync cron config without touching system cron when disabled by runtime env", async () => {
     const previousValue = process.env.ALPHACLAW_SKIP_SYSTEM_CRON_INSTALL;
     process.env.ALPHACLAW_SKIP_SYSTEM_CRON_INSTALL = "true";
@@ -759,6 +826,36 @@ describe("server/routes/system", () => {
     expect(res.body.gatewayConfigChanged).toBe(true);
     expect(deps.restartRequiredState.markRequired).toHaveBeenCalledWith(
       "openai_compat_api_enabled",
+    );
+  });
+
+  it("updates sync cron config for the managed scheduler on macOS", async () => {
+    const deps = createSystemDeps();
+    deps.platform = "darwin";
+    deps.fs.readFileSync
+      .mockReturnValueOnce(JSON.stringify({ enabled: true, schedule: "0 * * * *" }))
+      .mockReturnValueOnce(JSON.stringify({ enabled: true, schedule: "*/20 * * * *" }));
+    const app = createApp(deps);
+
+    const res = await request(app).put("/api/sync-cron").send({
+      enabled: true,
+      schedule: "*/20 * * * *",
+    });
+
+    expect(res.status).toBe(200);
+    expect(deps.fs.writeFileSync).toHaveBeenCalledWith(
+      "/tmp/openclaw/cron/system-sync.json",
+      expect.stringContaining('"schedule": "*/20 * * * *"'),
+    );
+    expect(deps.execFileSyncImpl).not.toHaveBeenCalled();
+    expect(res.body.syncCron).toEqual(
+      expect.objectContaining({
+        enabled: true,
+        schedule: "*/20 * * * *",
+        installed: false,
+        platform: "darwin",
+        installMethod: "managed_scheduler",
+      }),
     );
   });
 
