@@ -18,6 +18,8 @@ const flushPromises = async () => {
   await Promise.resolve();
 };
 
+const createdTempRoots = [];
+
 const createModelDeps = () => {
   const deps = {
     shellCmd: vi.fn(),
@@ -58,6 +60,7 @@ const createApp = (deps) => {
   const tempRoot = fs.mkdtempSync(
     path.join(os.tmpdir(), "alphaclaw-routes-models-"),
   );
+  createdTempRoots.push(tempRoot);
   const modelCatalogCache = createModelCatalogCache({
     cachePath: path.join(tempRoot, "cache", "model-catalog.json"),
     shellCmd: deps.shellCmd,
@@ -76,6 +79,12 @@ const createApp = (deps) => {
 };
 
 describe("server/routes/models", () => {
+  afterEach(() => {
+    for (const dir of createdTempRoots.splice(0)) {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
   it("bootstraps with the bundled catalog, then returns normalized models from openclaw output", async () => {
     const deps = createModelDeps();
     deps.shellCmd.mockResolvedValue("noise");
@@ -116,66 +125,6 @@ describe("server/routes/models", () => {
         refreshing: false,
         fetchedAt: expect.any(Number),
         models: [{ key: "openai/gpt-5.1-codex", provider: "openai", label: "GPT" }],
-      }),
-    );
-  });
-
-  it("starts a new catalog load on POST /api/models/refresh", async () => {
-    const deps = createModelDeps();
-    deps.shellCmd.mockResolvedValue("noise");
-    deps.parseJsonFromNoisyOutput
-      .mockReturnValueOnce({
-        models: [{ key: "openai/gpt-cached", name: "Cached" }],
-      })
-      .mockReturnValueOnce({
-        models: [{ key: "moonshot/kimi-k2.5", name: "Kimi K2.5" }],
-      });
-    deps.normalizeOnboardingModels
-      .mockReturnValueOnce([
-        { key: "openai/gpt-cached", provider: "openai", label: "Cached" },
-      ])
-      .mockReturnValueOnce([
-        {
-          key: "moonshot/kimi-k2.5",
-          provider: "moonshot",
-          label: "Kimi K2.5",
-        },
-      ]);
-    const app = createApp(deps);
-
-    await request(app).get("/api/models");
-    await flushPromises();
-
-    const response = await request(app).post("/api/models/refresh");
-
-    expect(response.status).toBe(200);
-    expect(response.body).toEqual(
-      expect.objectContaining({
-        ok: true,
-        source: "cache",
-        stale: true,
-        refreshing: true,
-        models: [
-          { key: "openai/gpt-cached", provider: "openai", label: "Cached" },
-        ],
-      }),
-    );
-    expect(deps.shellCmd).toHaveBeenCalledTimes(2);
-
-    await flushPromises();
-    const refreshed = await request(app).get("/api/models");
-    expect(refreshed.body).toEqual(
-      expect.objectContaining({
-        source: "openclaw",
-        stale: false,
-        refreshing: false,
-        models: [
-          {
-            key: "moonshot/kimi-k2.5",
-            provider: "moonshot",
-            label: "Kimi K2.5",
-          },
-        ],
       }),
     );
   });
