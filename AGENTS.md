@@ -95,12 +95,12 @@ Use this release flow when promoting tested beta builds to production:
 1. Ensure `main` is clean and synced, and tests pass.
 2. Publish beta iterations as needed:
    - `pnpm version prerelease --preid=beta`
-   - `git push && git push --tags`
+   - `bash scripts/git/publish-clean-branch.sh <branch> main origin && git push origin --tags`
    - `pnpm publish --tag beta`
 3. Immediately after each beta publish, update `~/Projects/openclaw-railway-template` on the `beta` branch to pin the exact beta version in `package.json` (for example `0.3.2-beta.4`), then commit and push that template change. Do not leave the beta template on `latest`, or Docker layer cache can reuse an older install.
 4. When ready for production, publish a stable release version (for example `0.3.2`):
    - `pnpm version 0.3.2`
-   - `git push && git push --tags`
+   - `bash scripts/git/publish-clean-branch.sh <branch> main origin && git push origin --tags`
    - `pnpm publish` (publishes to `latest`)
    - Pin all deployment templates on `main` to that release: set `@chrysb/alphaclaw` in `~/Projects/openclaw-railway-template`, `~/Projects/openclaw-render-template`, and `~/Projects/openclaw-apex-template` to the released version. The Render checkout must track `render-examples/openclaw-render-template`; verify `gh api repos/render-examples/openclaw-render-template --jq '.permissions.push'` returns `true` before publishing, and stop if write access is missing. Templates rely on AlphaClaw's declared `openclaw` dependency — do not add `package.json` `overrides` for `openclaw` unless you have a one-off debug reason. Run `pnpm install` in each repo, confirm `pnpm ls openclaw` matches AlphaClaw's `package.json` pin, commit `package.json` and `pnpm-lock.yaml`, and push. Skipping a template leaves it stale relative to the others.
 5. Return templates to production channel:

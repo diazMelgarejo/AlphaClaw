@@ -189,11 +189,12 @@ This project has coverage reporting configured. Aim for 80%+ coverage.
 ```js
 // tests/server/platform.test.js
 import { detectPlatform } from '../../lib/platform.js';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 
 describe('detectPlatform', () => {
   it('should return "darwin" on macOS', () => {
-    expect(['linux', 'darwin']).toContain(detectPlatform());
+    vi.spyOn(process, 'platform', 'get').mockReturnValue('darwin');
+    expect(detectPlatform()).toBe('darwin');
   });
 });
 ```
@@ -210,7 +211,7 @@ try {
   return result
 } catch (error) {
   console.error('Operation failed:', error)
-  throw new Error('User-friendly message')
+  throw new Error('User-friendly message', { cause: error })
 }
 ```
 
