@@ -91,13 +91,38 @@ while read -r h; do
   fi
 done < <(git rev-list "$range")
 
-echo "OK: ${range} passes attribution scan — force-pushing ${branch} → ${remote}"
-if [[ -x scripts/git/remind-pr-body-append-only.sh ]]; then
-  # Strict by default in audited publisher — override with PR_BODY_UPDATE_ACK=1
-  # after append-pr-body.sh when PR body was intentionally updated this session.
-  PR_BODY_GUARD_STRICT="${PR_BODY_GUARD_STRICT:-1}" \
-    bash scripts/git/remind-pr-body-append-only.sh "$branch"
+if [[ "${HISTORY_SURGERY_PUSH:-}" == "1" ]]; then
+  echo "OK: ${range} passes attribution scan — force-pushing ${branch} → ${remote} (hooks off)"
+  if [[ -x scripts/git/remind-pr-body-append-only.sh ]]; then
+    PR_BODY_GUARD_STRICT="${PR_BODY_GUARD_STRICT:-1}" \
+      bash scripts/git/remind-pr-body-append-only.sh "$branch"
+  fi
+  restore_hooks_on_exit=1
+  cleanup_publish_hooks() {
+    local cleanup_failed=0
+    if [[ "${restore_hooks_on_exit:-0}" == "1" && -x scripts/git/install-local-hooks.sh ]]; then
+      bash scripts/git/install-local-hooks.sh || cleanup_failed=1
+      restore_hooks_on_exit=0
+    fi
+    return "$cleanup_failed"
+  }
+  trap 'status=$?; cleanup_status=0; cleanup_publish_hooks || cleanup_status=$?; trap - EXIT; if [[ $status -ne 0 ]]; then exit $status; fi; exit $cleanup_status' EXIT
+  if [[ -x scripts/git/history-surgery-git.sh ]]; then
+    bash scripts/git/history-surgery-git.sh push --force-with-lease "$remote" "${branch}:${branch}"
+  else
+    git -c core.hooksPath=/dev/null push --force-with-lease "$remote" "${branch}:${branch}"
+  fi
+  cleanup_publish_hooks
+  trap - EXIT
+else
+  echo "OK: ${range} passes attribution scan — force-pushing ${branch} → ${remote}"
+  if [[ -x scripts/git/remind-pr-body-append-only.sh ]]; then
+    # Strict by default in audited publisher — override with PR_BODY_UPDATE_ACK=1
+    # after append-pr-body.sh when PR body was intentionally updated this session.
+    PR_BODY_GUARD_STRICT="${PR_BODY_GUARD_STRICT:-1}" \
+      bash scripts/git/remind-pr-body-append-only.sh "$branch"
+  fi
+  git push --force-with-lease "$remote" "${branch}:${branch}"
 fi
-git push --force-with-lease "$remote" "${branch}:${branch}"
 
 echo "OK: published $(git rev-parse --short "$branch") to ${remote}/${branch}"

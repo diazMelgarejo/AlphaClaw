@@ -1,43 +1,79 @@
-```markdown
-# AlphaClaw Development Patterns
+---
+name: alphaclaw-conventions
+description: Development conventions and patterns for AlphaClaw. JavaScript Express project with conventional commits.
+---
 
-> Auto-generated skill from repository analysis
+# AlphaClaw Conventions
+
+> Generated from [diazMelgarejo/AlphaClaw](https://github.com/diazMelgarejo/AlphaClaw) on 2026-08-20
 
 ## Overview
 
-This skill outlines the core development patterns, coding conventions, and workflows used in the AlphaClaw codebase—a JavaScript project built on Express. AlphaClaw emphasizes clear commit practices, robust testing, platform-specific support, and a strong documentation culture. This guide will help you contribute effectively by following established conventions and workflows, ensuring code quality and maintainability.
+This skill outlines the core development patterns, coding conventions, and workflows used in the
+AlphaClaw codebase — a JavaScript project built on Express, emphasizing clear commit practices,
+robust testing, platform-specific support, and a strong documentation culture. It teaches Claude
+these conventions so contributions stay consistent with what the codebase already does.
+
+## Tech Stack
+
+- **Primary Language**: JavaScript
+- **Framework**: Express
+- **Architecture**: hybrid module organization (single package)
+- **Test Location**: separate (`tests/`)
+- **Test Framework**: vitest
+
+## When to Use This Skill
+
+Activate this skill when:
+- Making changes to this repository
+- Adding new features following established patterns
+- Writing tests that match project conventions
+- Creating commits with proper message format
 
 ## Coding Conventions
 
 **File Naming**
-- Use `kebab-case` for all file names.
-  - Example: `server-utils.js`, `platform-support.js`
 
-**Import Style**
-- Use relative imports for all modules.
-  - Example:
-    ```js
-    import { startServer } from '../server/start-server.js';
-    ```
+| Element | Convention |
+|---------|------------|
+| Files | kebab-case |
+| Functions | camelCase |
+| Classes | PascalCase |
+| Constants | SCREAMING_SNAKE_CASE |
 
-**Export Style**
-- Use named exports.
-  - Example:
-    ```js
-    // lib/platform.js
-    export function detectPlatform() { ... }
-    export const SUPPORTED_PLATFORMS = ['linux', 'darwin'];
-    ```
+- Example: `server-utils.js`, `platform-support.js`
+
+**Import Style: Relative Imports**
+
+```js
+// Use relative imports
+import { startServer } from '../server/start-server.js';
+```
+
+**Export Style: Named Exports**
+
+```js
+// lib/platform.js
+export function detectPlatform() { ... }
+export const SUPPORTED_PLATFORMS = ['linux', 'darwin'];
+```
 
 **Commit Messages**
-- Follow [Conventional Commits](https://www.conventionalcommits.org/) with these prefixes: `docs`, `fix`, `chore`, `feat`, `merge`, `test`.
-- Keep commit messages concise (average ~62 characters).
-  - Example: `feat(server): add onboarding route for new users`
+
+Follow [Conventional Commits](https://www.conventionalcommits.org/) with these prefixes: `docs`,
+`fix`, `chore`, `feat`, `merge`, `test`. Keep the first line concise (average ~62 characters across
+the repo's committed history) and in imperative mood ("Add feature", not "Added feature").
+
+```text
+feat(server): add onboarding route for new users
+```
+
+**Configuration files that reflect these conventions:** `.github/workflows/ci.yml`, `package.json`.
 
 ## Workflows
 
 ### Feature Development with Tests and Docs
-**Trigger:** When adding a new capability, platform support, or major fix  
+**Trigger:** When adding a new capability, platform support, or major fix
 **Command:** `/feature`
 
 1. Modify or add implementation files (e.g., `bin/alphaclaw.js`, `lib/server/`, `lib/platform.js`).
@@ -64,12 +100,12 @@ describe('newFeature', () => {
 ---
 
 ### Merge Upstream and Resolve Conflicts
-**Trigger:** When upstream changes need to be integrated into a long-lived PR or feature branch  
+**Trigger:** When upstream changes need to be integrated into a long-lived PR or feature branch
 **Command:** `/merge-upstream`
 
 1. Merge `upstream/main` or release branch into your working branch.
 2. Resolve merge conflicts, preserving custom logic or guards.
-3. Update `package-lock.json` and other affected files.
+3. Update `pnpm-lock.yaml` and other affected files.
 4. Run and fix tests as needed.
 
 **Example:**
@@ -77,14 +113,14 @@ describe('newFeature', () => {
 git fetch upstream
 git merge upstream/main
 # Resolve conflicts in files like bin/alphaclaw.js
-npm install
-npm test
+pnpm install
+pnpm test
 ```
 
 ---
 
 ### Platform-Specific Support and Testing
-**Trigger:** When adding support for a new OS or fixing platform-specific bugs  
+**Trigger:** When adding support for a new OS or fixing platform-specific bugs
 **Command:** `/platform-support`
 
 1. Add or update platform detection and logic (e.g., `lib/platform.js`, `bin/alphaclaw.js`).
@@ -103,7 +139,7 @@ export function isMacOS() {
 ---
 
 ### Test Failure Triage and Fix
-**Trigger:** When tests fail after a merge, refactor, or platform update  
+**Trigger:** When tests fail after a merge, refactor, or platform update
 **Command:** `/fix-tests`
 
 1. Identify failing/flaky tests.
@@ -114,7 +150,7 @@ export function isMacOS() {
 ---
 
 ### Documentation Knowledge System Update
-**Trigger:** When new lessons are learned, new workflows established, or after significant merges/fixes  
+**Trigger:** When new lessons are learned, new workflows established, or after significant merges/fixes
 **Command:** `/add-lesson`
 
 1. Add or update `docs/Lessons.MD` with session logs or lessons.
@@ -125,42 +161,90 @@ export function isMacOS() {
 ---
 
 ### CI Config and Cross-Platform Test Matrix Update
-**Trigger:** When adding platform support or improving test coverage in CI  
+**Trigger:** When adding platform support or improving test coverage in CI
 **Command:** `/ci-update`
 
 1. Update `.github/workflows/ci.yml` to add new OS matrix entries or test steps.
 2. Update or add scripts/tests to support new CI paths.
-3. Update `package.json`/`package-lock.json` if needed for platform-specific dependencies.
+3. Update `package.json`/`pnpm-lock.yaml` if needed for platform-specific dependencies.
 
----
+## Testing
 
-## Testing Patterns
+### Test Framework: vitest
 
-- Use [vitest](https://vitest.dev/) for all tests.
-- Test files follow the pattern: `*.test.js`.
-- Place server-side tests in `tests/server/` and frontend tests in `tests/frontend/`.
-- Example test file:
-  ```js
-  // tests/server/platform.test.js
-  import { detectPlatform } from '../../lib/platform.js';
-  import { describe, it, expect } from 'vitest';
+### File Pattern: `*.test.js`
 
-  describe('detectPlatform', () => {
-    it('should return "darwin" on macOS', () => {
-      // Mock process.platform if needed
-      expect(['linux', 'darwin']).toContain(detectPlatform());
-    });
+### Test Types
+
+- **Unit tests**: Test individual functions and components in isolation
+- **Integration tests**: Test interactions between multiple components/services
+- **E2e tests**: Test complete user flows through the application
+
+### Coverage
+
+This project has coverage reporting configured. Aim for 80%+ coverage.
+
+*Test file structure*
+
+```js
+// tests/server/platform.test.js
+import { detectPlatform } from '../../lib/platform.js';
+import { describe, it, expect, vi } from 'vitest';
+
+describe('detectPlatform', () => {
+  it('should return "darwin" on macOS', () => {
+    vi.spyOn(process, 'platform', 'get').mockReturnValue('darwin');
+    expect(detectPlatform()).toBe('darwin');
   });
-  ```
+});
+```
+
+## Error Handling
+
+### Error Handling Style: Try-Catch Blocks
+
+*Standard error handling pattern*
+
+```js
+try {
+  const result = await riskyOperation()
+  return result
+} catch (error) {
+  console.error('Operation failed:', error)
+  throw new Error('User-friendly message', { cause: error })
+}
+```
 
 ## Commands
 
-| Command         | Purpose                                                        |
-|-----------------|----------------------------------------------------------------|
-| /feature        | Start feature development with tests and documentation         |
-| /merge-upstream | Merge upstream changes and resolve conflicts                   |
-| /platform-support | Add or fix platform-specific logic and tests                |
-| /fix-tests      | Diagnose and fix failing or flaky tests                        |
-| /add-lesson     | Add or update documentation, lessons, or wiki pages            |
-| /ci-update      | Update CI configuration or test matrix                         |
-```
+| Command            | Purpose                                                  |
+|---------------------|-----------------------------------------------------------|
+| `/feature`          | Start feature development with tests and documentation    |
+| `/merge-upstream`   | Merge upstream changes and resolve conflicts               |
+| `/platform-support` | Add or fix platform-specific logic and tests               |
+| `/fix-tests`        | Diagnose and fix failing or flaky tests                    |
+| `/add-lesson`       | Add or update documentation, lessons, or wiki pages         |
+| `/ci-update`        | Update CI configuration or test matrix                     |
+
+## Best Practices
+
+Based on analysis of the codebase, follow these practices:
+
+### Do
+
+- Use conventional commit format (feat:, fix:, etc.)
+- Write tests using vitest
+- Follow *.test.js naming pattern
+- Use kebab-case for file names
+- Prefer named exports
+- Follow the documented Workflows above for their respective triggers
+
+### Don't
+
+- Don't write vague commit messages
+- Don't skip tests for new features
+- Don't deviate from established patterns without discussion
+
+---
+
+*This skill was auto-generated by [ECC Tools](https://ecc.tools), synthesized additively with prior AlphaClaw-specific workflow documentation. Review and customize as needed for your team.*
