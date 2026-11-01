@@ -68,7 +68,7 @@ describe("server/helpers", () => {
     const normalized = normalizeOnboardingModels([
       { key: "unknown/model-a", name: "Ignore me" },
       { key: "openai/gpt-5.1-codex", name: "OpenAI A" },
-      { key: "openrouter/anthropic/claude-sonnet-4-6", name: "OpenRouter Sonnet 4.6" },
+      { key: "openrouter/anthropic/claude-sonnet-5-5", name: "OpenRouter Sonnet 5.5" },
       { key: "codex/gpt-5.4-mini", name: "GPT-5.4-Mini" },
       { key: "anthropic/claude-opus-4-6", name: "Opus 4.6" },
       { key: "zai/glm-5", name: "GLM 5" },
@@ -96,9 +96,9 @@ describe("server/helpers", () => {
         agentRuntime: { id: "codex" },
       },
       {
-        key: "openrouter/anthropic/claude-sonnet-4-6",
+        key: "openrouter/anthropic/claude-sonnet-5-5",
         provider: "openrouter",
-        label: "OpenRouter Sonnet 4.6",
+        label: "OpenRouter Sonnet 5.5",
       },
       {
         key: "google/gemini-3.1-pro-preview",
