@@ -1,0 +1,6 @@
+{
+  "enabledMcpjsonServers": [
+    "xcode"
+  ],
+  "enableAllProjectMcpServers": true
+}

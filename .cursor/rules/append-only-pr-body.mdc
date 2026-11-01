@@ -1,0 +1,32 @@
+---
+description: Append-only PR body updates when human override authorizes a body edit (Layers 1–6)
+alwaysApply: true
+---
+
+# Append-only PR body workflow (Layers 1–6 — after human override only)
+
+**Layer 0 applies first:** `.cursor/rules/pr-body-comment-only.mdc` — Cursor agents
+**comment only** by default. This file governs body writes **only** after the operator
+runs `scripts/cursor/grant-pr-body-human-override.sh` (interactive; not agent-runnable).
+
+`ManagePullRequest update_pr`, `gh pr edit`, and GitHub's API **replace the entire PR body**
+when `body` is set. Passing only the latest follow-up paragraph deletes the original Summary.
+
+**Canonical skill:** `bin/orama-system/skills/cursor-pr-body/SKILL.md`  
+**Incident ledger:** `bin/orama-system/references/pr-body-anti-clobber-incident-ledger.md`  
+**Canonical script:** `scripts/cursor/append-pr-body.sh`
+
+## Non-negotiable workflow (human-authorized body edit only)
+
+| Step | Action |
+| ---- | ------ |
+| 1. **READ** | `gh pr view <N> --repo <owner/repo> --json body --jq .body` |
+| 2. **BACKUP** | Save to `.git/pr-body-backups/<repo-slug>-pr<N>-<UTC-timestamp>.md` |
+| 3. **MERGE** | Keep original `## Summary`; append `## Follow-up:` chronologically |
+| 4. **WRITE** | `append-pr-body.sh` or `gh pr edit --body-file` with **full** merged body |
+
+## Forbidden (even with human override)
+
+- Delta-only `body=` containing only the latest paragraph or CI delta
+- Skipping backup because "it's a small follow-up"
+- Reordering or deleting prior follow-ups
