@@ -213,6 +213,7 @@ describe("server/watchdog gateway hardening (e2e)", () => {
     expect(repairRes.body.ok).toBe(true);
     expect(clawCmd).toHaveBeenCalledWith("doctor --fix --yes", {
       quiet: true,
+      timeoutMs: expect.any(Number),
     });
     expect(launchGatewayProcess).toHaveBeenCalledTimes(1);
 

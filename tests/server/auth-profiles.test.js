@@ -81,6 +81,55 @@ afterAll(() => {
 });
 
 describe("server/auth-profiles", () => {
+  it("reads and writes the selected canonical agent without changing defaults or peers", () => {
+    const config = readJson("openclaw.json");
+    config.agents.entries = {
+      main: { model: { primary: "openai/gpt-5.6-sol", fallbacks: ["anthropic/claude-opus-4-6"] }, models: { "openai/gpt-5.6-sol": { alias: "Old" } }, modelPolicy: { allow: ["openai/gpt-5.6-sol"] }, identity: { name: "Claudia" } },
+      wolf: { model: "anthropic/claude-opus-4-6", models: { "anthropic/claude-opus-4-6": {} } },
+    };
+    config.agents.list = [{ id: "main", model: "stale/legacy" }];
+    fs.writeFileSync(path.join(tmpDir, ".openclaw/openclaw.json"), JSON.stringify(config));
+    expect(ap.getModelConfig("main").primary).toBe("openai/gpt-5.6-sol");
+    ap.setModelConfig({ primary: "openai/gpt-6.1-sol" }, "main");
+    const saved = readJson("openclaw.json");
+    expect(saved.agents.defaults).toEqual(config.agents.defaults);
+    expect(saved.agents.entries.wolf).toEqual(config.agents.entries.wolf);
+    expect(saved.agents.entries.main.model).toEqual({ primary: "openai/gpt-6.1-sol", fallbacks: ["anthropic/claude-opus-4-6"] });
+    expect(saved.agents.entries.main.models["openai/gpt-6.1-sol"]).toBeDefined();
+    expect(saved.agents.entries.main.modelPolicy.allow).toEqual(["openai/gpt-5.6-sol", "openai/gpt-6.1-sol"]);
+    expect(saved.agents.entries.main.models["openai/gpt-5.6-sol"].alias).toBe("Old");
+    expect(saved.agents.entries.main.identity.name).toBe("Claudia");
+    expect(saved.agents).not.toHaveProperty("list");
+    expect(saved.plugins.entries.codex.enabled).toBe(true);
+    expect(ap.getModelConfig("main").primary).toBe("openai/gpt-6.1-sol");
+  });
+
+  it("inherits defaults until a scoped save creates an override", () => {
+    expect(ap.getModelConfig("main").primary).toBe("anthropic/claude-opus-4-6");
+    ap.setModelConfig({ primary: "openai/gpt-6.1-sol", configuredModels: { "openai/gpt-6.1-sol": { agentRuntime: { id: "codex" } } } }, "main");
+    expect(ap.getModelConfig().primary).toBe("anthropic/claude-opus-4-6");
+    expect(ap.getModelConfig("main").configuredModels["openai/gpt-6.1-sol"].agentRuntime.id).toBe("codex");
+  });
+
+  it("rejects unknown agent scopes without modifying config", () => {
+    const before = readJson("openclaw.json");
+    for (const id of ["missing", "__proto__", "constructor"]) {
+      expect(() => ap.setModelConfig({ primary: "openai/gpt-6.1-sol" }, id)).toThrow("not found");
+      expect(() => ap.getModelConfig(id)).toThrow("not found");
+    }
+    expect(readJson("openclaw.json")).toEqual(before);
+  });
+
+  it("updates string-form global models and preserves explicit agent overrides", () => {
+    const config = readJson("openclaw.json");
+    config.agents.defaults.model = "anthropic/claude-opus-4-6";
+    config.agents.entries = { main: { model: "anthropic/claude-opus-4-6" } };
+    fs.writeFileSync(path.join(tmpDir, ".openclaw/openclaw.json"), JSON.stringify(config));
+    expect(ap.getModelConfig().primary).toBe("anthropic/claude-opus-4-6");
+    ap.setModelConfig({ primary: "openai/gpt-6.1-sol" });
+    expect(ap.getModelConfig().primary).toBe("openai/gpt-6.1-sol");
+    expect(ap.getModelConfig("main").primary).toBe("anthropic/claude-opus-4-6");
+  });
   it("reads and updates Codex OAuth credentials in the SQLite auth store", () => {
     const databasePath = path.join(
       tmpDir,

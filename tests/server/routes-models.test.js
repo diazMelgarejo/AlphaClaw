@@ -85,6 +85,22 @@ describe("server/routes/models", () => {
     }
   });
 
+  it("passes the selected agent scope through model reads and writes", async () => {
+    const deps = createModelDeps();
+    const app = createApp(deps);
+    const read = await request(app).get("/api/models/config?agentId=wolf");
+    expect(read.status).toBe(200);
+    expect(deps.authProfiles.getModelConfig).toHaveBeenCalledWith("wolf");
+    const write = await request(app).put("/api/models/config?agentId=wolf").send({
+      primary: "openai/gpt-6.1-sol",
+      configuredModels: { "openai/gpt-6.1-sol": {} },
+    });
+    expect(write.status).toBe(200);
+    expect(deps.authProfiles.setModelConfig).toHaveBeenCalledWith({
+      primary: "openai/gpt-6.1-sol",
+      configuredModels: { "openai/gpt-6.1-sol": {} },
+    }, "wolf");
+  });
   it("bootstraps with the bundled catalog, then returns normalized models from openclaw output", async () => {
     const deps = createModelDeps();
     deps.shellCmd.mockResolvedValue("noise");
@@ -305,7 +321,7 @@ describe("server/routes/models", () => {
       configuredModels: {
         "openai-codex/gpt-5.3-codex": {},
       },
-    });
+    }, undefined);
     expect(deps.authProfiles.syncConfigAuthReferencesForAgent).toHaveBeenCalledWith(
       undefined,
     );

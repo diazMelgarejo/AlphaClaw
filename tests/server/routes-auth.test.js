@@ -92,21 +92,30 @@ describe("server/routes/auth", () => {
       loginThrottle: { ...createLoginThrottle(), getClientKey },
     });
 
-    for (let i = 0; i < kLoginGlobalMaxAttempts - 1; i += 1) {
-      const res = await request(app)
+    // Keep one listener for the burst instead of repeatedly recycling ephemeral
+    // ports while other HTTP tests are running in parallel.
+    const server = app.listen(0);
+    try {
+      for (let i = 0; i < kLoginGlobalMaxAttempts - 1; i += 1) {
+        const res = await request(server)
+          .post("/api/auth/login")
+          .set("X-Forwarded-For", getTestIp(i))
+          .send({ password: "wrong" });
+        expect(res.status).toBe(401);
+      }
+
+      const res = await request(server)
         .post("/api/auth/login")
-        .set("X-Forwarded-For", getTestIp(i))
+        .set("X-Forwarded-For", getTestIp(kLoginGlobalMaxAttempts))
         .send({ password: "wrong" });
-      expect(res.status).toBe(401);
+
+      expect(res.status).toBe(429);
+      expect(res.headers["retry-after"]).toBeTruthy();
+    } finally {
+      await new Promise((resolve, reject) =>
+        server.close(error => error ? reject(error) : resolve()),
+      );
     }
-
-    const res = await request(app)
-      .post("/api/auth/login")
-      .set("X-Forwarded-For", getTestIp(kLoginGlobalMaxAttempts))
-      .send({ password: "wrong" });
-
-    expect(res.status).toBe(429);
-    expect(res.headers["retry-after"]).toBeTruthy();
   });
 
   it("sets auth cookie on success and allows protected API by cookie", async () => {

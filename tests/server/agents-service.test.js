@@ -1,3 +1,7 @@
+const fs = require("fs");
+const os = require("os");
+const path = require("path");
+const { DatabaseSync } = require("node:sqlite");
 const { createAgentsService } = require("../../lib/server/agents/service");
 
 const buildFsMock = ({ initialConfig = {}, fileContents = {} } = {}) => {
@@ -60,6 +64,26 @@ const buildFsMock = ({ initialConfig = {}, fileContents = {} } = {}) => {
 };
 
 describe("server/agents/service", () => {
+  it("edits the canonical agent and its allowlist instead of a stale legacy list", async () => {
+    const main = { identity: { name: "Claudia" }, model: { primary: "openai/gpt-5.6-sol", fallbacks: ["anthropic/claude-opus-4-6"] }, models: { "openai/gpt-5.6-sol": { alias: "Old" } }, modelPolicy: { allow: ["openai/gpt-5.6-sol"] } };
+    const wolf = { model: "anthropic/claude-opus-4-6" };
+    const fsMock = buildFsMock({ initialConfig: { agents: { defaults: { model: "anthropic/claude-opus-4-6" }, entries: { main, wolf }, list: [{ id: "main", model: "stale/legacy" }] } } });
+    const service = createAgentsService({ fs: fsMock, OPENCLAW_DIR: "/tmp/openclaw" });
+    expect(service.getAgent("main").model.primary).toBe("openai/gpt-5.6-sol");
+    await service.updateAgent("main", { model: { primary: "openai/gpt-6.1-sol" } });
+    const saved = fsMock.readConfig();
+    expect(saved.agents).not.toHaveProperty("list");
+    expect(saved.agents.entries.main).not.toHaveProperty("id");
+    expect(saved.agents.entries.main.model).toEqual({ primary: "openai/gpt-6.1-sol", fallbacks: ["anthropic/claude-opus-4-6"] });
+    expect(saved.agents.entries.main.models["openai/gpt-6.1-sol"]).toBeDefined();
+    expect(saved.agents.entries.main.modelPolicy.allow).toContain("openai/gpt-6.1-sol");
+    expect(saved.agents.entries.main.identity).toEqual(main.identity);
+    expect(saved.agents.entries.wolf.model).toBe(wolf.model);
+    expect(saved.plugins.entries.codex.enabled).toBe(true);
+    await service.updateAgent("main", { model: null });
+    expect(fsMock.readConfig().agents.entries.main).not.toHaveProperty("model");
+    expect(fsMock.readConfig().agents.entries.main.models["anthropic/claude-opus-4-6"]).toBeDefined();
+  });
   it("creates an agent without replacing implicit main agent", () => {
     const fsMock = buildFsMock({
       initialConfig: {
@@ -81,11 +105,11 @@ describe("server/agents/service", () => {
     const agents = service.listAgents();
 
     expect(agents.map((entry) => entry.id)).toEqual(["main", "ops"]);
-    expect(agents.find((entry) => entry.id === "main")?.default).toBe(true);
+    expect(agents.find((entry) => entry.id === "main")?.default).toBe(false);
     expect(agents.find((entry) => entry.id === "ops")?.default).toBe(false);
   });
 
-  it("sets a new default agent and unsets others", () => {
+  it("rejects retired default-agent selection for multi-agent fleets", () => {
     const fsMock = buildFsMock({
       initialConfig: {
         agents: {
@@ -101,10 +125,8 @@ describe("server/agents/service", () => {
       OPENCLAW_DIR: "/tmp/openclaw",
     });
 
-    service.setDefaultAgent("ops");
-    const agents = service.listAgents();
-    expect(agents.find((entry) => entry.id === "ops")?.default).toBe(true);
-    expect(agents.find((entry) => entry.id === "main")?.default).toBe(false);
+    expect(() => service.setDefaultAgent("ops")).toThrow("explicit channel bindings");
+    expect(fsMock.writeFileSync).not.toHaveBeenCalled();
   });
 
   it("creates agent with custom workspace folder", () => {
@@ -154,7 +176,7 @@ describe("server/agents/service", () => {
     const config = fsMock.readConfig();
 
     expect(updated).not.toHaveProperty("model");
-    expect(config.agents.list[0]).not.toHaveProperty("model");
+    expect(config.agents.entries.main).not.toHaveProperty("model");
   });
 
   it("enables the Codex plugin for an agent-level OpenAI model override", async () => {
@@ -230,7 +252,7 @@ describe("server/agents/service", () => {
       alsoAllow: ["read"],
       deny: ["session_status"],
     });
-    expect(fsMock.readConfig().agents.list[0].tools).toEqual({
+    expect(fsMock.readConfig().agents.entries.main.tools).toEqual({
       profile: "minimal",
       alsoAllow: ["read"],
       deny: ["session_status"],
@@ -255,11 +277,11 @@ describe("server/agents/service", () => {
       thinkingDefault: "high",
     });
     expect(updated.thinkingDefault).toBe("high");
-    expect(fsMock.readConfig().agents.list[0].thinkingDefault).toBe("high");
+    expect(fsMock.readConfig().agents.entries.main.thinkingDefault).toBe("high");
 
     const cleared = await service.updateAgent("main", { thinkingDefault: null });
     expect(cleared).not.toHaveProperty("thinkingDefault");
-    expect(fsMock.readConfig().agents.list[0]).not.toHaveProperty(
+    expect(fsMock.readConfig().agents.entries.main).not.toHaveProperty(
       "thinkingDefault",
     );
   });
@@ -352,7 +374,7 @@ describe("server/agents/service", () => {
 
     service.deleteAgent("ops", { keepWorkspace: true });
     const config = fsMock.readConfig();
-    expect(config.agents.list.map((entry) => entry.id)).toEqual(["main"]);
+    expect(Object.keys(config.agents.entries)).toEqual(["main"]);
     expect(config.bindings).toEqual([
       { agentId: "main", match: { channel: "telegram" } },
     ]);
@@ -625,6 +647,61 @@ describe("server/agents/service", () => {
             paired: 1,
             status: "paired",
           },
+        ],
+      },
+    ]);
+  });
+
+  it("includes paired status from OpenClaw SQLite channel state", () => {
+    const openclawDir = fs.mkdtempSync(path.join(os.tmpdir(), "alphaclaw-agent-pairing-"));
+    fs.mkdirSync(path.join(openclawDir, "state"), { recursive: true });
+    fs.writeFileSync(
+      path.join(openclawDir, "openclaw.json"),
+      JSON.stringify({
+        channels: {
+          telegram: {
+            enabled: true,
+            botToken: "${TELEGRAM_BOT_TOKEN}",
+            dmPolicy: "pairing",
+          },
+        },
+      }),
+      "utf8",
+    );
+    const db = new DatabaseSync(path.join(openclawDir, "state", "openclaw.sqlite"));
+    db.exec(`
+      CREATE TABLE channel_pairing_allow_entries (
+        channel_key TEXT NOT NULL,
+        account_id TEXT NOT NULL,
+        entry TEXT NOT NULL,
+        sort_order INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL
+      ) STRICT;
+      CREATE TABLE channel_pairing_requests (
+        channel_key TEXT NOT NULL,
+        account_id TEXT NOT NULL,
+        request_id TEXT NOT NULL,
+        code TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        last_seen_at TEXT NOT NULL,
+        meta_json TEXT
+      ) STRICT;
+      INSERT INTO channel_pairing_allow_entries
+        VALUES ('telegram', 'default', '1050628644', 0, 1);
+    `);
+    db.close();
+
+    const service = createAgentsService({ fs, OPENCLAW_DIR: openclawDir });
+
+    expect(service.listConfiguredChannelAccounts()).toEqual([
+      {
+        channel: "telegram",
+        accounts: [
+          expect.objectContaining({
+            id: "default",
+            paired: 1,
+            status: "paired",
+          }),
         ],
       },
     ]);
@@ -1604,7 +1681,7 @@ describe("server/agents/service", () => {
     expect(reloadEnv).toHaveBeenCalledTimes(2);
     expect(fsMock.readConfig()).toEqual({
       agents: {
-        list: [{ id: "main", default: true }],
+        entries: { main: {} },
       },
     });
   });

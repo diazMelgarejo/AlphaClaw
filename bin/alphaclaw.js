@@ -5,6 +5,23 @@ const fs = require("fs");
 const os = require("os");
 const path = require("path");
 const { execFileSync, execSync } = require("child_process");
+
+// Apply global path/port flags before loading project modules. Several of those
+// modules derive filesystem constants at require time, so waiting for the main
+// argument parser would make --root-dir point only part of the process at the
+// requested root.
+const bootstrapArgs = process.argv.slice(2);
+const bootstrapFlagValue = (flag) => {
+  const index = bootstrapArgs.indexOf(flag);
+  return index >= 0 && index + 1 < bootstrapArgs.length
+    ? bootstrapArgs[index + 1]
+    : undefined;
+};
+const bootstrapRootDir = bootstrapFlagValue("--root-dir");
+if (bootstrapRootDir) process.env.ALPHACLAW_ROOT_DIR = bootstrapRootDir;
+const bootstrapPort = bootstrapFlagValue("--port");
+if (bootstrapPort) process.env.PORT = bootstrapPort;
+
 const {
   normalizeGitSyncFilePath,
   validateGitSyncFilePath,
@@ -23,8 +40,15 @@ const {
 } = require("../lib/cli/openclaw-config-restore");
 const { buildSecretReplacements } = require("../lib/server/helpers");
 const {
+  ensureLegacyCompatibilityDefaults,
   migrateLegacyTelegramStreamingConfig,
 } = require("../lib/server/openclaw-config-migrations");
+const {
+  runOpenclawDoctorPreflight,
+} = require("../lib/server/openclaw-doctor-preflight");
+const {
+  reconcileOpenclawChannelPlugins,
+} = require("../lib/server/openclaw-channel-plugin-preflight");
 const {
   migrateManagedInternalFiles,
 } = require("../lib/server/internal-files-migration");
@@ -430,15 +454,7 @@ const runGitSync = () => {
   try {
     fs.writeFileSync(
       askPassPath,
-      [
-        "#!/usr/bin/env sh",
-        'case "$1" in',
-        '  *Username*) echo "x-access-token" ;;',
-        '  *Password*) echo "${GITHUB_TOKEN:-}" ;;',
-        '  *) echo "" ;;',
-        "esac",
-        "",
-      ].join("\n"),
+      fs.readFileSync(path.join(__dirname, "..", "lib", "scripts", "git-askpass"), "utf8"),
       { mode: 0o700 },
     );
 
@@ -966,8 +982,48 @@ if (fs.existsSync(path.join(openclawDir, ".git"))) {
 // that prevents the CLI from starting.
 if (fs.existsSync(configPath)) {
   try {
+    const result = runOpenclawDoctorPreflight({
+      configPath,
+      stateDir: openclawDir,
+      env: process.env,
+    });
+    if (result.retiredManagedExecApprovals?.retired) {
+      console.log(
+        `[alphaclaw] Archived retired exec approvals stub at ${result.retiredManagedExecApprovals.archivePath}`,
+      );
+    }
+    if (result.changed) {
+      console.log(
+        `[alphaclaw] Migrated OpenClaw config from ${result.fromVersion} to ${result.toVersion}`,
+      );
+    }
+  } catch (error) {
+    console.error(`[alphaclaw] Fatal preflight error: ${error.message}`);
+    process.exit(1);
+  }
+}
+
+if (fs.existsSync(configPath)) {
+  try {
+    const result = reconcileOpenclawChannelPlugins({ env: process.env });
+    for (const update of result.updated) {
+      console.log(
+        `[alphaclaw] Aligned ${update.id} channel plugin from ${update.fromVersion} to ${update.toVersion}`,
+      );
+    }
+  } catch (error) {
+    console.error(
+      `[alphaclaw] Channel plugin preflight skipped: ${error.message}`,
+    );
+  }
+}
+
+if (fs.existsSync(configPath)) {
+  try {
     const cfg = JSON.parse(fs.readFileSync(configPath, "utf8"));
-    if (migrateLegacyTelegramStreamingConfig(cfg)) {
+    const migratedTelegram = migrateLegacyTelegramStreamingConfig(cfg);
+    const appliedCompatibilityDefaults = ensureLegacyCompatibilityDefaults(cfg);
+    if (migratedTelegram || appliedCompatibilityDefaults) {
       let content = `${JSON.stringify(cfg, null, 2)}\n`;
       for (const [secret, envRef] of buildSecretReplacements(process.env)) {
         if (!secret) continue;
@@ -976,26 +1032,18 @@ if (fs.existsSync(configPath)) {
           .join(JSON.stringify(envRef));
       }
       fs.writeFileSync(configPath, content, "utf8");
-      console.log("[alphaclaw] Migrated legacy Telegram streaming config");
+      if (migratedTelegram) {
+        console.log("[alphaclaw] Migrated legacy Telegram streaming config");
+      }
+      if (appliedCompatibilityDefaults) {
+        console.log("[alphaclaw] Applied legacy-compatible OpenClaw defaults");
+      }
     }
   } catch (error) {
     console.error(
       `[alphaclaw] Preflight config migration failed: ${error.message}`,
     );
-  }
-}
-
-if (fs.existsSync(configPath)) {
-  try {
-    execFileSync(process.execPath, [
-      path.join(__dirname, "..", "lib", "scripts", "migrate-openclaw-codex.js"),
-    ], {
-      env: process.env,
-      stdio: "inherit",
-      timeout: 60_000,
-    });
-  } catch (error) {
-    console.error(`[alphaclaw] Codex migration process failed: ${error.message}`);
+    process.exit(1);
   }
 }
 

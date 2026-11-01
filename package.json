@@ -28,12 +28,13 @@
     "test:watch": "vitest",
     "test:watchdog": "vitest run tests/server/watchdog.test.js tests/server/watchdog-db.test.js tests/server/routes-watchdog.test.js",
     "test:coverage": "vitest run --coverage",
+    "preinstall": "node lib/scripts/check-node-runtime.js",
     "prepack": "npm run build:ui"
   },
   "dependencies": {
-    "express": "^4.21.0",
+    "express": "^5.2.1",
     "http-proxy": "^1.18.1",
-    "openclaw": "2026.7.1-2",
+    "openclaw": "2026.10.6",
     "ws": "^8.19.0"
   },
   "devDependencies": {
@@ -52,7 +53,7 @@
   },
   "packageManager": "pnpm@10.26.0",
   "engines": {
-    "node": ">=22.22.3 <23 || >=24.15.0 <25 || >=25.9.0"
+    "node": ">=24.22.1 <25 || >=26.12.1"
   },
   "optionalDependencies": {
     "@esbuild/darwin-arm64": "0.25.x",
