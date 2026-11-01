@@ -4,6 +4,16 @@
 
 ---
 
+http://192.168.9.238:1234	qwen3.5-27b-claude-4.6-opus-reasoning-distilled-v2
+http://192.168.8.153:1234	gemma-4-26b-a4b-it-nvfp4
+
+---
+
+http://192.168.9.238:1234\tqwen3.5-27b-claude-4.6-opus-reasoning-distilled-v2
+http://192.168.8.153:1234\tgemma-4-26b-a4b-it-nvfp4
+
+---
+
 ## Launcher Setup (lab machine)
 
 ### Node / npm
