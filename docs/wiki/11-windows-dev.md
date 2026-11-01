@@ -4,13 +4,22 @@
 
 ---
 
-http://192.168.9.238:1234	qwen3.5-27b-claude-4.6-opus-reasoning-distilled-v2
-http://192.168.8.153:1234	gemma-4-26b-a4b-it-nvfp4
+## LM Studio endpoints (Windows GPU nodes)
 
----
+Each Windows GPU node serves LM Studio on port 1234. Addresses come from DHCP,
+so never write them in tracked files. Set them once in `.env.local`
+(`LM_STUDIO_WIN_ENDPOINTS=http://<node-1>:1234,http://<node-2>:1234`) or let
+discovery write `~/.openclaw/state/last_discovery.json`.
 
-http://192.168.9.238:1234\tqwen3.5-27b-claude-4.6-opus-reasoning-distilled-v2
-http://192.168.8.153:1234\tgemma-4-26b-a4b-it-nvfp4
+| Node | GPU | LM Studio model IDs |
+| ---- | --- | ------------------- |
+| `win-rtx3080` | RTX 3080, 10 GB | `qwen3.5-27b-claude-4.6-opus-reasoning-distilled-v2`, `gemma-4-26b-a4b-it` (Q4_K_M), `qwen/qwen3.8-27b` (benchmark pending) |
+| `win-rtx5080` | RTX 5080, 16 GB | `gemma-4-26b-a4b-it-nvfp4`, `qwen/qwen3.8-27b` (benchmark pending), `diffusiongemma-26b-a4b-it-nvfp4` (text-to-image; benchmark later) |
+
+Model placement, offload and benchmarks live in Perpetua-Tools
+[`config/models.yml`](https://github.com/diazMelgarejo/Perpetua-Tools/blob/main/config/models.yml)
+and [`hardware/SKILL.md`](https://github.com/diazMelgarejo/Perpetua-Tools/blob/main/hardware/SKILL.md);
+this table only names what each node serves.
 
 ---
 
