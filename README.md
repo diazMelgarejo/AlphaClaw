@@ -25,7 +25,7 @@
 
 <p align="center"><strong>Render sponsors AlphaClaw.</strong> Redeem $50 in Render credits with code <code>RENDER-ALPHACLAW</code>.</p>
 
-> **Platform:** AlphaClaw currently targets Docker/Linux deployments. macOS local development is not yet supported.
+> **Platform:** AlphaClaw supports Docker/Linux deployments and local macOS development. Linux installs the hourly git sync via `/etc/cron.d`; macOS runs the sync schedule from AlphaClaw's managed in-process scheduler.
 
 ## Features
 
