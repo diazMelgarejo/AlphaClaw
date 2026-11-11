@@ -1,6 +1,6 @@
 {
   "name": "@chrysb/alphaclaw",
-  "version": "0.9.36",
+  "version": "0.9.38-beta.1",
   "publishConfig": {
     "access": "public"
   },
@@ -34,7 +34,7 @@
   "dependencies": {
     "express": "^5.2.1",
     "http-proxy": "^1.18.1",
-    "openclaw": "2026.9.3",
+    "openclaw": "2026.10.6",
     "ws": "^8.19.0"
   },
   "devDependencies": {
@@ -52,6 +52,6 @@
     "wouter-preact": "^3.7.1"
   },
   "engines": {
-    "node": ">=24.16.0 <25 || >=26.1.0"
+    "node": ">=24.22.1 <25 || >=26.12.1"
   }
 }

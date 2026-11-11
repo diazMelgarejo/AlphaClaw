@@ -5,6 +5,23 @@ const fs = require("fs");
 const os = require("os");
 const path = require("path");
 const { execFileSync, execSync } = require("child_process");
+
+// Apply global path/port flags before loading project modules. Several of those
+// modules derive filesystem constants at require time, so waiting for the main
+// argument parser would make --root-dir point only part of the process at the
+// requested root.
+const bootstrapArgs = process.argv.slice(2);
+const bootstrapFlagValue = (flag) => {
+  const index = bootstrapArgs.indexOf(flag);
+  return index >= 0 && index + 1 < bootstrapArgs.length
+    ? bootstrapArgs[index + 1]
+    : undefined;
+};
+const bootstrapRootDir = bootstrapFlagValue("--root-dir");
+if (bootstrapRootDir) process.env.ALPHACLAW_ROOT_DIR = bootstrapRootDir;
+const bootstrapPort = bootstrapFlagValue("--port");
+if (bootstrapPort) process.env.PORT = bootstrapPort;
+
 const {
   shouldSkipSystemCronInstall,
   resolveGitAskPassPath,
@@ -351,15 +368,7 @@ const runGitSync = () => {
   try {
     fs.writeFileSync(
       askPassPath,
-      [
-        "#!/usr/bin/env sh",
-        'case "$1" in',
-        '  *Username*) echo "x-access-token" ;;',
-        '  *Password*) echo "${GITHUB_TOKEN:-}" ;;',
-        '  *) echo "" ;;',
-        "esac",
-        "",
-      ].join("\n"),
+      fs.readFileSync(path.join(__dirname, "..", "lib", "scripts", "git-askpass"), "utf8"),
       { mode: 0o700 },
     );
 
@@ -876,20 +885,6 @@ if (fs.existsSync(configPath)) {
       `[alphaclaw] Preflight config migration failed: ${error.message}`,
     );
     process.exit(1);
-  }
-}
-
-if (fs.existsSync(configPath)) {
-  try {
-    execFileSync(process.execPath, [
-      path.join(__dirname, "..", "lib", "scripts", "migrate-openclaw-codex.js"),
-    ], {
-      env: process.env,
-      stdio: "inherit",
-      timeout: 60_000,
-    });
-  } catch (error) {
-    console.error(`[alphaclaw] Codex migration process failed: ${error.message}`);
   }
 }
 
