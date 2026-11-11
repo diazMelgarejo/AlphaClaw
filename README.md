@@ -94,6 +94,18 @@ ENTRYPOINT ["/usr/bin/tini", "--"]
 CMD ["alphaclaw", "start"]
 ```
 
+The server listens on `127.0.0.1` by default on bare metal. When
+`/.dockerenv` is present, it listens on `0.0.0.0` so Docker bridge networking
+and published ports can reach it. `ALPHACLAW_ROOT_DIR` does not affect binding.
+Set `ALPHACLAW_BIND_HOST` before starting AlphaClaw to override either default
+(for example, `0.0.0.0` for a container without that marker, or `127.0.0.1`
+for Docker host networking). Blank values use the default. Restart AlphaClaw
+after changing it.
+
+Binding all interfaces does not restrict who can reach the Setup UI. Limit
+Docker port publishing to host loopback (for example, `127.0.0.1:3000:3000`)
+or use firewall/reverse-proxy access controls when remote access is required.
+
 ## Setup UI
 
 | Tab           | What it manages                                                                                                          |
@@ -163,6 +175,7 @@ The built-in watchdog monitors gateway health and recovers from failures automat
 | `WATCHDOG_AUTO_REPAIR`            | Optional | Enable auto-repair on crash (`true`/`false`)       |
 | `WATCHDOG_NOTIFICATIONS_DISABLED` | Optional | Disable watchdog notifications (`true`/`false`)    |
 | `PORT`                            | Optional | Server port (default `3000`)                       |
+| `ALPHACLAW_BIND_HOST`             | Optional | Listen address override (default loopback; all IPv4 interfaces when `/.dockerenv` is present) |
 | `ALPHACLAW_ROOT_DIR`              | Optional | Data directory (default `/data`)                   |
 | `ALPHACLAW_SKIP_SYSTEM_CRON_INSTALL` | Optional | Skip writes to `/etc/cron.d` while keeping cron config (`true`/`false`); the managed hourly script still exits when sync is disabled |
 | `ALPHACLAW_GIT_SHIM_PATH`         | Optional | Install the managed git auth shim at this path and prepend its directory to runtime `PATH` (default `/usr/local/bin/git`) |
