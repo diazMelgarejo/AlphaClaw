@@ -39,7 +39,7 @@ Runtime model:
 - Follow existing UI conventions and shared components for consistency.
 - Reuse existing server route and state patterns before introducing new abstractions.
 - Update tests when behavior changes in routes, watchdog flows, or setup state.
-- Before running tests in a fresh checkout, run `npm install` so `vitest` (devDependency) is available for `npm test`.
+- Before running tests in a fresh checkout, run `pnpm install` so `vitest` (devDependency) is available for `pnpm test`.
 
 ### Code Structure
 
@@ -71,6 +71,21 @@ Runtime model:
 - **This file (`AGENTS.md`):** Project-level guidance for coding agents working on the AlphaClaw codebase — architecture, conventions, release flow, UI patterns, etc.
 - **`lib/setup/core-prompts/AGENTS.md`:** Runtime prompt injected into the OpenClaw agent's system prompt. Only write there when the guidance is meant for the deployed agent's behavior, not for coding on this project.
 
+### Prime directives for agent-maintained records
+
+- Treat vulnerability memory, lessons, audits, and review ledgers as append-only historical records. Do not erase, delete, replace, truncate, or rewrite prior entries unless the user explicitly instructs that exact destructive action.
+- When a record is stale, defunct, remediated, duplicated, or superseded, update it additively: add or change status/notes/feedback fields, append a follow-up entry, or link to the replacement. Preserve the original evidence and dates.
+- For JSON records, load and write with structured parsers (`json.load` / `json.dump(..., indent=4)` in Python). Never hand-edit by string concatenation, ad hoc patches, or regex substitutions.
+- Before any destructive or ambiguity-prone record operation, use AskUserQuestions: ask the user which record to change, what status to apply, and whether deletion/replacement is truly intended.
+- Git attribution must stay policy-compliant: primary author may be one of the approved owner emails or an approved well-known AI author such as `Codex <codex@openai.com>`; `Co-authored-by` may include well-known public AI/helper domains and markers, but random/unattributable Gmail co-authors are blocked.
+
+### Security PR stacking directive
+
+- Before opening or preparing any security-remediation PR, read the canonical security policy in `../orama-system/docs/SECURITY-POLICY.md` and follow its "Security PR stacking and merge strategy" section.
+- Merge or revive existing security-priority branches before creating duplicate replacement branches.
+- Stack security PRs in policy-priority order: `PR1` starts from `main`; each `PR(N+1)` is rebased on the previous PR branch before opening.
+- Rebasing or force-updating an existing remote branch requires explicit current user authorization.
+
 ## Operations
 
 ### Release Flow (Beta -> Production)
@@ -79,15 +94,15 @@ Use this release flow when promoting tested beta builds to production:
 
 1. Ensure `main` is clean and synced, and tests pass.
 2. Publish beta iterations as needed:
-   - `npm version prerelease --preid=beta`
-   - `git push && git push --tags`
-   - `npm publish --tag beta`
+   - `pnpm version prerelease --preid=beta`
+   - `bash scripts/git/publish-clean-branch.sh <branch> main origin && git push origin --tags`
+   - `pnpm publish --tag beta`
 3. Immediately after each beta publish, update `~/Projects/openclaw-railway-template` on the `beta` branch to pin the exact beta version in `package.json` (for example `0.3.2-beta.4`), then commit and push that template change. Do not leave the beta template on `latest`, or Docker layer cache can reuse an older install.
 4. When ready for production, publish a stable release version (for example `0.3.2`):
-   - `npm version 0.3.2`
-   - `git push && git push --tags`
-   - `npm publish` (publishes to `latest`)
-   - Pin all deployment templates on `main` to that release: set `@chrysb/alphaclaw` in `~/Projects/openclaw-railway-template`, `~/Projects/openclaw-render-template`, and `~/Projects/openclaw-apex-template` to the released version. The Render checkout must track `render-examples/openclaw-render-template`; verify `gh api repos/render-examples/openclaw-render-template --jq '.permissions.push'` returns `true` before publishing, and stop if write access is missing. Templates rely on AlphaClaw’s declared `openclaw` dependency — do not add `package.json` `overrides` for `openclaw` unless you have a one-off debug reason. Run `npm install` in each repo, confirm `npm ls openclaw` matches AlphaClaw’s `package.json` pin, commit `package.json` and `package-lock.json`, and push. Skipping a template leaves it stale relative to the others.
+   - `pnpm version 0.3.2`
+   - `bash scripts/git/publish-clean-branch.sh <branch> main origin && git push origin --tags`
+   - `pnpm publish` (publishes to `latest`)
+   - Pin all deployment templates on `main` to that release: set `@chrysb/alphaclaw` in `~/Projects/openclaw-railway-template`, `~/Projects/openclaw-render-template`, and `~/Projects/openclaw-apex-template` to the released version. The Render checkout must track `render-examples/openclaw-render-template`; verify `gh api repos/render-examples/openclaw-render-template --jq '.permissions.push'` returns `true` before publishing, and stop if write access is missing. Templates rely on AlphaClaw's declared `openclaw` dependency — do not add `package.json` `overrides` for `openclaw` unless you have a one-off debug reason. Run `pnpm install` in each repo, confirm `pnpm ls openclaw` matches AlphaClaw's `package.json` pin, commit `package.json` and `pnpm-lock.yaml`, and push. Skipping a template leaves it stale relative to the others.
 5. Return templates to production channel:
    - `@chrysb/alphaclaw: "latest"`
 6. Optionally keep beta branch/tag flows active for next release cycle.
@@ -233,3 +248,29 @@ Use these conventions for all UI work under `lib/public/js` and `lib/public/css`
 - All standalone `localStorage` keys are defined in `lib/public/js/lib/storage-keys.js`. Import keys from this file — never define raw localStorage key strings inline in components.
 - Use the naming convention `alphaclaw.<area>.<purpose>` for new keys (e.g. `alphaclaw.doctor.lastSessionKey`).
 - Keys that live inside the `alphaclaw.ui.settings` JSON blob (e.g. `browseLastPath`, `doctorWarningDismissedUntilMs`) are sub-keys, not standalone localStorage entries — those stay in their consuming file.
+
+## Coding Tasks
+
+When spawning Claude Code sessions for coding work, tell the session to use gstack skills.
+
+Examples:
+
+- **Security audit:** "Load gstack. Run /cso"
+- **Code review:** "Load gstack. Run /review"
+- **QA test a URL:** "Load gstack. Run /qa https://..."
+- **Build a feature end-to-end:** "Load gstack. Run /autoplan, implement the plan, then run /ship"
+- **Plan before building:** "Load gstack. Run /office-hours then /autoplan. Save the plan, don't implement."
+
+## Cursor Cloud: git commits
+
+Cloud agents may inject `Co-authored-by` trailers via `~/.cursor/agent-hooks/…/commit-msg.cursor.co-author`. Run on VM boot:
+
+```bash
+bash scripts/git/apply-attribution-guard-all-repos.sh
+```
+
+Hook-free commits: `bash scripts/git/commit-clean.sh -m "type(scope): summary"`.
+
+**Fork policy:** `main` tracks upstream only. Integration branch: `feature/MacOS-post-install`. Open PRs from `cursor/sync-attribution-guards-6421` → `feature/MacOS-post-install` (not → `main`).
+
+See orama-system `docs/wiki/12-cursor-cloud-commit-attribution.md` and `docs/wiki/13-alphaclaw-fork-contrib-branches.md`.

@@ -1,0 +1,11 @@
+overrides:
+  'express@5.2.1>body-parser': 2.4.0
+  'postcss-nested@6.2.0>postcss-selector-parser': 6.1.5
+  'tailwindcss@3.4.17>postcss-selector-parser': 6.1.5
+
+allowBuilds:
+  '@google/genai': true
+  esbuild: true
+  openclaw: true
+  protobufjs: true
+  tree-sitter-bash: true
